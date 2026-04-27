@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useProjects } from "@/hooks/useProjects";
 import { useLang } from "@/contexts/LangContext";
+import { useAssistant } from "@/contexts/AssistantContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RiskBadge } from "@/components/RiskBadge";
@@ -48,6 +50,7 @@ export default function ProjectDetail() {
   const { id = "" } = useParams();
   const { get } = useProjects();
   const { tr } = useLang();
+  const { setPageContext, setInput } = useAssistant();
   const project = get(id);
 
   const buildingLabel: Record<number, string> = {
@@ -55,6 +58,23 @@ export default function ProjectDetail() {
     [BuildingType.comercial]: tr.bt_commercial,
     [BuildingType.industrial]: tr.bt_industrial,
   };
+
+  useEffect(() => {
+    if (project) {
+      setPageContext({ page: "project_detail", payload: { project } });
+      setInput({
+        buildingType: project.building_type,
+        usage: project.usage,
+        areaM2: project.area_m2 || undefined,
+        floors: project.floors,
+        occupants: project.occupants,
+        ceilingHeight: project.ceiling_height_m,
+        volume: project.volume_m3,
+      });
+    } else {
+      setPageContext({ page: "project_detail", payload: { id } });
+    }
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <DashboardLayout>

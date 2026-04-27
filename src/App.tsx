@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound.tsx";
 import { LangProvider } from "@/contexts/LangContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AssistantProvider } from "@/contexts/AssistantContext";
 import { RequireAuth } from "@/components/RequireAuth";
 import Evaluator from "./pages/Evaluator.tsx";
 
@@ -24,6 +25,7 @@ const App = () => (
     <ThemeProvider>
       <AuthProvider>
         <LangProvider>
+          <AssistantProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
@@ -42,6 +44,7 @@ const App = () => (
               </Routes>
             </BrowserRouter>
           </TooltipProvider>
+          </AssistantProvider>
         </LangProvider>
       </AuthProvider>
     </ThemeProvider>

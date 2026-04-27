@@ -7,6 +7,7 @@ import { ChatPanel } from "@/components/ChatPanel";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLang } from "@/contexts/LangContext";
+import { useAssistant } from "@/contexts/AssistantContext";
 import { fireCodeApi, BuildingType, RuleCategory } from "@/services/fireCodeApi";
 import { type Msg } from "@/components/ChatPanel";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,7 @@ const CATEGORY_TABS: { type: string; value: RuleCategory }[] = [
 
 const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { tr, lang } = useLang();
+  const assistant = useAssistant();
 
   const [building, setBuilding]         = useState<BuildingType>(BuildingType.comercial);
   const [area, setArea]                 = useState<number>(0);
@@ -43,10 +45,30 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<Msg[]>([]);
 
+  // /demo only: lock body when local chat modal opens
   useEffect(() => {
+    if (embedded) return;
     document.body.style.overflow = chatOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [chatOpen]);
+  }, [chatOpen, embedded]);
+
+  // Dashboard: sync evaluator state into global assistant
+  useEffect(() => {
+    if (!embedded) return;
+    assistant.setInput({
+      buildingType: building,
+      usage: context,
+      areaM2: area || undefined,
+      floors: floors || undefined,
+      occupants: occupants || undefined,
+      ceilingHeight: ceilingHeight || undefined,
+      volume: volume || undefined,
+    });
+    assistant.setPageContext({
+      page: "evaluation",
+      payload: { building, usage: context, area, floors, occupants, ceilingHeight, volume },
+    });
+  }, [embedded, building, context, area, floors, occupants, ceilingHeight, volume]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filters = { building, area, context, floors, occupants, ceilingHeight, volume };
 
@@ -278,26 +300,27 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
             )}
           </div>
 
-          {/* ── RIGHT COLUMN: chat — desktop only, sticky below header ── */}
-          <div
-            className={cn(
-              "no-print hidden lg:flex lg:w-[360px] lg:shrink-0 lg:flex-col lg:sticky",
-              embedded ? "lg:top-2" : "lg:top-[4.5rem]"
-            )}
-            style={{ height: embedded ? "calc(100dvh - 4.5rem)" : "calc(100dvh - 5.5rem)" }}
-          >
-            <ChatPanel
-              buildingType={building}
-              usage={context}
-              areaM2={area         || undefined}
-              floors={floors       || undefined}
-              occupants={occupants || undefined}
-              ceilingHeight={ceilingHeight || undefined}
-              volume={volume       || undefined}
-              messages={chatMessages}
-              setMessages={setChatMessages}
-            />
-          </div>
+          {/* ── RIGHT COLUMN: chat — /demo only. In dashboard the global assistant is used. ── */}
+          {!embedded && (
+            <div
+              className={cn(
+                "no-print hidden lg:flex lg:w-[360px] lg:shrink-0 lg:flex-col lg:sticky lg:top-[4.5rem]"
+              )}
+              style={{ height: "calc(100dvh - 5.5rem)" }}
+            >
+              <ChatPanel
+                buildingType={building}
+                usage={context}
+                areaM2={area         || undefined}
+                floors={floors       || undefined}
+                occupants={occupants || undefined}
+                ceilingHeight={ceilingHeight || undefined}
+                volume={volume       || undefined}
+                messages={chatMessages}
+                setMessages={setChatMessages}
+              />
+            </div>
+          )}
         </div>
 
         <footer className="shrink-0 pt-2 pb-1 text-center text-xs text-muted-foreground no-print">
@@ -305,8 +328,8 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
         </footer>
       </main>
 
-      {/* ── Mobile chat modal, lg:hidden ── */}
-      {chatOpen && (
+      {/* ── Mobile chat modal — /demo only ── */}
+      {!embedded && chatOpen && (
         <div className="lg:hidden">
           {/* Backdrop */}
           <div
