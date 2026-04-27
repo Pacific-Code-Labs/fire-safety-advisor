@@ -7,6 +7,7 @@ import { ChatPanel } from "@/components/ChatPanel";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLang } from "@/contexts/LangContext";
+import { useAssistant } from "@/contexts/AssistantContext";
 import { fireCodeApi, BuildingType, RuleCategory } from "@/services/fireCodeApi";
 import { type Msg } from "@/components/ChatPanel";
 import { cn } from "@/lib/utils";
