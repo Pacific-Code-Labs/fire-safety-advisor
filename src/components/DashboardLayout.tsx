@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { GlobalAssistant } from "@/components/GlobalAssistant";
 
 function AppSidebar() {
   const { tr } = useLang();
@@ -155,6 +156,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
             <div className="container max-w-6xl py-6 px-4 sm:px-6">{children}</div>
           </main>
         </div>
+        <GlobalAssistant />
       </div>
     </SidebarProvider>
   );
