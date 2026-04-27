@@ -300,27 +300,27 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
             )}
           </div>
 
-          {/* ── RIGHT COLUMN: chat — desktop only, sticky below header ── */}
-          <div
-            className={cn(
-              "no-print hidden lg:flex lg:w-[360px] lg:shrink-0 lg:flex-col lg:sticky",
-              embedded ? "lg:top-2" : "lg:top-[4.5rem]"
-            )}
-            style={{ height: embedded ? "calc(100dvh - 4.5rem)" : "calc(100dvh - 5.5rem)" }}
-          >
-            <ChatPanel
-              buildingType={building}
-              usage={context}
-              areaM2={area         || undefined}
-              floors={floors       || undefined}
-              occupants={occupants || undefined}
-              ceilingHeight={ceilingHeight || undefined}
-              volume={volume       || undefined}
-              messages={chatMessages}
-              setMessages={setChatMessages}
-            />
-          </div>
-        </div>
+          {/* ── RIGHT COLUMN: chat — /demo only. In dashboard the global assistant is used. ── */}
+          {!embedded && (
+            <div
+              className={cn(
+                "no-print hidden lg:flex lg:w-[360px] lg:shrink-0 lg:flex-col lg:sticky lg:top-[4.5rem]"
+              )}
+              style={{ height: "calc(100dvh - 5.5rem)" }}
+            >
+              <ChatPanel
+                buildingType={building}
+                usage={context}
+                areaM2={area         || undefined}
+                floors={floors       || undefined}
+                occupants={occupants || undefined}
+                ceilingHeight={ceilingHeight || undefined}
+                volume={volume       || undefined}
+                messages={chatMessages}
+                setMessages={setChatMessages}
+              />
+            </div>
+          )}
 
         <footer className="shrink-0 pt-2 pb-1 text-center text-xs text-muted-foreground no-print">
           {tr.disclaimer}
