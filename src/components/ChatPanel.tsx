@@ -1,15 +1,32 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Sparkles, AlertTriangle, BookOpen, MapPin, Loader2, Trash2, X } from "lucide-react";
+import { Send, Sparkles, Loader2, Trash2, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
 import { fireCodeApi, BuildingType, type EvaluateResponse } from "@/services/fireCodeApi";
+import {
+  normalizeAssistantResponse,
+  type ProjectCreatedData,
+  type MessageData,
+} from "@/lib/assistantResponse";
+import { TextMessage } from "@/components/assistant/TextMessage";
+import { EvaluationCard } from "@/components/assistant/EvaluationCard";
+import { ProjectCard } from "@/components/assistant/ProjectCard";
 import { cn } from "@/lib/utils";
+
+export type MsgType = "message" | "evaluation" | "project" | "error";
 
 export interface Msg {
   role: "user" | "assistant";
+  /** Free-text fallback / summary line */
   text: string;
+  /** Discriminator for assistant payload rendering */
+  type?: MsgType;
+  /** Legacy: full evaluation response (kept for backward compat) */
   answer?: EvaluateResponse;
+  /** New polymorphic payload */
+  payload?: EvaluateResponse | ProjectCreatedData | MessageData;
 }
 
 interface Props {
@@ -33,15 +50,77 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const suggestions = lang === "es"
     ? ["¿Qué sistema necesita un restaurante?", "¿Dónde instalo detectores de humo?", "¿Necesito rociadores en una bodega?"]
     : ["What system does a restaurant need?", "Where do I install smoke detectors?", "Do I need sprinklers in a warehouse?"];
 
+  const handleResponse = (raw: unknown) => {
+    const norm = normalizeAssistantResponse(raw);
+
+    switch (norm.type) {
+      case "evaluation": {
+        const data = norm.data;
+        const summary = data.matchedRules.length > 0
+          ? lang === "es"
+            ? `Encontré ${data.matchedRules.length} norma(s) aplicable(s).`
+            : `Found ${data.matchedRules.length} applicable standard(s).`
+          : data.foundryUsed && data.requirements.length > 0
+          ? lang === "es"
+            ? "El agente IA proporcionó recomendaciones generales."
+            : "The AI agent provided general recommendations."
+          : lang === "es"
+          ? "No encontré normas específicas para esa consulta."
+          : "No specific standards found for that query.";
+
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", text: summary, type: "evaluation", payload: data, answer: data },
+        ]);
+        break;
+      }
+      case "message": {
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", text: norm.data.message, type: "message", payload: norm.data },
+        ]);
+        break;
+      }
+      case "project_created": {
+        const name = norm.data.name || (lang === "es" ? "Proyecto" : "Project");
+        setMessages((m) => [
+          ...m,
+          {
+            role: "assistant",
+            text: lang === "es" ? `Proyecto "${name}" creado.` : `Project "${name}" created.`,
+            type: "project",
+            payload: norm.data,
+          },
+        ]);
+        toast.success(lang === "es" ? "Proyecto creado" : "Project created successfully");
+        break;
+      }
+    }
+  };
+
+  const handleError = (err?: unknown) => {
+    setMessages((m) => [
+      ...m,
+      {
+        role: "assistant",
+        type: "error",
+        text: lang === "es"
+          ? "Error al procesar la consulta. Verifique su conexión."
+          : "Error processing the request. Please check your connection.",
+      },
+    ]);
+    if (err) console.error("Assistant error:", err);
+  };
+
   const ask = async (text: string) => {
     if (!text.trim() || isLoading) return;
-    setMessages((m) => [...m, { role: "user", text }]);
+    setMessages((m) => [...m, { role: "user", text, type: "message" }]);
     setInput("");
     setIsLoading(true);
 
@@ -56,33 +135,37 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         ceiling_height_m: ceilingHeight || undefined,
         volume_m3: volume || undefined,
       });
-
-      const summary = result.matchedRules.length > 0
-        ? lang === "es"
-          ? `Encontré ${result.matchedRules.length} norma(s) aplicable(s).`
-          : `Found ${result.matchedRules.length} applicable standard(s).`
-        : result.foundryUsed && result.requirements.length > 0
-        ? lang === "es"
-          ? "El agente IA proporcionó recomendaciones generales."
-          : "The AI agent provided general recommendations."
-        : lang === "es"
-        ? "No encontré normas específicas para esa consulta."
-        : "No specific standards found for that query.";
-
-      setMessages((m) => [...m, { role: "assistant", text: summary, answer: result }]);
-    } catch {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          text: lang === "es"
-            ? "Error al procesar la consulta. Verifique su conexión."
-            : "Error processing the request. Please check your connection.",
-        },
-      ]);
+      handleResponse(result);
+    } catch (err) {
+      handleError(err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const renderAssistantBody = (m: Msg) => {
+    // Resolve effective type with backward compatibility
+    const type: MsgType = m.type ?? (m.answer ? "evaluation" : "message");
+
+    if (type === "evaluation") {
+      const data = (m.payload as EvaluateResponse | undefined) ?? m.answer;
+      return (
+        <>
+          <TextMessage text={m.text} />
+          {data && <div className="mt-3"><EvaluationCard data={data} /></div>}
+        </>
+      );
+    }
+    if (type === "project") {
+      return (
+        <>
+          <TextMessage text={m.text} />
+          {m.payload && <div className="mt-3"><ProjectCard data={m.payload as ProjectCreatedData} /></div>}
+        </>
+      );
+    }
+    // message / error / fallback
+    return <TextMessage text={m.text} />;
   };
 
   return (
@@ -140,78 +223,12 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
                 "max-w-[90%] rounded-lg px-3 py-2 text-sm",
                 m.role === "user"
                   ? "bg-primary text-primary-foreground"
+                  : m.type === "error"
+                  ? "border border-destructive/40 bg-destructive/10 text-destructive"
                   : "bg-secondary/60 border border-border"
               )}
             >
-              <div className="whitespace-pre-wrap">{m.text}</div>
-
-              {m.answer && (m.answer.matchedRules.length > 0 || m.answer.foundryUsed) && (
-                <div className="mt-3 space-y-2">
-                  {m.answer.foundryUsed && m.answer.reference.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                      <BookOpen className="h-3.5 w-3.5" />
-                      <span className="font-semibold">{tr.refLabel}:</span>
-                      {m.answer.reference.map((r) => (
-                        <span key={r} className="rounded border border-border bg-background/60 px-1.5 py-0.5 font-mono text-[10px]">{r}</span>
-                      ))}
-                    </div>
-                  )}
-
-                  {m.answer.matchedRules.length > 0 && (
-                    <div className="rounded-md border border-border bg-background/40 p-2 text-xs">
-                      <div className="flex items-center gap-1.5 font-semibold text-accent">
-                        <MapPin className="h-3.5 w-3.5" /> {tr.crLabel}
-                      </div>
-                      <ul className="mt-1.5 space-y-1 text-muted-foreground">
-                        {m.answer.matchedRules.map((r) => (
-                          <li key={r.id}>• {r.title} — <span className="opacity-80">{r.description.slice(0, 80)}…</span></li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {m.answer.foundryUsed && m.answer.requirements.length > 0 && (
-                    <div className="rounded-md border border-border bg-background/30 p-2 text-xs">
-                      <div className="font-semibold text-accent mb-1">{tr.requirements}:</div>
-                      <ul className="space-y-0.5 text-muted-foreground">
-                        {m.answer.requirements.map((req, ri) => (
-                          <li key={ri}>• {req}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {m.answer.foundryUsed && m.answer.contextCr.length > 0 && (
-                    <div className="rounded-md border border-border bg-background/20 p-2 text-xs text-muted-foreground">
-                      <ul className="space-y-0.5">
-                        {m.answer.contextCr.map((ctx, ci) => (
-                          <li key={ci}>• {ctx}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {!m.answer.foundryUsed && (
-                    <p className="text-[11px] italic text-muted-foreground">
-                      {lang === "es"
-                        ? "Evaluación IA no disponible — mostrando resultados determinísticos."
-                        : "AI evaluation unavailable — showing deterministic results."}
-                    </p>
-                  )}
-
-                  {m.answer.risk === "alto" && (
-                    <div className="flex items-start gap-2 rounded-md border border-[hsl(var(--risk-high)/0.4)] bg-[hsl(var(--risk-high)/0.1)] p-2 text-xs text-[hsl(var(--risk-high))]">
-                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                      <span>
-                        <strong>{tr.riskWarning}:</strong>{" "}
-                        {lang === "es"
-                          ? "El incumplimiento puede generar paralización de obra y responsabilidad civil."
-                          : "Non-compliance may cause work shutdown and civil liability."}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
+              {m.role === "user" ? <TextMessage text={m.text} /> : renderAssistantBody(m)}
             </div>
           </div>
         ))}
