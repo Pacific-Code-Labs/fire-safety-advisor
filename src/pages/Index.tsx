@@ -31,6 +31,7 @@ const CATEGORY_TABS: { type: string; value: RuleCategory }[] = [
 
 const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { tr, lang } = useLang();
+  const assistant = useAssistant();
 
   const [building, setBuilding]         = useState<BuildingType>(BuildingType.comercial);
   const [area, setArea]                 = useState<number>(0);
@@ -44,10 +45,30 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<Msg[]>([]);
 
+  // /demo only: lock body when local chat modal opens
   useEffect(() => {
+    if (embedded) return;
     document.body.style.overflow = chatOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [chatOpen]);
+  }, [chatOpen, embedded]);
+
+  // Dashboard: sync evaluator state into global assistant
+  useEffect(() => {
+    if (!embedded) return;
+    assistant.setInput({
+      buildingType: building,
+      usage: context,
+      areaM2: area || undefined,
+      floors: floors || undefined,
+      occupants: occupants || undefined,
+      ceilingHeight: ceilingHeight || undefined,
+      volume: volume || undefined,
+    });
+    assistant.setPageContext({
+      page: "evaluation",
+      payload: { building, usage: context, area, floors, occupants, ceilingHeight, volume },
+    });
+  }, [embedded, building, context, area, floors, occupants, ceilingHeight, volume]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filters = { building, area, context, floors, occupants, ceilingHeight, volume };
 
