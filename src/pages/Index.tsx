@@ -327,8 +327,8 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
         </footer>
       </main>
 
-      {/* ── Mobile chat modal, lg:hidden ── */}
-      {chatOpen && (
+      {/* ── Mobile chat modal — /demo only ── */}
+      {!embedded && chatOpen && (
         <div className="lg:hidden">
           {/* Backdrop */}
           <div
