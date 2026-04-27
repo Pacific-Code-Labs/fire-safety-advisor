@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
+import { useAssistant } from "@/contexts/AssistantContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RiskBadge } from "@/components/RiskBadge";
@@ -13,8 +15,14 @@ export default function Dashboard() {
   const { projects, loading } = useProjects();
   const { user } = useAuth();
   const { tr } = useLang();
+  const { setPageContext, setInput } = useAssistant();
   const email = (user?.signInDetails?.loginId as string | undefined) ?? user?.username ?? "";
   const recent = projects.slice(0, 5);
+
+  useEffect(() => {
+    setPageContext({ page: "dashboard", payload: { totalProjects: projects.length } });
+    setInput({});
+  }, [projects.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const buildingLabel: Record<number, string> = {
     [BuildingType.residencial]: tr.bt_residential,

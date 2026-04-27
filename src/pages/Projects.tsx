@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useProjects } from "@/hooks/useProjects";
 import { useLang } from "@/contexts/LangContext";
+import { useAssistant } from "@/contexts/AssistantContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RiskBadge } from "@/components/RiskBadge";
@@ -23,6 +25,12 @@ import {
 export default function Projects() {
   const { projects, loading, remove } = useProjects();
   const { tr } = useLang();
+  const { setPageContext, setInput } = useAssistant();
+
+  useEffect(() => {
+    setPageContext({ page: "projects", payload: { count: projects.length } });
+    setInput({});
+  }, [projects.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const buildingLabel: Record<number, string> = {
     [BuildingType.residencial]: tr.bt_residential,
