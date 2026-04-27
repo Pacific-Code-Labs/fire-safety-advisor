@@ -51,21 +51,6 @@ export function GlobalAssistant() {
               "lg:inset-auto lg:right-4 lg:bottom-4 lg:top-20 lg:w-[400px] lg:rounded-xl"
             )}
           >
-            {/* Tiny meta bar showing page context */}
-            <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5 text-[11px] text-muted-foreground">
-              <span className="truncate">
-                {lang === "es" ? "Contexto" : "Context"}: <span className="font-mono">{pageContext.page}</span>
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 lg:hidden"
-                onClick={() => setOpen(false)}
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-
             <div className="flex-1 min-h-0">
               <ChatPanel
                 buildingType={input.buildingType ?? BuildingType.comercial}
