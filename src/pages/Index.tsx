@@ -321,6 +321,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
               />
             </div>
           )}
+        </div>
 
         <footer className="shrink-0 pt-2 pb-1 text-center text-xs text-muted-foreground no-print">
           {tr.disclaimer}
