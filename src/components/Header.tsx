@@ -1,23 +1,29 @@
-import { Flame, Languages, Home, LayoutDashboard, LogIn, LogOut, Menu } from "lucide-react";
+import { Languages, Home, LayoutDashboard, LogIn, LogOut, Menu } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@pacific-code-labs/fire-code-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { tChrome } from "@/lib/chrome-i18n";
+import { getBrandingVM } from "@/services/branding.service";
 
 interface HeaderProps {
   chatButton?: React.ReactNode;
 }
 
 export function Header({ chatButton }: HeaderProps) {
-  const { lang, setLang, tr } = useLang();
+  const { lang, setLang } = useLang();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const onDemo = pathname.startsWith("/demo");
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const chrome = tChrome(lang);
+  const brand = getBrandingVM(lang);
+  const nextLang = lang === "es" ? "en" : "es";
 
   const closeMobile = () => setMobileOpen(false);
 
@@ -25,12 +31,16 @@ export function Header({ chatButton }: HeaderProps) {
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 no-print">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 border border-primary/30 glow-red">
-            <Flame className="h-5 w-5 text-primary" />
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 border border-primary/30 glow-red overflow-hidden">
+            {brand.logoUrl ? (
+              <img src={brand.logoUrl} alt="" className="h-full w-full object-contain" />
+            ) : (
+              <brand.LogoIcon className="h-5 w-5 text-primary" aria-hidden />
+            )}
           </div>
           <div className="leading-tight">
-            <div className="text-lg font-bold tracking-tight">{tr.appName} <span className="text-primary">CR</span></div>
-            <div className="text-xs text-muted-foreground hidden sm:block">{tr.tagline}</div>
+            <div className="text-lg font-bold tracking-tight">{brand.companyName} <span className="text-primary">{brand.companySuffix}</span></div>
+            <div className="text-xs text-muted-foreground hidden sm:block">{brand.tagline}</div>
           </div>
         </Link>
         <div className="flex items-center gap-2">
@@ -38,7 +48,7 @@ export function Header({ chatButton }: HeaderProps) {
             <Button asChild variant="ghost" size="sm" className="gap-2 hidden sm:inline-flex">
               <Link to="/">
                 <Home className="h-4 w-4" />
-                {tr.home}
+                {chrome.nav.home}
               </Link>
             </Button>
           )}
@@ -48,7 +58,7 @@ export function Header({ chatButton }: HeaderProps) {
               <Button asChild variant="ghost" size="sm" className="gap-2 hidden sm:inline-flex">
                 <Link to="/dashboard">
                   <LayoutDashboard className="h-4 w-4" />
-                  {tr.nav_dashboard}
+                  {chrome.nav.dashboard}
                 </Link>
               </Button>
               <Button
@@ -58,14 +68,14 @@ export function Header({ chatButton }: HeaderProps) {
                 onClick={async () => { await signOut(); navigate("/"); }}
               >
                 <LogOut className="h-4 w-4" />
-                {tr.sign_out}
+                {chrome.nav.signOut}
               </Button>
             </>
           ) : (
             <Button asChild variant="ghost" size="sm" className="gap-2 hidden sm:inline-flex">
               <Link to="/login">
                 <LogIn className="h-4 w-4" />
-                {tr.sign_in}
+                {chrome.nav.signIn}
               </Link>
             </Button>
           )}
@@ -73,32 +83,32 @@ export function Header({ chatButton }: HeaderProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setLang(lang === "es" ? "en" : "es")}
+            onClick={() => setLang(nextLang)}
             className="gap-2"
           >
             <Languages className="h-4 w-4" />
-            {lang === "es" ? "EN" : "ES"}
+            {chrome.nav.langSwitchTo}
           </Button>
 
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="sm:hidden" aria-label="Open menu">
+              <Button variant="outline" size="icon" className="sm:hidden" aria-label={chrome.nav.openMenu}>
                 <Menu className="h-4 w-4" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
-                  <Flame className="h-4 w-4 text-primary" />
-                  {tr.appName} <span className="text-primary">CR</span>
+                  <brand.LogoIcon className="h-4 w-4 text-primary" aria-hidden />
+                  {brand.companyName} <span className="text-primary">{brand.companySuffix}</span>
                 </SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col gap-2">
                 <Button asChild variant="ghost" className="justify-start gap-2" onClick={closeMobile}>
                   <Link to="/">
                     <Home className="h-4 w-4" />
-                    {tr.home}
+                    {chrome.nav.home}
                   </Link>
                 </Button>
                 {user ? (
@@ -106,7 +116,7 @@ export function Header({ chatButton }: HeaderProps) {
                     <Button asChild variant="ghost" className="justify-start gap-2" onClick={closeMobile}>
                       <Link to="/dashboard">
                         <LayoutDashboard className="h-4 w-4" />
-                        {tr.nav_dashboard}
+                        {chrome.nav.dashboard}
                       </Link>
                     </Button>
                     <Button
@@ -115,14 +125,14 @@ export function Header({ chatButton }: HeaderProps) {
                       onClick={async () => { closeMobile(); await signOut(); navigate("/"); }}
                     >
                       <LogOut className="h-4 w-4" />
-                      {tr.sign_out}
+                      {chrome.nav.signOut}
                     </Button>
                   </>
                 ) : (
                   <Button asChild variant="ghost" className="justify-start gap-2" onClick={closeMobile}>
                     <Link to="/login">
                       <LogIn className="h-4 w-4" />
-                      {tr.sign_in}
+                      {chrome.nav.signIn}
                     </Link>
                   </Button>
                 )}

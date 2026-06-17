@@ -1,6 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@pacific-code-labs/fire-code-design-system";
 import type { RuleDTO } from "@/services/fireCodeApi";
 import { cn } from "@/lib/utils";
 

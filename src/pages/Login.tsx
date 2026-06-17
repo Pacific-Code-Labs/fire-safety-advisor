@@ -1,198 +1,129 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { Flame, Loader2 } from "lucide-react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Loader2 } from "lucide-react";
+import { Button, FormField, Input } from "@pacific-code-labs/fire-code-design-system";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { PasswordField } from "@/components/auth/PasswordField";
+import { emailSchema } from "@/lib/authSchemas";
 
-type Mode = "signin" | "signup" | "confirm";
+const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, "val_password_required"),
+});
+type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const { user, signIn, signUp, confirmSignUp, resendCode, loading: authLoading } = useAuth();
+  const { user, signIn, loading: authLoading } = useAuth();
   const { tr } = useLang();
   const navigate = useNavigate();
   const location = useLocation();
+  // redirectAfterLogin: RequireAuth stores the intended path in location.state.from.
   const from = (location.state as { from?: string } | null)?.from ?? "/dashboard";
 
-  const [mode, setMode] = useState<Mode>("signin");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const form = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
+
+  // Resolve zod error keys through the dictionary (fall back to the key).
+  const tErr = (key?: string) => (key ? (tr as Record<string, string>)[key] ?? key : undefined);
 
   if (!authLoading && user) return <Navigate to={from} replace />;
 
-  const handleError = (e: unknown) => {
-    const msg = e instanceof Error ? e.message : tr.something_wrong;
-    setError(msg);
-  };
-
-  const onSignIn = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginForm) => {
     setError(null);
-    setInfo(null);
     setSubmitting(true);
     try {
-      await signIn(email.trim(), password);
-      navigate(from, { replace: true });
-    } catch (e) { handleError(e); } finally { setSubmitting(false); }
-  };
-
-  const onSignUp = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setInfo(null);
-    setSubmitting(true);
-    try {
-      const { needsConfirmation } = await signUp(email.trim(), password);
+      // signIn() force-clears any stale Cognito session before sign-in.
+      const { needsConfirmation } = await signIn(data.email.trim(), data.password);
       if (needsConfirmation) {
-        setMode("confirm");
-        setInfo(tr.code_sent);
-      } else {
-        await signIn(email.trim(), password);
-        navigate(from, { replace: true });
+        // Unconfirmed user — route to verification with the stashed creds.
+        sessionStorage.setItem("verificationEmail", data.email.trim());
+        sessionStorage.setItem("verificationPassword", data.password);
+        sessionStorage.setItem("redirectAfterLogin", from);
+        navigate("/verify-email");
+        return;
       }
-    } catch (e) { handleError(e); } finally { setSubmitting(false); }
+      navigate(from, { replace: true });
+    } catch (e: unknown) {
+      const name = (e as { name?: string })?.name ?? "";
+      const message = e instanceof Error ? e.message : tr.auth_login_error;
+      if (name === "UserNotConfirmedException" || message.includes("CONFIRM_SIGN_UP")) {
+        sessionStorage.setItem("verificationEmail", data.email.trim());
+        sessionStorage.setItem("verificationPassword", data.password);
+        sessionStorage.setItem("redirectAfterLogin", from);
+        navigate("/verify-email");
+        return;
+      }
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const onConfirm = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setInfo(null);
-    setSubmitting(true);
-    try {
-      await confirmSignUp(email.trim(), code.trim());
-      if (password) {
-        await signIn(email.trim(), password);
-        navigate(from, { replace: true });
-      } else {
-        setMode("signin");
-        setInfo(tr.email_confirmed);
-      }
-    } catch (e) { handleError(e); } finally { setSubmitting(false); }
-  };
-
-  const onResend = async () => {
-    setError(null);
-    setInfo(null);
-    try {
-      await resendCode(email.trim());
-      setInfo(tr.new_code_sent);
-    } catch (e) { handleError(e); }
-  };
+  const isBusy = submitting || authLoading;
 
   return (
-    <div className="min-h-screen grid place-items-center bg-background px-4 py-10 relative">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-      <div className="w-full max-w-md">
-        <Link to="/" className="flex items-center gap-3 justify-center mb-6">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 border border-primary/30 glow-red">
-            <Flame className="h-5 w-5 text-primary" />
+    <AuthShell
+      title={tr.auth_login_title}
+      subtitle={tr.auth_login_subtitle}
+      footer={
+        <div className="flex flex-col gap-2">
+          <Link to="/forgot-password" className="text-primary font-medium hover:underline mx-auto">
+            {tr.auth_login_forgot}
+          </Link>
+          <div>
+            <span className="text-muted-foreground">{tr.auth_login_no_account} </span>
+            <Link to="/register" className="text-primary font-medium hover:underline">
+              {tr.auth_login_register}
+            </Link>
           </div>
-          <div className="text-lg font-bold tracking-tight">
-            FireCode <span className="text-primary">CR</span>
-          </div>
-        </Link>
+          <Link to="/" className="text-muted-foreground hover:text-foreground mt-1">
+            {tr.back_home}
+          </Link>
+        </div>
+      }
+    >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <FormField label={tr.auth_login_email} error={tErr(form.formState.errors.email?.message)}>
+          <Controller
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <Input type="email" placeholder={tr.auth_login_email_ph} autoFocus disabled={isBusy} {...field} />
+            )}
+          />
+        </FormField>
 
-        <Card className="p-6">
-          {mode === "confirm" ? (
-            <form onSubmit={onConfirm} className="space-y-4">
-              <div>
-                <h1 className="text-xl font-semibold">{tr.confirm_email}</h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {tr.confirm_email_sub} <span className="font-medium">{email}</span>.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="code">{tr.verification_code}</Label>
-                <Input
-                  id="code"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="123456"
-                  inputMode="numeric"
-                  required
-                  autoFocus
-                />
-              </div>
-              {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-              {info && <Alert><AlertDescription>{info}</AlertDescription></Alert>}
-              <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                {tr.confirm}
-              </Button>
-              <div className="flex justify-between text-sm">
-                <button type="button" onClick={onResend} className="text-primary hover:underline">
-                  {tr.resend_code}
-                </button>
-                <button type="button" onClick={() => setMode("signin")} className="text-muted-foreground hover:underline">
-                  {tr.back_to_signin}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <Tabs value={mode} onValueChange={(v) => { setMode(v as Mode); setError(null); setInfo(null); }}>
-              <TabsList className="grid grid-cols-2 w-full">
-                <TabsTrigger value="signin">{tr.sign_in}</TabsTrigger>
-                <TabsTrigger value="signup">{tr.sign_up}</TabsTrigger>
-              </TabsList>
+        <FormField label={tr.auth_login_password} error={tErr(form.formState.errors.password?.message)}>
+          <Controller
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <PasswordField placeholder={tr.auth_login_password_ph} disabled={isBusy} {...field} />
+            )}
+          />
+        </FormField>
 
-              <TabsContent value="signin" className="mt-4">
-                <form onSubmit={onSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email-in">{tr.email}</Label>
-                    <Input id="email-in" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password-in">{tr.password}</Label>
-                    <Input id="password-in" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                  </div>
-                  {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-                  {info && <Alert><AlertDescription>{info}</AlertDescription></Alert>}
-                  <Button type="submit" className="w-full" disabled={submitting}>
-                    {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {tr.sign_in}
-                  </Button>
-                </form>
-              </TabsContent>
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
 
-              <TabsContent value="signup" className="mt-4">
-                <form onSubmit={onSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email-up">{tr.email}</Label>
-                    <Input id="email-up" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password-up">{tr.password}</Label>
-                    <Input id="password-up" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
-                    <p className="text-xs text-muted-foreground">{tr.min_chars}</p>
-                  </div>
-                  {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-                  {info && <Alert><AlertDescription>{info}</AlertDescription></Alert>}
-                  <Button type="submit" className="w-full" disabled={submitting}>
-                    {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {tr.sign_up}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-          )}
-        </Card>
-
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          <Link to="/" className="hover:text-foreground">{tr.back_home}</Link>
-        </p>
-      </div>
-    </div>
+        <Button type="submit" variant="primary" className="w-full mt-1" disabled={isBusy}>
+          {isBusy && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isBusy ? tr.auth_login_submitting : tr.auth_login_submit}
+        </Button>
+      </form>
+    </AuthShell>
   );
 }

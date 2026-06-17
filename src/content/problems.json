@@ -1,0 +1,36 @@
+{
+  "eyebrow": { "es": "El problema", "en": "The problem" },
+  "title": {
+    "es": "Los códigos son densos, ambiguos y costosos de interpretar",
+    "en": "Codes are dense, ambiguous and costly to interpret"
+  },
+  "items": [
+    {
+      "id": "complexity",
+      "iconName": "book-open",
+      "title": { "es": "Normativa compleja", "en": "Complex regulation" },
+      "description": {
+        "es": "Cientos de páginas NFPA, referencias cruzadas y ediciones distintas que cambian el alcance de cada requisito.",
+        "en": "Hundreds of NFPA pages, cross-references and editions that change the scope of every requirement."
+      }
+    },
+    {
+      "id": "time",
+      "iconName": "clock",
+      "title": { "es": "Tiempo perdido", "en": "Time wasted" },
+      "description": {
+        "es": "Horas de lectura para responder preguntas básicas: ¿qué sistema necesita este edificio?",
+        "en": "Hours of reading just to answer basic questions: which system does this building need?"
+      }
+    },
+    {
+      "id": "error",
+      "iconName": "alert-triangle",
+      "title": { "es": "Riesgo de error", "en": "Risk of mistakes" },
+      "description": {
+        "es": "Una mala interpretación puede significar rechazo de planos, sanciones o riesgo real para las personas.",
+        "en": "A misinterpretation can mean rejected drawings, fines or real risk to people."
+      }
+    }
+  ]
+}

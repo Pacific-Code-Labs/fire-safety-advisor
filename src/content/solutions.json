@@ -1,0 +1,40 @@
+{
+  "eyebrow": { "es": "La solución", "en": "The solution" },
+  "title": {
+    "es": "Un asistente que entiende su proyecto y la norma",
+    "en": "An assistant that understands your project and the standard"
+  },
+  "subtitle": {
+    "es": "Combinamos un motor determinista basado en reglas con un agente IA para darle respuestas claras, trazables y aplicables.",
+    "en": "We combine a deterministic rule engine on the NFPA base with an AI agent to give you clear, traceable, applicable answers."
+  },
+  "items": [
+    {
+      "id": "rules-ai",
+      "iconName": "bot",
+      "title": { "es": "Reglas + IA", "en": "Rules + AI" },
+      "description": {
+        "es": "Filtro determinista sobre la base NFPA y un agente IA que interpreta el contexto del proyecto.",
+        "en": "Deterministic filter over the NFPA base plus an AI agent that interprets project context."
+      }
+    },
+    {
+      "id": "fast",
+      "iconName": "zap",
+      "title": { "es": "Interpretación rápida", "en": "Fast interpretation" },
+      "description": {
+        "es": "Ingrese los datos del edificio y obtenga los requisitos en segundos.",
+        "en": "Enter the building data and get the requirements in seconds."
+      }
+    },
+    {
+      "id": "outputs",
+      "iconName": "layers",
+      "title": { "es": "Salidas prácticas", "en": "Practical outputs" },
+      "description": {
+        "es": "Resultados agrupados por categoría: iniciación, notificación, monitoreo y accionamiento.",
+        "en": "Results grouped by category: initiation, notification, monitoring and actuation."
+      }
+    }
+  ]
+}

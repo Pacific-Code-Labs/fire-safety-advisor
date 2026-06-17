@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "demo": "Demo",
+    "signIn": "Ingresar",
+    "signOut": "Salir",
+    "langCode": "ES",
+    "langSwitchTo": "EN",
+    "openMenu": "Abrir menú",
+    "themeToLight": "Cambiar a modo claro",
+    "themeToDark": "Cambiar a modo oscuro"
+  },
+  "demo": {
+    "assistant": "Asistente",
+    "badge": "NFPA · Costa Rica",
+    "heroTitlePrefix": "Interprete normas ",
+    "heroTitleHighlight": "NFPA",
+    "heroTitleSuffix": " en lenguaje práctico.",
+    "heroSubtitle": "Seleccione el tipo de edificio, ingrese el uso y obtenga los sistemas requeridos clasificados por categoría.",
+    "total": "Total:",
+    "highRisk": "Riesgo alto",
+    "allCategories": "Todas",
+    "loadError": "Error al cargar las normas. Verifique su conexión e intente de nuevo.",
+    "paginationStatus": "Página {page} de {total} — {count} normas"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Página no encontrada",
+    "backHome": "Volver al inicio"
+  }
+}

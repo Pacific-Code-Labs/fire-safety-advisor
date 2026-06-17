@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { applyActiveTheme } from "@/lib/brand-theme";
 
 export type Theme = "light" | "dark";
 interface Ctx { theme: Theme; setTheme: (t: Theme) => void; toggle: () => void; }
@@ -25,6 +26,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
     localStorage.setItem(STORAGE_KEY, theme);
+    // Re-apply the active brand theme in the new mode so the DS theme engine
+    // writes the correct light/dark token map (FCR-080).
+    applyActiveTheme(theme === "dark");
   }, [theme]);
 
   const setTheme = (t: Theme) => setThemeState(t);

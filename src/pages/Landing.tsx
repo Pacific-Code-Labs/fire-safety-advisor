@@ -1,53 +1,51 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Zap, FileText, BookOpen, MapPin, MessageSquare, Printer, Layers, Clock, AlertTriangle, BookOpenCheck, Sparkles, Bot, Workflow } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { useLang } from "@/contexts/LangContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { tChrome } from "@/lib/chrome-i18n";
+import { resolveSeo, useHeadTags } from "@/lib/seo";
+import { getBrandingVM } from "@/services/branding.service";
+import {
+  getHeroVM,
+  getProblemsVM,
+  getSolutionsVM,
+  getFeaturesVM,
+  getHowItWorksVM,
+  getCtaVM,
+  getFooterVM,
+  type CardVM,
+} from "@/services/landing.service";
 
 const Landing = () => {
-  const { tr } = useLang();
+  const { lang } = useLang();
   const { user } = useAuth();
   const demoHref = user ? "/dashboard/evaluator" : "/demo";
 
-  const problems = [
-    { icon: BookOpen, t: tr.problem_1_t, d: tr.problem_1_d },
-    { icon: Clock, t: tr.problem_2_t, d: tr.problem_2_d },
-    { icon: AlertTriangle, t: tr.problem_3_t, d: tr.problem_3_d },
-  ];
+  useHeadTags(resolveSeo("home", lang), lang, "home");
 
-  const solutions = [
-    { icon: Bot, t: tr.sol_1_t, d: tr.sol_1_d },
-    { icon: Zap, t: tr.sol_2_t, d: tr.sol_2_d },
-    { icon: Layers, t: tr.sol_3_t, d: tr.sol_3_d },
-  ];
-
-  const features = [
-    { icon: Sparkles, t: tr.feat_1_t, d: tr.feat_1_d },
-    { icon: BookOpenCheck, t: tr.feat_2_t, d: tr.feat_2_d },
-    { icon: MapPin, t: tr.feat_3_t, d: tr.feat_3_d },
-    { icon: Layers, t: tr.feat_4_t, d: tr.feat_4_d },
-    { icon: MessageSquare, t: tr.feat_5_t, d: tr.feat_5_d },
-    { icon: Printer, t: tr.feat_6_t, d: tr.feat_6_d },
-  ];
-
-  const steps = [
-    { icon: FileText, t: tr.how_1_t, d: tr.how_1_d },
-    { icon: Workflow, t: tr.how_2_t, d: tr.how_2_d },
-    { icon: ShieldCheck, t: tr.how_3_t, d: tr.how_3_d },
-  ];
+  const chrome = tChrome(lang);
+  const brand = getBrandingVM(lang);
+  const hero = getHeroVM(lang);
+  const problems = getProblemsVM(lang);
+  const solutions = getSolutionsVM(lang);
+  const features = getFeaturesVM(lang);
+  const how = getHowItWorksVM(lang);
+  const cta = getCtaVM(lang);
+  const footer = getFooterVM(lang);
 
   const demoButton = (
     <Button asChild size="sm" className="gap-2">
       <Link to={demoHref}>
-        {tr.nav_demo} <ArrowRight className="h-4 w-4" />
+        {chrome.nav.demo} <ArrowRight className="h-4 w-4" />
       </Link>
     </Button>
   );
 
-  type Card = { icon: typeof Zap; t: string; d: string };
   const renderCard = (
-    { icon: Icon, t, d }: Card,
+    { id, Icon, title, description }: CardVM,
     opts: { tone?: "primary" | "destructive"; index?: number } = {}
   ) => {
     const tone = opts.tone ?? "primary";
@@ -56,7 +54,7 @@ const Landing = () => {
         ? "bg-destructive/10 border-destructive/30 text-destructive"
         : "bg-primary/10 border-primary/30 text-primary";
     return (
-      <div key={t} className="relative rounded-lg border border-border bg-card overflow-hidden hover:border-primary/40 transition-colors">
+      <div key={id} className="relative rounded-lg border border-border bg-card overflow-hidden hover:border-primary/40 transition-colors">
         {opts.index !== undefined && (
           <div className="absolute top-3 right-3 text-xs font-mono text-primary bg-background border border-primary/30 px-2 py-0.5 rounded">
             0{opts.index + 1}
@@ -66,10 +64,10 @@ const Landing = () => {
           <div className={`flex h-9 w-9 items-center justify-center rounded-md border ${toneCls}`}>
             <Icon className="h-5 w-5" />
           </div>
-          <div className="text-sm font-semibold">{t}</div>
+          <div className="text-sm font-semibold">{title}</div>
         </div>
         <div className="px-4 py-4">
-          <p className="text-sm text-muted-foreground leading-relaxed">{d}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
         </div>
       </div>
     );
@@ -91,26 +89,26 @@ const Landing = () => {
         <div className="container py-20 md:py-28 lg:py-32">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary mb-6">
-              <Sparkles className="h-3.5 w-3.5" />
-              {tr.hero_badge}
+              <hero.BadgeIcon className="h-3.5 w-3.5" aria-hidden />
+              {hero.badge}
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
-              {tr.hero_title}
+              {hero.title}
             </h1>
             <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl">
-              {tr.hero_sub}
+              {hero.subtitle}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="gap-2">
                 <Link to={demoHref}>
-                  {tr.hero_cta} <ArrowRight className="h-4 w-4" />
+                  {hero.ctaPrimary} <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <a href="#how">{tr.hero_cta2}</a>
+                <a href="#how">{hero.ctaSecondary}</a>
               </Button>
             </div>
-            <p className="mt-6 text-sm text-muted-foreground">{tr.hero_trust}</p>
+            <p className="mt-6 text-sm text-muted-foreground">{hero.trust}</p>
           </div>
         </div>
       </section>
@@ -119,11 +117,11 @@ const Landing = () => {
       <section className="border-b border-border">
         <div className="container py-20 md:py-24">
           <div className="max-w-2xl mb-12">
-            <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{tr.problem_eyebrow}</div>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{tr.problem_title}</h2>
+            <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{problems.heading.eyebrow}</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{problems.heading.title}</h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {problems.map((c) => renderCard(c, { tone: "destructive" }))}
+            {problems.cards.map((c) => renderCard(c, { tone: "destructive" }))}
           </div>
         </div>
       </section>
@@ -132,12 +130,12 @@ const Landing = () => {
       <section className="border-b border-border bg-muted/20">
         <div className="container py-20 md:py-24">
           <div className="max-w-2xl mb-12">
-            <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{tr.solution_eyebrow}</div>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{tr.solution_title}</h2>
-            <p className="mt-4 text-muted-foreground text-lg">{tr.solution_sub}</p>
+            <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{solutions.heading.eyebrow}</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{solutions.heading.title}</h2>
+            <p className="mt-4 text-muted-foreground text-lg">{solutions.heading.subtitle}</p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {solutions.map((c) => renderCard(c))}
+            {solutions.cards.map((c) => renderCard(c))}
           </div>
         </div>
       </section>
@@ -146,11 +144,11 @@ const Landing = () => {
       <section id="features" className="border-b border-border">
         <div className="container py-20 md:py-24">
           <div className="max-w-2xl mb-12">
-            <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{tr.features_eyebrow}</div>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{tr.features_title}</h2>
+            <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{features.heading.eyebrow}</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{features.heading.title}</h2>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((c) => renderCard(c))}
+            {features.cards.map((c) => renderCard(c))}
           </div>
         </div>
       </section>
@@ -159,11 +157,11 @@ const Landing = () => {
       <section id="how" className="border-b border-border bg-muted/20">
         <div className="container py-20 md:py-24">
           <div className="max-w-2xl mb-12">
-            <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{tr.how_eyebrow}</div>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{tr.how_title}</h2>
+            <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{how.heading.eyebrow}</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{how.heading.title}</h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {steps.map((c, i) => renderCard(c, { index: i }))}
+            {how.cards.map((c, i) => renderCard(c, { index: i }))}
           </div>
         </div>
       </section>
@@ -179,12 +177,12 @@ const Landing = () => {
                   "radial-gradient(600px 300px at 50% 0%, hsl(var(--primary) / 0.18), transparent 70%)",
               }}
             />
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{tr.cta_title}</h2>
-            <p className="mt-4 text-lg text-muted-foreground">{tr.cta_sub}</p>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">{cta.title}</h2>
+            <p className="mt-4 text-lg text-muted-foreground">{cta.subtitle}</p>
             <div className="mt-8">
               <Button asChild size="lg" className="gap-2">
                 <Link to={demoHref}>
-                  {tr.cta_button} <ArrowRight className="h-4 w-4" />
+                  {cta.button} <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -196,10 +194,10 @@ const Landing = () => {
       <footer className="bg-background">
         <div className="container py-10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} {tr.appName} CR. {tr.footer_rights}
+            © {new Date().getFullYear()} {brand.companyName} {brand.companySuffix}. {footer.rights}
           </div>
           <Link to={demoHref} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            {tr.footer_demo}
+            {footer.demoLink}
           </Link>
         </div>
       </footer>

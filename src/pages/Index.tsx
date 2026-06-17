@@ -5,12 +5,14 @@ import { BuildingSelector } from "@/components/BuildingSelector";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ChatPanel } from "@/components/ChatPanel";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@pacific-code-labs/fire-code-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { useAssistant } from "@/contexts/AssistantContext";
 import { fireCodeApi, BuildingType, RuleCategory } from "@/services/fireCodeApi";
 import { type Msg } from "@/components/ChatPanel";
 import { cn } from "@/lib/utils";
+import { tChrome, fmt } from "@/lib/chrome-i18n";
+import { resolveSeo, useHeadTags } from "@/lib/seo";
 import { Printer, ShieldAlert, ListChecks, AlertTriangle, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
 const PAGE_SIZE = 20;
@@ -31,7 +33,11 @@ const CATEGORY_TABS: { type: string; value: RuleCategory }[] = [
 
 const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { tr, lang } = useLang();
+  const chrome = tChrome(lang);
   const assistant = useAssistant();
+
+  // SEO head tags for the standalone /demo route (skip when embedded elsewhere).
+  useHeadTags(resolveSeo("demo", lang), lang, embedded ? undefined : "demo");
 
   const [building, setBuilding]         = useState<BuildingType>(BuildingType.comercial);
   const [area, setArea]                 = useState<number>(0);
@@ -73,7 +79,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const filters = { building, area, context, floors, occupants, ceilingHeight, volume };
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["rules", filters, page, selectedCategory],
+    queryKey: ["rules", filters, page, selectedCategory, lang],
     queryFn: () =>
       fireCodeApi.getRules({
         building_type:    building   || undefined,
@@ -86,6 +92,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
         category:         selectedCategory ?? undefined,
         page,
         page_size: PAGE_SIZE,
+        language:         lang,
       }),
     staleTime: 30_000,
   });
@@ -120,7 +127,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
               onClick={() => setChatOpen(true)}
             >
               <Sparkles className="h-4 w-4" />
-              {lang === "es" ? "Asistente" : "Assistant"}
+              {chrome.demo.assistant}
             </Button>
           }
         />
@@ -139,20 +146,16 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
             {/* Title + badge */}
             <section className={cn(embedded ? "space-y-1" : "space-y-2")}>
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                <ShieldAlert className="h-3.5 w-3.5" /> NFPA · Costa Rica
+                <ShieldAlert className="h-3.5 w-3.5" /> {chrome.demo.badge}
               </div>
               <h1 className={cn("font-bold leading-tight", embedded ? "text-lg sm:text-xl" : "text-2xl sm:text-3xl")}>
-                {lang === "es" ? (
-                  <>Interprete normas <span className="text-primary">NFPA</span> en lenguaje práctico.</>
-                ) : (
-                  <>Interpret <span className="text-primary">NFPA</span> standards in practical language.</>
-                )}
+                {chrome.demo.heroTitlePrefix}
+                <span className="text-primary">{chrome.demo.heroTitleHighlight}</span>
+                {chrome.demo.heroTitleSuffix}
               </h1>
               {!embedded && (
                 <p className="text-sm text-muted-foreground max-w-xl">
-                  {lang === "es"
-                    ? "Seleccione el tipo de edificio, ingrese el uso y obtenga los sistemas requeridos clasificados por categoría."
-                    : "Select the building type, enter the occupancy and get required systems classified by category."}
+                  {chrome.demo.heroSubtitle}
                 </p>
               )}
             </section>
@@ -173,12 +176,12 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <div className="flex items-center gap-1.5">
                   <ListChecks className="h-4 w-4 text-accent" />
-                  <span className="text-muted-foreground">Total:</span>
+                  <span className="text-muted-foreground">{chrome.demo.total}</span>
                   <span className="font-semibold">{isLoading ? "—" : totalRules}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <ShieldAlert className="h-4 w-4 text-[hsl(var(--risk-high))]" />
-                  <span className="text-muted-foreground">{lang === "es" ? "Riesgo alto" : "High risk"}:</span>
+                  <span className="text-muted-foreground">{chrome.demo.highRisk}:</span>
                   <span className="font-semibold text-[hsl(var(--risk-high))]">{isLoading ? "—" : highRisk}</span>
                 </div>
 
@@ -194,7 +197,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
                       : "border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/5"
                   )}
                 >
-                  {lang === "es" ? "Todas" : "All"}
+                  {chrome.demo.allCategories}
                 </button>
 
                 {CATEGORY_TABS.map(({ type, value }) => {
@@ -240,9 +243,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
               {isError && (
                 <div className="flex items-center gap-3 rounded-md border border-[hsl(var(--risk-high)/0.4)] bg-[hsl(var(--risk-high)/0.1)] p-4 text-sm text-[hsl(var(--risk-high))]">
                   <AlertTriangle className="h-4 w-4 shrink-0" />
-                  {lang === "es"
-                    ? "Error al cargar las normas. Verifique su conexión e intente de nuevo."
-                    : "Error loading standards. Check your connection and try again."}
+                  {chrome.demo.loadError}
                 </div>
               )}
 
@@ -273,9 +274,11 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
             {pagination && pagination.totalPages > 1 && (
               <div className="flex items-center justify-between panel px-4 py-3 shrink-0">
                 <span className="text-xs text-muted-foreground">
-                  {lang === "es"
-                    ? `Página ${pagination.page + 1} de ${pagination.totalPages} — ${pagination.totalElements} normas`
-                    : `Page ${pagination.page + 1} of ${pagination.totalPages} — ${pagination.totalElements} rules`}
+                  {fmt(chrome.demo.paginationStatus, {
+                    page: pagination.page + 1,
+                    total: pagination.totalPages,
+                    count: pagination.totalElements,
+                  })}
                 </span>
                 <div className="flex items-center gap-2">
                   <Button
@@ -318,6 +321,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
                 volume={volume       || undefined}
                 messages={chatMessages}
                 setMessages={setChatMessages}
+                demo
               />
             </div>
           )}
@@ -349,6 +353,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
               onClose={() => setChatOpen(false)}
               messages={chatMessages}
               setMessages={setChatMessages}
+              demo
             />
           </div>
         </div>

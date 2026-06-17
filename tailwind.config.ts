@@ -2,7 +2,18 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    // FCR-003: scan the shared design-system's built primitives so their
+    // Tailwind classes (incl. animate-in/data-[state]/slide-in-* from
+    // tailwindcss-animate, and arbitrary hsl(var(--cat-*/--risk-*)) values)
+    // are emitted. The DS uses the SAME semantic token names defined in
+    // src/index.css, so no extra color mapping is required.
+    "./node_modules/@pacific-code-labs/fire-code-design-system/dist/**/*.{js,cjs}",
+  ],
   prefix: "",
   theme: {
     container: {

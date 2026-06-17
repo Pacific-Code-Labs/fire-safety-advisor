@@ -9,6 +9,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  packages: read
 
 concurrency:
   group: pages
@@ -24,7 +25,14 @@ jobs:
         with:
           bun-version: latest
 
-      - run: bun install
+      # Authenticate to GitHub Packages so the private DS package
+      # (@pacific-code-labs/fire-code-design-system) resolves. The committed
+      # .npmrc points @pacific-code-labs at npm.pkg.github.com and reads the
+      # token from $NODE_AUTH_TOKEN; GITHUB_TOKEN has packages:read here.
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun install
 
       - name: Build
         env:
@@ -35,8 +43,11 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
         run: bun run build
 
-      - name: SPA fallback (404.html)
-        run: cp dist/index.html dist/404.html
+      # NOTE: `bun run build` runs the SEO prerender (scripts/prerender.mjs),
+      # which already emits a NOINDEX dist/404.html SPA shell (so client routes
+      # resolve on hard refresh without being indexed as duplicate content). Do
+      # NOT `cp dist/index.html dist/404.html` here — that would clobber it with
+      # an indexable copy (landing-dxp-builder seo-deploy.md).
 
       - name: Disable Jekyll
         run: touch dist/.nojekyll

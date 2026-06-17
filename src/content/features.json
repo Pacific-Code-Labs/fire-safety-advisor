@@ -1,0 +1,66 @@
+{
+  "eyebrow": { "es": "Características", "en": "Features" },
+  "title": {
+    "es": "Todo lo que necesita para evaluar un proyecto",
+    "en": "Everything you need to evaluate a project"
+  },
+  "items": [
+    {
+      "id": "instant-analysis",
+      "iconName": "sparkles",
+      "title": {
+        "es": "Análisis instantáneo de requisitos",
+        "en": "Instant requirement analysis"
+      },
+      "description": {
+        "es": "Indique tipo de edificio, área, pisos y ocupación; el sistema devuelve los requisitos aplicables.",
+        "en": "Provide building type, area, floors and occupancy; the system returns applicable requirements."
+      }
+    },
+    {
+      "id": "nfpa-references",
+      "iconName": "book-open-check",
+      "title": { "es": "Referencias NFPA", "en": "NFPA references" },
+      "description": {
+        "es": "Cada requisito incluye la norma y sección de origen para que pueda verificarlo.",
+        "en": "Each requirement includes its standard and section so you can verify it."
+      }
+    },
+    {
+      "id": "cr-context",
+      "iconName": "map-pin",
+      "title": { "es": "Contexto Costa Rica", "en": "Costa Rica context" },
+      "description": {
+        "es": "Notas prácticas alineadas a la realidad regulatoria local.",
+        "en": "Practical notes aligned to local regulatory reality."
+      }
+    },
+    {
+      "id": "structured-outputs",
+      "iconName": "layers",
+      "title": { "es": "Salidas estructuradas", "en": "Structured outputs" },
+      "description": {
+        "es": "Resultados organizados por categoría de protección contra incendios, listos para informe.",
+        "en": "Results organized by fire protection category, ready for reporting."
+      }
+    },
+    {
+      "id": "conversational",
+      "iconName": "message-square",
+      "title": { "es": "Asistente conversacional", "en": "Conversational assistant" },
+      "description": {
+        "es": "Pregunte en lenguaje natural sobre sistemas, normas o riesgos.",
+        "en": "Ask in natural language about systems, standards or risks."
+      }
+    },
+    {
+      "id": "export",
+      "iconName": "printer",
+      "title": { "es": "Exportación / Impresión", "en": "Export / Print" },
+      "description": {
+        "es": "Genere una vista imprimible para adjuntar a su expediente.",
+        "en": "Generate a printable view to attach to your file."
+      }
+    }
+  ]
+}

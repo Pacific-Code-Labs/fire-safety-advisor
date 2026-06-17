@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { fireCodeApi, BuildingType } from "@/services/fireCodeApi";
+import { fireCodeApi, BuildingType, QuotaError } from "@/services/fireCodeApi";
 import type { RiskLevel } from "@/hooks/useProjects";
 import { Loader2, ArrowLeft } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@pacific-code-labs/fire-code-design-system";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 function normalizeRisk(raw?: string): RiskLevel | undefined {
   if (!raw) return undefined;
@@ -37,6 +38,7 @@ export default function NewProject() {
   const [volume, setVolume] = useState<number | "">("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [quota, setQuota] = useState<QuotaError | null>(null);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -55,11 +57,17 @@ export default function NewProject() {
           ceiling_height_m: ceiling === "" ? undefined : Number(ceiling),
           volume_m3: volume === "" ? undefined : Number(volume),
         });
-      } catch {
-        // backend evaluation optional; project still saves
+      } catch (evalErr) {
+        // The evaluate quota (429) blocks the project too — surface the upgrade
+        // CTA instead of silently saving an un-evaluated project.
+        if (evalErr instanceof QuotaError) {
+          setQuota(evalErr);
+          return;
+        }
+        // Otherwise the backend evaluation is optional; project still saves.
       }
 
-      const project = create({
+      const project = await create({
         name: name.trim(),
         building_type: buildingType,
         usage: usage.trim(),
@@ -71,12 +79,24 @@ export default function NewProject() {
         risk: normalizeRisk(evalResult?.risk),
         requirements: evalResult?.requirements,
         reference: evalResult?.reference,
-        contextCr: evalResult?.contextCr,
+        // FCR-043: projects persist plain strings; flatten structured items.
+        contextCr: (evalResult?.contextCr ?? []).map((c) =>
+          typeof c === "string"
+            ? c
+            : [c.topic ? `${c.topic}: ${c.detail}` : c.detail, [c.authority, c.reference].filter(Boolean).join(" · ")]
+                .filter(Boolean)
+                .join(" ")
+        ),
       });
 
       navigate(`/projects/${project.id}`, { replace: true });
     } catch (e) {
-      setError(e instanceof Error ? e.message : tr.failed_create);
+      // FCR-026: saved-projects limit (402) → open the upgrade CTA.
+      if (e instanceof QuotaError) {
+        setQuota(e);
+      } else {
+        setError(e instanceof Error ? e.message : tr.failed_create);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -155,6 +175,7 @@ export default function NewProject() {
           </CardContent>
         </Card>
       </div>
+      <UpgradeModal quota={quota} onClose={() => setQuota(null)} />
     </DashboardLayout>
   );
 }

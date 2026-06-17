@@ -1,8 +1,22 @@
 import { AlertTriangle, BookOpen, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
-import type { EvaluateResponse } from "@/services/fireCodeApi";
+import type { CrContextItem, EvaluateResponse } from "@/services/fireCodeApi";
 
 interface Props { data: EvaluateResponse; }
+
+/**
+ * FCR-043: contextCr is now CrContextItem[] but older backends (and the
+ * project-created path) may still send string[]. Normalize either shape so the
+ * card renders consistently.
+ */
+function toContextItems(raw: EvaluateResponse["contextCr"]): CrContextItem[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((c) =>
+    typeof c === "string"
+      ? { topic: "", detail: c }
+      : (c as CrContextItem)
+  );
+}
 
 export function EvaluationCard({ data }: Props) {
   const { lang, tr } = useLang();
@@ -43,10 +57,20 @@ export function EvaluationCard({ data }: Props) {
         </div>
       )}
 
-      {data.foundryUsed && data.contextCr?.length > 0 && (
+      {data.foundryUsed && toContextItems(data.contextCr).length > 0 && (
         <div className="rounded-md border border-border bg-background/20 p-2 text-xs text-muted-foreground">
-          <ul className="space-y-0.5">
-            {data.contextCr.map((ctx, ci) => <li key={ci}>• {ctx}</li>)}
+          <ul className="space-y-1">
+            {toContextItems(data.contextCr).map((ctx, ci) => (
+              <li key={ci}>
+                {ctx.topic ? <span className="font-semibold text-foreground/80">{ctx.topic}: </span> : "• "}
+                {ctx.detail}
+                {(ctx.authority || ctx.reference) && (
+                  <span className="ml-1 opacity-70">
+                    ({[ctx.authority, ctx.reference].filter(Boolean).join(" · ")})
+                  </span>
+                )}
+              </li>
+            ))}
           </ul>
         </div>
       )}

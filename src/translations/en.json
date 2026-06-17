@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "demo": "Demo",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "langCode": "EN",
+    "langSwitchTo": "ES",
+    "openMenu": "Open menu",
+    "themeToLight": "Switch to light mode",
+    "themeToDark": "Switch to dark mode"
+  },
+  "demo": {
+    "assistant": "Assistant",
+    "badge": "NFPA · Costa Rica",
+    "heroTitlePrefix": "Interpret ",
+    "heroTitleHighlight": "NFPA",
+    "heroTitleSuffix": " standards in practical language.",
+    "heroSubtitle": "Select the building type, enter the occupancy and get required systems classified by category.",
+    "total": "Total:",
+    "highRisk": "High risk",
+    "allCategories": "All",
+    "loadError": "Error loading standards. Check your connection and try again.",
+    "paginationStatus": "Page {page} of {total} — {count} rules"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Oops! Page not found",
+    "backHome": "Return to Home"
+  }
+}

@@ -1,0 +1,2583 @@
+{
+  "generatedAt": "2026-06-16T15:26:58.933Z",
+  "counts": {
+    "lib": 22,
+    "component": 70,
+    "content": 14,
+    "context": 4,
+    "hook": 5,
+    "page": 16,
+    "repository": 2,
+    "service": 5
+  },
+  "nodes": [
+    {
+      "id": "App",
+      "label": "App",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/App.tsx"
+    },
+    {
+      "id": "components/assistant/DemoLimitCard",
+      "label": "DemoLimitCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/DemoLimitCard.tsx"
+    },
+    {
+      "id": "components/assistant/EvaluationCard",
+      "label": "EvaluationCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/EvaluationCard.tsx"
+    },
+    {
+      "id": "components/assistant/ProjectCard",
+      "label": "ProjectCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/ProjectCard.tsx"
+    },
+    {
+      "id": "components/assistant/TextMessage",
+      "label": "TextMessage",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/TextMessage.tsx"
+    },
+    {
+      "id": "components/auth/AuthShell",
+      "label": "AuthShell",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/auth/AuthShell.tsx"
+    },
+    {
+      "id": "components/auth/PasswordField",
+      "label": "PasswordField",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/auth/PasswordField.tsx"
+    },
+    {
+      "id": "components/auth/PasswordStrengthIndicator",
+      "label": "PasswordStrengthIndicator",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/auth/PasswordStrengthIndicator.tsx"
+    },
+    {
+      "id": "components/BuildingSelector",
+      "label": "BuildingSelector",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/BuildingSelector.tsx"
+    },
+    {
+      "id": "components/CategoryCard",
+      "label": "CategoryCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/CategoryCard.tsx"
+    },
+    {
+      "id": "components/ChatPanel",
+      "label": "ChatPanel",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ChatPanel.tsx"
+    },
+    {
+      "id": "components/DashboardLayout",
+      "label": "DashboardLayout",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/DashboardLayout.tsx"
+    },
+    {
+      "id": "components/GlobalAssistant",
+      "label": "GlobalAssistant",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/GlobalAssistant.tsx"
+    },
+    {
+      "id": "components/Header",
+      "label": "Header",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/Header.tsx"
+    },
+    {
+      "id": "components/NavLink",
+      "label": "NavLink",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/NavLink.tsx"
+    },
+    {
+      "id": "components/RequireAuth",
+      "label": "RequireAuth",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/RequireAuth.tsx"
+    },
+    {
+      "id": "components/RiskBadge",
+      "label": "RiskBadge",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/RiskBadge.tsx"
+    },
+    {
+      "id": "components/roles/PermissionMatrix",
+      "label": "PermissionMatrix",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/roles/PermissionMatrix.tsx"
+    },
+    {
+      "id": "components/roles/RoleDrawerForm",
+      "label": "RoleDrawerForm",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/roles/RoleDrawerForm.tsx"
+    },
+    {
+      "id": "components/RuleDetailModal",
+      "label": "RuleDetailModal",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/RuleDetailModal.tsx"
+    },
+    {
+      "id": "components/ThemeToggle",
+      "label": "ThemeToggle",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ThemeToggle.tsx"
+    },
+    {
+      "id": "components/ui/accordion",
+      "label": "accordion",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/accordion.tsx"
+    },
+    {
+      "id": "components/ui/alert",
+      "label": "alert",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/alert.tsx"
+    },
+    {
+      "id": "components/ui/alert-dialog",
+      "label": "alert-dialog",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/alert-dialog.tsx"
+    },
+    {
+      "id": "components/ui/aspect-ratio",
+      "label": "aspect-ratio",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/aspect-ratio.tsx"
+    },
+    {
+      "id": "components/ui/avatar",
+      "label": "avatar",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/avatar.tsx"
+    },
+    {
+      "id": "components/ui/badge",
+      "label": "badge",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/badge.tsx"
+    },
+    {
+      "id": "components/ui/breadcrumb",
+      "label": "breadcrumb",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/breadcrumb.tsx"
+    },
+    {
+      "id": "components/ui/button",
+      "label": "button",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/button.tsx"
+    },
+    {
+      "id": "components/ui/calendar",
+      "label": "calendar",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/calendar.tsx"
+    },
+    {
+      "id": "components/ui/card",
+      "label": "card",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/card.tsx"
+    },
+    {
+      "id": "components/ui/carousel",
+      "label": "carousel",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/carousel.tsx"
+    },
+    {
+      "id": "components/ui/chart",
+      "label": "chart",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/chart.tsx"
+    },
+    {
+      "id": "components/ui/checkbox",
+      "label": "checkbox",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/checkbox.tsx"
+    },
+    {
+      "id": "components/ui/collapsible",
+      "label": "collapsible",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/collapsible.tsx"
+    },
+    {
+      "id": "components/ui/command",
+      "label": "command",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/command.tsx"
+    },
+    {
+      "id": "components/ui/context-menu",
+      "label": "context-menu",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/context-menu.tsx"
+    },
+    {
+      "id": "components/ui/dialog",
+      "label": "dialog",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/dialog.tsx"
+    },
+    {
+      "id": "components/ui/drawer",
+      "label": "drawer",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/drawer.tsx"
+    },
+    {
+      "id": "components/ui/dropdown-menu",
+      "label": "dropdown-menu",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/dropdown-menu.tsx"
+    },
+    {
+      "id": "components/ui/form",
+      "label": "form",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/form.tsx"
+    },
+    {
+      "id": "components/ui/hover-card",
+      "label": "hover-card",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/hover-card.tsx"
+    },
+    {
+      "id": "components/ui/input",
+      "label": "input",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/input.tsx"
+    },
+    {
+      "id": "components/ui/input-otp",
+      "label": "input-otp",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/input-otp.tsx"
+    },
+    {
+      "id": "components/ui/label",
+      "label": "label",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/label.tsx"
+    },
+    {
+      "id": "components/ui/menubar",
+      "label": "menubar",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/menubar.tsx"
+    },
+    {
+      "id": "components/ui/navigation-menu",
+      "label": "navigation-menu",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/navigation-menu.tsx"
+    },
+    {
+      "id": "components/ui/pagination",
+      "label": "pagination",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/pagination.tsx"
+    },
+    {
+      "id": "components/ui/popover",
+      "label": "popover",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/popover.tsx"
+    },
+    {
+      "id": "components/ui/progress",
+      "label": "progress",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/progress.tsx"
+    },
+    {
+      "id": "components/ui/radio-group",
+      "label": "radio-group",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/radio-group.tsx"
+    },
+    {
+      "id": "components/ui/resizable",
+      "label": "resizable",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/resizable.tsx"
+    },
+    {
+      "id": "components/ui/scroll-area",
+      "label": "scroll-area",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/scroll-area.tsx"
+    },
+    {
+      "id": "components/ui/select",
+      "label": "select",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/select.tsx"
+    },
+    {
+      "id": "components/ui/separator",
+      "label": "separator",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/separator.tsx"
+    },
+    {
+      "id": "components/ui/sheet",
+      "label": "sheet",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/sheet.tsx"
+    },
+    {
+      "id": "components/ui/sidebar",
+      "label": "sidebar",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/sidebar.tsx"
+    },
+    {
+      "id": "components/ui/skeleton",
+      "label": "skeleton",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/skeleton.tsx"
+    },
+    {
+      "id": "components/ui/slider",
+      "label": "slider",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/slider.tsx"
+    },
+    {
+      "id": "components/ui/sonner",
+      "label": "sonner",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/sonner.tsx"
+    },
+    {
+      "id": "components/ui/switch",
+      "label": "switch",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/switch.tsx"
+    },
+    {
+      "id": "components/ui/table",
+      "label": "table",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/table.tsx"
+    },
+    {
+      "id": "components/ui/tabs",
+      "label": "tabs",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/tabs.tsx"
+    },
+    {
+      "id": "components/ui/textarea",
+      "label": "textarea",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/textarea.tsx"
+    },
+    {
+      "id": "components/ui/toast",
+      "label": "toast",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/toast.tsx"
+    },
+    {
+      "id": "components/ui/toaster",
+      "label": "toaster",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/toaster.tsx"
+    },
+    {
+      "id": "components/ui/toggle",
+      "label": "toggle",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/toggle.tsx"
+    },
+    {
+      "id": "components/ui/toggle-group",
+      "label": "toggle-group",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/toggle-group.tsx"
+    },
+    {
+      "id": "components/ui/tooltip",
+      "label": "tooltip",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/tooltip.tsx"
+    },
+    {
+      "id": "components/ui/use-toast",
+      "label": "use-toast",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/use-toast.ts"
+    },
+    {
+      "id": "components/UpgradeModal",
+      "label": "UpgradeModal",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/UpgradeModal.tsx"
+    },
+    {
+      "id": "config/amplify",
+      "label": "amplify",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/config/amplify.ts"
+    },
+    {
+      "id": "content/branding",
+      "label": "branding",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/branding.json"
+    },
+    {
+      "id": "content/cta",
+      "label": "cta",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/cta.json"
+    },
+    {
+      "id": "content/features",
+      "label": "features",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/features.json"
+    },
+    {
+      "id": "content/footer",
+      "label": "footer",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/footer.json"
+    },
+    {
+      "id": "content/hero",
+      "label": "hero",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/hero.json"
+    },
+    {
+      "id": "content/how-it-works",
+      "label": "how-it-works",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/how-it-works.json"
+    },
+    {
+      "id": "content/inventory",
+      "label": "inventory",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/inventory.json"
+    },
+    {
+      "id": "content/media",
+      "label": "media",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/media.json"
+    },
+    {
+      "id": "content/problems",
+      "label": "problems",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/problems.json"
+    },
+    {
+      "id": "content/seo",
+      "label": "seo",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/seo.json"
+    },
+    {
+      "id": "content/solutions",
+      "label": "solutions",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/solutions.json"
+    },
+    {
+      "id": "content/themes",
+      "label": "themes",
+      "type": "content",
+      "group": "content",
+      "path": "src/content/themes.json"
+    },
+    {
+      "id": "contexts/AssistantContext",
+      "label": "AssistantContext",
+      "type": "context",
+      "group": "context",
+      "path": "src/contexts/AssistantContext.tsx"
+    },
+    {
+      "id": "contexts/AuthContext",
+      "label": "AuthContext",
+      "type": "context",
+      "group": "context",
+      "path": "src/contexts/AuthContext.tsx"
+    },
+    {
+      "id": "contexts/LangContext",
+      "label": "LangContext",
+      "type": "context",
+      "group": "context",
+      "path": "src/contexts/LangContext.tsx"
+    },
+    {
+      "id": "contexts/ThemeContext",
+      "label": "ThemeContext",
+      "type": "context",
+      "group": "context",
+      "path": "src/contexts/ThemeContext.tsx"
+    },
+    {
+      "id": "data/knowledgeBase",
+      "label": "knowledgeBase",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/data/knowledgeBase.ts"
+    },
+    {
+      "id": "hooks/use-mobile",
+      "label": "use-mobile",
+      "type": "hook",
+      "group": "hook",
+      "path": "src/hooks/use-mobile.tsx"
+    },
+    {
+      "id": "hooks/use-toast",
+      "label": "use-toast",
+      "type": "hook",
+      "group": "hook",
+      "path": "src/hooks/use-toast.ts"
+    },
+    {
+      "id": "hooks/useMe",
+      "label": "useMe",
+      "type": "hook",
+      "group": "hook",
+      "path": "src/hooks/useMe.ts"
+    },
+    {
+      "id": "hooks/useProjects",
+      "label": "useProjects",
+      "type": "hook",
+      "group": "hook",
+      "path": "src/hooks/useProjects.ts"
+    },
+    {
+      "id": "hooks/useRbac",
+      "label": "useRbac",
+      "type": "hook",
+      "group": "hook",
+      "path": "src/hooks/useRbac.ts"
+    },
+    {
+      "id": "index.css",
+      "label": "index.css",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/index.css"
+    },
+    {
+      "id": "lib/assistantResponse",
+      "label": "assistantResponse",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/assistantResponse.ts"
+    },
+    {
+      "id": "lib/authSchemas",
+      "label": "authSchemas",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/authSchemas.ts"
+    },
+    {
+      "id": "lib/brand-theme",
+      "label": "brand-theme",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/brand-theme.ts"
+    },
+    {
+      "id": "lib/chrome-i18n",
+      "label": "chrome-i18n",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/chrome-i18n.ts"
+    },
+    {
+      "id": "lib/content-lang",
+      "label": "content-lang",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/content-lang.ts"
+    },
+    {
+      "id": "lib/engine",
+      "label": "engine",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/engine.ts"
+    },
+    {
+      "id": "lib/flatten",
+      "label": "flatten",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/flatten.ts"
+    },
+    {
+      "id": "lib/i18n",
+      "label": "i18n",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/i18n.ts"
+    },
+    {
+      "id": "lib/icons",
+      "label": "icons",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/icons.ts"
+    },
+    {
+      "id": "lib/media",
+      "label": "media",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/media.ts"
+    },
+    {
+      "id": "lib/rbacI18n",
+      "label": "rbacI18n",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/rbacI18n.ts"
+    },
+    {
+      "id": "lib/seo",
+      "label": "seo",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/seo.ts"
+    },
+    {
+      "id": "lib/utils",
+      "label": "utils",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/utils.ts"
+    },
+    {
+      "id": "main",
+      "label": "main",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/main.tsx"
+    },
+    {
+      "id": "pages/Dashboard",
+      "label": "Dashboard",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/Dashboard.tsx"
+    },
+    {
+      "id": "pages/Evaluator",
+      "label": "Evaluator",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/Evaluator.tsx"
+    },
+    {
+      "id": "pages/ForgotPassword",
+      "label": "ForgotPassword",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/ForgotPassword.tsx"
+    },
+    {
+      "id": "pages/Index",
+      "label": "Index",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/Index.tsx"
+    },
+    {
+      "id": "pages/Landing",
+      "label": "Landing",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/Landing.tsx"
+    },
+    {
+      "id": "pages/Login",
+      "label": "Login",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/Login.tsx"
+    },
+    {
+      "id": "pages/NewOrganization",
+      "label": "NewOrganization",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/NewOrganization.tsx"
+    },
+    {
+      "id": "pages/NewProject",
+      "label": "NewProject",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/NewProject.tsx"
+    },
+    {
+      "id": "pages/NotFound",
+      "label": "NotFound",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/NotFound.tsx"
+    },
+    {
+      "id": "pages/ProfilePage",
+      "label": "ProfilePage",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/ProfilePage.tsx"
+    },
+    {
+      "id": "pages/ProjectDetail",
+      "label": "ProjectDetail",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/ProjectDetail.tsx"
+    },
+    {
+      "id": "pages/Projects",
+      "label": "Projects",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/Projects.tsx"
+    },
+    {
+      "id": "pages/Register",
+      "label": "Register",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/Register.tsx"
+    },
+    {
+      "id": "pages/ResetPassword",
+      "label": "ResetPassword",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/ResetPassword.tsx"
+    },
+    {
+      "id": "pages/RolesPage",
+      "label": "RolesPage",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/RolesPage.tsx"
+    },
+    {
+      "id": "pages/VerifyEmail",
+      "label": "VerifyEmail",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/VerifyEmail.tsx"
+    },
+    {
+      "id": "repositories/branding.repository",
+      "label": "branding.repository",
+      "type": "repository",
+      "group": "repository",
+      "path": "src/repositories/branding.repository.ts"
+    },
+    {
+      "id": "repositories/landing.repository",
+      "label": "landing.repository",
+      "type": "repository",
+      "group": "repository",
+      "path": "src/repositories/landing.repository.ts"
+    },
+    {
+      "id": "services/authToken",
+      "label": "authToken",
+      "type": "service",
+      "group": "service",
+      "path": "src/services/authToken.ts"
+    },
+    {
+      "id": "services/branding.service",
+      "label": "branding.service",
+      "type": "service",
+      "group": "service",
+      "path": "src/services/branding.service.ts"
+    },
+    {
+      "id": "services/fireCodeApi",
+      "label": "fireCodeApi",
+      "type": "service",
+      "group": "service",
+      "path": "src/services/fireCodeApi.ts"
+    },
+    {
+      "id": "services/landing.service",
+      "label": "landing.service",
+      "type": "service",
+      "group": "service",
+      "path": "src/services/landing.service.ts"
+    },
+    {
+      "id": "services/rbacApi",
+      "label": "rbacApi",
+      "type": "service",
+      "group": "service",
+      "path": "src/services/rbacApi.ts"
+    },
+    {
+      "id": "test/example.test",
+      "label": "example.test",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/test/example.test.ts"
+    },
+    {
+      "id": "test/setup",
+      "label": "setup",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/test/setup.ts"
+    },
+    {
+      "id": "translations/en",
+      "label": "en",
+      "type": "content",
+      "group": "content",
+      "path": "src/translations/en.json"
+    },
+    {
+      "id": "translations/es",
+      "label": "es",
+      "type": "content",
+      "group": "content",
+      "path": "src/translations/es.json"
+    },
+    {
+      "id": "types/rbac",
+      "label": "rbac",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/types/rbac.ts"
+    },
+    {
+      "id": "vite-env.d",
+      "label": "vite-env.d",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/vite-env.d.ts"
+    }
+  ],
+  "edges": [
+    {
+      "from": "App",
+      "to": "components/RequireAuth",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "components/ui/sonner",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "components/ui/toaster",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "components/ui/tooltip",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "contexts/ThemeContext",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/Dashboard",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/Evaluator",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/ForgotPassword",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/Index",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/Landing",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/Login",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/NewOrganization",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/NewProject",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/NotFound",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/ProfilePage",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/ProjectDetail",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/Projects",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/Register",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/ResetPassword",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/RolesPage",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
+      "to": "pages/VerifyEmail",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/DemoLimitCard",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/DemoLimitCard",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/EvaluationCard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/EvaluationCard",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ProjectCard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ProjectCard",
+      "to": "lib/assistantResponse",
+      "kind": "imports"
+    },
+    {
+      "from": "components/auth/AuthShell",
+      "to": "components/ThemeToggle",
+      "kind": "imports"
+    },
+    {
+      "from": "components/auth/PasswordField",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/auth/PasswordField",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/auth/PasswordStrengthIndicator",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/auth/PasswordStrengthIndicator",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "components/auth/PasswordStrengthIndicator",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "components/ui/input",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "components/ui/label",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/CategoryCard",
+      "to": "components/RuleDetailModal",
+      "kind": "imports"
+    },
+    {
+      "from": "components/CategoryCard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/CategoryCard",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/CategoryCard",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/DemoLimitCard",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/EvaluationCard",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/ProjectCard",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/TextMessage",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/ui/input",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/UpgradeModal",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "lib/assistantResponse",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/DashboardLayout",
+      "to": "components/GlobalAssistant",
+      "kind": "imports"
+    },
+    {
+      "from": "components/DashboardLayout",
+      "to": "components/NavLink",
+      "kind": "imports"
+    },
+    {
+      "from": "components/DashboardLayout",
+      "to": "components/ThemeToggle",
+      "kind": "imports"
+    },
+    {
+      "from": "components/DashboardLayout",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/DashboardLayout",
+      "to": "components/ui/sidebar",
+      "kind": "imports"
+    },
+    {
+      "from": "components/DashboardLayout",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/DashboardLayout",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/DashboardLayout",
+      "to": "hooks/useRbac",
+      "kind": "imports"
+    },
+    {
+      "from": "components/GlobalAssistant",
+      "to": "components/ChatPanel",
+      "kind": "imports"
+    },
+    {
+      "from": "components/GlobalAssistant",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/GlobalAssistant",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/GlobalAssistant",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/GlobalAssistant",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/GlobalAssistant",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/Header",
+      "to": "components/ThemeToggle",
+      "kind": "imports"
+    },
+    {
+      "from": "components/Header",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/Header",
+      "to": "components/ui/sheet",
+      "kind": "imports"
+    },
+    {
+      "from": "components/Header",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/Header",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/Header",
+      "to": "lib/chrome-i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "components/Header",
+      "to": "services/branding.service",
+      "kind": "imports"
+    },
+    {
+      "from": "components/NavLink",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RequireAuth",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RiskBadge",
+      "to": "components/ui/badge",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RiskBadge",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RiskBadge",
+      "to": "hooks/useProjects",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RiskBadge",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/PermissionMatrix",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/PermissionMatrix",
+      "to": "lib/rbacI18n",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/PermissionMatrix",
+      "to": "types/rbac",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/RoleDrawerForm",
+      "to": "components/roles/PermissionMatrix",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/RoleDrawerForm",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/RoleDrawerForm",
+      "to": "hooks/useMe",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/RoleDrawerForm",
+      "to": "hooks/useRbac",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/RoleDrawerForm",
+      "to": "lib/rbacI18n",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/RoleDrawerForm",
+      "to": "services/rbacApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/roles/RoleDrawerForm",
+      "to": "types/rbac",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RuleDetailModal",
+      "to": "components/ui/dialog",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RuleDetailModal",
+      "to": "components/ui/tabs",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RuleDetailModal",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RuleDetailModal",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ThemeToggle",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ThemeToggle",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ThemeToggle",
+      "to": "contexts/ThemeContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ThemeToggle",
+      "to": "lib/chrome-i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/accordion",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/alert-dialog",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/alert-dialog",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/alert",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/avatar",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/badge",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/breadcrumb",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/button",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/calendar",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/calendar",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/card",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/carousel",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/carousel",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/chart",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/checkbox",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/command",
+      "to": "components/ui/dialog",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/command",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/context-menu",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/dialog",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/drawer",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/dropdown-menu",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/form",
+      "to": "components/ui/label",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/form",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/hover-card",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/input-otp",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/input",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/label",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/menubar",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/navigation-menu",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/pagination",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/pagination",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/popover",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/progress",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/radio-group",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/resizable",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/scroll-area",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/select",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/separator",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sheet",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sidebar",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sidebar",
+      "to": "components/ui/input",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sidebar",
+      "to": "components/ui/separator",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sidebar",
+      "to": "components/ui/sheet",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sidebar",
+      "to": "components/ui/skeleton",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sidebar",
+      "to": "components/ui/tooltip",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sidebar",
+      "to": "hooks/use-mobile",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/sidebar",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/skeleton",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/slider",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/switch",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/table",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/tabs",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/textarea",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/toaster",
+      "to": "components/ui/toast",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/toaster",
+      "to": "hooks/use-toast",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/toast",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/toggle-group",
+      "to": "components/ui/toggle",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/toggle-group",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/toggle",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/tooltip",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/use-toast",
+      "to": "hooks/use-toast",
+      "kind": "imports"
+    },
+    {
+      "from": "components/UpgradeModal",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/UpgradeModal",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "contexts/AssistantContext",
+      "to": "components/ChatPanel",
+      "kind": "imports"
+    },
+    {
+      "from": "contexts/AssistantContext",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "contexts/AuthContext",
+      "to": "services/authToken",
+      "kind": "imports"
+    },
+    {
+      "from": "contexts/LangContext",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "contexts/ThemeContext",
+      "to": "lib/brand-theme",
+      "kind": "imports"
+    },
+    {
+      "from": "hooks/use-toast",
+      "to": "components/ui/toast",
+      "kind": "imports"
+    },
+    {
+      "from": "hooks/useMe",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "hooks/useMe",
+      "to": "services/rbacApi",
+      "kind": "imports"
+    },
+    {
+      "from": "hooks/useMe",
+      "to": "types/rbac",
+      "kind": "imports"
+    },
+    {
+      "from": "hooks/useProjects",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "hooks/useRbac",
+      "to": "hooks/useMe",
+      "kind": "imports"
+    },
+    {
+      "from": "hooks/useRbac",
+      "to": "services/rbacApi",
+      "kind": "imports"
+    },
+    {
+      "from": "hooks/useRbac",
+      "to": "types/rbac",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/assistantResponse",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/brand-theme",
+      "to": "content/branding",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/brand-theme",
+      "to": "content/themes",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/brand-theme",
+      "to": "lib/media",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/chrome-i18n",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/chrome-i18n",
+      "to": "translations/en",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/chrome-i18n",
+      "to": "translations/es",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/content-lang",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/engine",
+      "to": "data/knowledgeBase",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/media",
+      "to": "content/seo",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/rbacI18n",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/seo",
+      "to": "content/seo",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/seo",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/seo",
+      "to": "lib/media",
+      "kind": "imports"
+    },
+    {
+      "from": "main",
+      "to": "App",
+      "kind": "imports"
+    },
+    {
+      "from": "main",
+      "to": "config/amplify",
+      "kind": "imports"
+    },
+    {
+      "from": "main",
+      "to": "index.css",
+      "kind": "imports"
+    },
+    {
+      "from": "main",
+      "to": "lib/brand-theme",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "components/DashboardLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "components/RiskBadge",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "components/ui/card",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "hooks/useProjects",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Dashboard",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Evaluator",
+      "to": "components/DashboardLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Evaluator",
+      "to": "pages/Index",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ForgotPassword",
+      "to": "components/auth/AuthShell",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ForgotPassword",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ForgotPassword",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ForgotPassword",
+      "to": "lib/authSchemas",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/BuildingSelector",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/CategoryCard",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/ChatPanel",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/Header",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/ui/skeleton",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "lib/chrome-i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "lib/seo",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Landing",
+      "to": "components/Header",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Landing",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Landing",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Landing",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Landing",
+      "to": "lib/chrome-i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Landing",
+      "to": "lib/seo",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Landing",
+      "to": "services/branding.service",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Landing",
+      "to": "services/landing.service",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Login",
+      "to": "components/auth/AuthShell",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Login",
+      "to": "components/auth/PasswordField",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Login",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Login",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Login",
+      "to": "lib/authSchemas",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewOrganization",
+      "to": "components/DashboardLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewOrganization",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "components/DashboardLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "components/ui/alert",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "components/ui/card",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "components/ui/input",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "components/ui/label",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "components/ui/select",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "components/UpgradeModal",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "hooks/useProjects",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NewProject",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NotFound",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NotFound",
+      "to": "lib/chrome-i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/NotFound",
+      "to": "lib/seo",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProfilePage",
+      "to": "components/auth/PasswordField",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProfilePage",
+      "to": "components/auth/PasswordStrengthIndicator",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProfilePage",
+      "to": "components/DashboardLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProfilePage",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProfilePage",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProfilePage",
+      "to": "lib/authSchemas",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProjectDetail",
+      "to": "components/DashboardLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProjectDetail",
+      "to": "components/RiskBadge",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProjectDetail",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProjectDetail",
+      "to": "components/ui/card",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProjectDetail",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProjectDetail",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProjectDetail",
+      "to": "hooks/useProjects",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ProjectDetail",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "components/DashboardLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "components/RiskBadge",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "components/ui/alert-dialog",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "components/ui/card",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "components/ui/table",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "hooks/useProjects",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Projects",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Register",
+      "to": "components/auth/AuthShell",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Register",
+      "to": "components/auth/PasswordField",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Register",
+      "to": "components/auth/PasswordStrengthIndicator",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Register",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Register",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Register",
+      "to": "lib/authSchemas",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ResetPassword",
+      "to": "components/auth/AuthShell",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ResetPassword",
+      "to": "components/auth/PasswordField",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ResetPassword",
+      "to": "components/auth/PasswordStrengthIndicator",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ResetPassword",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ResetPassword",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/ResetPassword",
+      "to": "lib/authSchemas",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/RolesPage",
+      "to": "components/DashboardLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/RolesPage",
+      "to": "components/roles/RoleDrawerForm",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/RolesPage",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/RolesPage",
+      "to": "hooks/useMe",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/RolesPage",
+      "to": "hooks/useRbac",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/RolesPage",
+      "to": "lib/rbacI18n",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/RolesPage",
+      "to": "services/rbacApi",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/RolesPage",
+      "to": "types/rbac",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/VerifyEmail",
+      "to": "components/auth/AuthShell",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/VerifyEmail",
+      "to": "contexts/AuthContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/VerifyEmail",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/branding.repository",
+      "to": "content/branding",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/landing.repository",
+      "to": "content/cta",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/landing.repository",
+      "to": "content/features",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/landing.repository",
+      "to": "content/footer",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/landing.repository",
+      "to": "content/hero",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/landing.repository",
+      "to": "content/how-it-works",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/landing.repository",
+      "to": "content/problems",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/landing.repository",
+      "to": "content/solutions",
+      "kind": "imports"
+    },
+    {
+      "from": "services/branding.service",
+      "to": "lib/content-lang",
+      "kind": "imports"
+    },
+    {
+      "from": "services/branding.service",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "services/branding.service",
+      "to": "lib/icons",
+      "kind": "imports"
+    },
+    {
+      "from": "services/branding.service",
+      "to": "lib/media",
+      "kind": "imports"
+    },
+    {
+      "from": "services/branding.service",
+      "to": "repositories/branding.repository",
+      "kind": "imports"
+    },
+    {
+      "from": "services/fireCodeApi",
+      "to": "config/amplify",
+      "kind": "imports"
+    },
+    {
+      "from": "services/fireCodeApi",
+      "to": "services/authToken",
+      "kind": "imports"
+    },
+    {
+      "from": "services/landing.service",
+      "to": "lib/content-lang",
+      "kind": "imports"
+    },
+    {
+      "from": "services/landing.service",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "services/landing.service",
+      "to": "lib/icons",
+      "kind": "imports"
+    },
+    {
+      "from": "services/landing.service",
+      "to": "repositories/landing.repository",
+      "kind": "imports"
+    },
+    {
+      "from": "services/rbacApi",
+      "to": "services/authToken",
+      "kind": "imports"
+    },
+    {
+      "from": "services/rbacApi",
+      "to": "types/rbac",
+      "kind": "imports"
+    }
+  ]
+}

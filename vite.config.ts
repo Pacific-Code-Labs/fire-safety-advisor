@@ -11,6 +11,8 @@ export default defineConfig(() => ({
       overlay: false,
     },
   },
+  // The admin CMS (incl. its local-CMS write-back middleware) now lives in the
+  // separate `fire-code-admin` app/repo; this public site ships no admin code.
   plugins: [react()],
   resolve: {
     alias: {

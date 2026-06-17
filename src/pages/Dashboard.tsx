@@ -8,6 +8,7 @@ import { useAssistant } from "@/contexts/AssistantContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RiskBadge } from "@/components/RiskBadge";
+import { CurrentPlanPanel } from "@/components/CurrentPlanPanel";
 import { FolderKanban, Plus, Sparkles, ArrowRight } from "lucide-react";
 import { BuildingType } from "@/services/fireCodeApi";
 
@@ -80,6 +81,8 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        <CurrentPlanPanel />
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">

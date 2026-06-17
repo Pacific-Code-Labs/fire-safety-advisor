@@ -4,7 +4,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
-import { fireCodeApi, BuildingType, type EvaluateResponse } from "@/services/fireCodeApi";
+import { fireCodeApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse } from "@/services/fireCodeApi";
+import { UpgradeModal } from "@/components/UpgradeModal";
+import type { PageContext } from "@/contexts/AssistantContext";
 import {
   normalizeAssistantResponse,
   type ProjectCreatedData,
@@ -13,9 +15,10 @@ import {
 import { TextMessage } from "@/components/assistant/TextMessage";
 import { EvaluationCard } from "@/components/assistant/EvaluationCard";
 import { ProjectCard } from "@/components/assistant/ProjectCard";
+import { DemoLimitCard } from "@/components/assistant/DemoLimitCard";
 import { cn } from "@/lib/utils";
 
-export type MsgType = "message" | "evaluation" | "project" | "error";
+export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit";
 
 export interface Msg {
   role: "user" | "assistant";
@@ -26,7 +29,7 @@ export interface Msg {
   /** Legacy: full evaluation response (kept for backward compat) */
   answer?: EvaluateResponse;
   /** New polymorphic payload */
-  payload?: EvaluateResponse | ProjectCreatedData | MessageData;
+  payload?: EvaluateResponse | ProjectCreatedData | MessageData | DemoLimitResponse;
 }
 
 interface Props {
@@ -40,12 +43,34 @@ interface Props {
   onClose?: () => void;
   messages: Msg[];
   setMessages: React.Dispatch<React.SetStateAction<Msg[]>>;
+  /** FCR-042: page/project context forwarded to the agent for continuity. */
+  pageContext?: PageContext;
+  /**
+   * FCR-047: when true this is the PUBLIC demo assistant — calls the throttled
+   * public /demo/evaluate (teaser answers, never creates projects) and renders a
+   * sign-up CTA on the 429 daily-cap response.
+   */
+  demo?: boolean;
 }
 
-export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages }: Props) {
+/** Cap replayed history to the most recent N turns (FCR-042 token budget). */
+const MAX_CONVERSATION_TURNS = 10;
+
+/** Map the running assistant message list to the agent {role,content} contract. */
+function toConversation(messages: Msg[]): ConversationTurn[] {
+  return messages
+    .filter((m) => m.type !== "error" && (m.text?.trim()?.length ?? 0) > 0)
+    .map<ConversationTurn>((m) => ({ role: m.role, content: m.text }))
+    .slice(-MAX_CONVERSATION_TURNS);
+}
+
+export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages, pageContext, demo = false }: Props) {
   const { lang, tr } = useLang();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // FCR-026: the authenticated /evaluate quota gate returns 402/429 → QuotaError.
+  // The public demo path keeps using DemoLimitError; this is the signed-in path.
+  const [quota, setQuota] = useState<QuotaError | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -104,6 +129,13 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     }
   };
 
+  const handleDemoLimit = (payload: DemoLimitResponse) => {
+    setMessages((m) => [
+      ...m,
+      { role: "assistant", text: payload.message, type: "demo_limit", payload },
+    ]);
+  };
+
   const handleError = (err?: unknown) => {
     setMessages((m) => [
       ...m,
@@ -120,24 +152,52 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
 
   const ask = async (text: string) => {
     if (!text.trim() || isLoading) return;
+    // Prior turns BEFORE appending the current question (FCR-042). The current
+    // query is sent separately as user_query, so it is excluded here.
+    const conversation = toConversation(messages);
     setMessages((m) => [...m, { role: "user", text, type: "message" }]);
     setInput("");
     setIsLoading(true);
 
+    // FCR-047: the public demo sends demo=true + context.page="demo" and hits
+    // the throttled public /demo/evaluate; the dashboard assistant uses the
+    // authenticated /evaluate.
+    const requestBody = {
+      // FCR-044: send the REAL selected values (or omit). No fabricated
+      // "comercial"/usage-from-query defaults — the agent infers or asks.
+      building_type: buildingType || undefined,
+      usage: usage || undefined,
+      user_query: text,
+      area_m2: areaM2 || undefined,
+      floors: floors || undefined,
+      occupants: occupants || undefined,
+      ceiling_height_m: ceilingHeight || undefined,
+      volume_m3: volume || undefined,
+      language: lang,
+      conversation,
+      context: demo
+        ? { page: "demo" as const, project: null }
+        : pageContext
+        ? { page: pageContext.page, project: pageContext.payload ?? null }
+        : undefined,
+      demo: demo || undefined,
+    };
+
     try {
-      const result = await fireCodeApi.evaluate({
-        building_type: buildingType || BuildingType.comercial,
-        usage: usage || text,
-        user_query: text,
-        area_m2: areaM2 || undefined,
-        floors: floors || undefined,
-        occupants: occupants || undefined,
-        ceiling_height_m: ceilingHeight || undefined,
-        volume_m3: volume || undefined,
-      });
+      const result = demo
+        ? await fireCodeApi.evaluateDemo(requestBody)
+        : await fireCodeApi.evaluate(requestBody);
       handleResponse(result);
     } catch (err) {
-      handleError(err);
+      if (err instanceof DemoLimitError) {
+        handleDemoLimit(err.payload);
+      } else if (err instanceof QuotaError) {
+        // Signed-in evaluate quota reached — open the UpgradeModal (FCR-026)
+        // instead of pushing a generic error bubble.
+        setQuota(err);
+      } else {
+        handleError(err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -163,6 +223,9 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
           {m.payload && <div className="mt-3"><ProjectCard data={m.payload as ProjectCreatedData} /></div>}
         </>
       );
+    }
+    if (type === "demo_limit" && m.payload) {
+      return <DemoLimitCard data={m.payload as DemoLimitResponse} />;
     }
     // message / error / fallback
     return <TextMessage text={m.text} />;
@@ -257,6 +320,8 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </form>
+
+      <UpgradeModal quota={quota} onClose={() => setQuota(null)} />
     </div>
   );
 }

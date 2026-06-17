@@ -1,0 +1,21 @@
+{
+  "badgeIconName": "sparkles",
+  "badge": {
+    "es": "Nuevo · Asistente NFPA para Costa Rica",
+    "en": "New · NFPA Assistant for Costa Rica"
+  },
+  "title": {
+    "es": "Interprete códigos contra incendios en segundos, no en semanas",
+    "en": "Interpret fire codes in seconds, not weeks"
+  },
+  "subtitle": {
+    "es": "FireCode CR combina IA y reglas deterministas para entregarle requisitos NFPA aplicables a su proyecto, con contexto local de Costa Rica.",
+    "en": "FireCode CR combines AI and a deterministic rule engine to deliver NFPA requirements that apply to your project, with Costa Rica context built in."
+  },
+  "ctaPrimary": { "es": "Probar la demo", "en": "Try the demo" },
+  "ctaSecondary": { "es": "Ver cómo funciona", "en": "See how it works" },
+  "trust": {
+    "es": "Basado en NFPA · Contexto Costa Rica · Resultados estructurados",
+    "en": "NFPA-based · Costa Rica context · Structured outputs"
+  }
+}

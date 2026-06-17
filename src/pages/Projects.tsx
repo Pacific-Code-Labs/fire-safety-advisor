@@ -7,10 +7,15 @@ import { useAssistant } from "@/contexts/AssistantContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RiskBadge } from "@/components/RiskBadge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FolderKanban, Plus, Trash2, Eye } from "lucide-react";
 import { BuildingType } from "@/services/fireCodeApi";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -20,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@pacific-code-labs/fire-code-design-system";
 
 export default function Projects() {
   const { projects, loading, remove } = useProjects();

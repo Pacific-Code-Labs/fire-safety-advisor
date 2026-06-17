@@ -63,6 +63,7 @@ export function GlobalAssistant() {
                 onClose={() => setOpen(false)}
                 messages={messages}
                 setMessages={setMessages}
+                pageContext={pageContext}
               />
             </div>
           </aside>
