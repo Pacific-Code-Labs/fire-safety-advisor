@@ -43,7 +43,16 @@ function meta(route, lang) {
   };
 }
 
-function renderShell({ lang, title, description, canonical, route, noindex }) {
+// The Vite-built SPA shell (has the hashed module <script>, CSS <link>, and the
+// <div id="root">). base="/" → asset URLs are root-absolute, so the bundle loads
+// correctly even from a nested /es/demo/index.html. We INJECT per-route SEO head
+// tags into THIS shell (rather than emitting an SEO-only stub) so every
+// prerendered page both ranks AND boots the React app. (Read once, up front,
+// BEFORE we overwrite the root index.html with the redirect shell below.)
+const SPA_SHELL = await fs.readFile(path.join(OUT, "index.html"), "utf8");
+
+/** Inject per-route SEO tags into the real SPA shell, keeping the app bootable. */
+function injectSeo(shell, { lang, title, description, canonical, route, noindex }) {
   const slug = slugOf(route);
   const alternates = LANGS.map(
     (l) => `<link rel="alternate" hreflang="${l}" href="${siteUrl}/${l}${slug}" />`,
@@ -62,33 +71,42 @@ function renderShell({ lang, title, description, canonical, route, noindex }) {
       },
     ],
   };
-  return `<!doctype html>
-<html lang="${lang}">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${esc(title)}</title>
-    <meta name="description" content="${esc(description)}" />
-    ${noindex ? '<meta name="robots" content="noindex,follow" />' : '<meta name="robots" content="index,follow" />'}
-    <link rel="canonical" href="${canonical}" />
-    ${alternates}
-    ${xDefault}
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="${esc(title)}" />
-    <meta property="og:description" content="${esc(description)}" />
-    <meta property="og:url" content="${canonical}" />
-    <meta property="og:image" content="${ogImage}" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${esc(title)}" />
-    <meta name="twitter:description" content="${esc(description)}" />
-    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
-  </head>
-  <body>
-    <p>${esc(title)} — ${esc(description)}</p>
-    <p><a href="${siteUrl}/">Continue to the app</a></p>
-  </body>
-</html>
-`;
+  const headBlock = [
+    `<meta name="description" content="${esc(description)}" />`,
+    noindex ? '<meta name="robots" content="noindex,follow" />' : '<meta name="robots" content="index,follow" />',
+    `<link rel="canonical" href="${canonical}" />`,
+    alternates,
+    xDefault,
+    '<meta property="og:type" content="website" />',
+    `<meta property="og:title" content="${esc(title)}" />`,
+    `<meta property="og:description" content="${esc(description)}" />`,
+    `<meta property="og:url" content="${canonical}" />`,
+    `<meta property="og:image" content="${ogImage}" />`,
+    '<meta name="twitter:card" content="summary_large_image" />',
+    `<meta name="twitter:title" content="${esc(title)}" />`,
+    `<meta name="twitter:description" content="${esc(description)}" />`,
+    `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+  ].join("\n    ");
+
+  let html = shell;
+  // <html lang> for this page
+  html = html.replace(/<html[^>]*>/i, `<html lang="${lang}">`);
+  // Replace the shell's <title> (or insert one) + strip any SEO tags it carries,
+  // so we don't end up with duplicates after injecting ours.
+  if (/<title>[\s\S]*?<\/title>/i.test(html)) {
+    html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(title)}</title>`);
+  } else {
+    html = html.replace(/<\/head>/i, `  <title>${esc(title)}</title>\n  </head>`);
+  }
+  html = html
+    .replace(/\s*<meta\s+name="description"[^>]*>/gi, "")
+    .replace(/\s*<link\s+rel="canonical"[^>]*>/gi, "")
+    .replace(/\s*<link\s+rel="alternate"\s+hreflang=[^>]*>/gi, "")
+    .replace(/\s*<meta\s+property="og:[^"]*"[^>]*>/gi, "")
+    .replace(/\s*<meta\s+name="twitter:[^"]*"[^>]*>/gi, "");
+  // Inject the fresh SEO block immediately before </head>.
+  html = html.replace(/<\/head>/i, `    ${headBlock}\n  </head>`);
+  return html;
 }
 
 let written = 0;
@@ -96,7 +114,7 @@ for (const lang of LANGS) {
   for (const route of ROUTES) {
     const { title, description } = meta(route, lang);
     const canonical = `${siteUrl}/${lang}${slugOf(route)}`;
-    const html = renderShell({ lang, title, description, canonical, route });
+    const html = injectSeo(SPA_SHELL, { lang, title, description, canonical, route });
     const dir = path.join(OUT, lang, route === "home" ? "" : route);
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(path.join(dir, "index.html"), html);
