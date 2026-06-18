@@ -116,14 +116,12 @@ export interface EvaluateRequest {
   language?: Language;
   /** FCR-042: trimmed prior turns (most recent last), excludes current user_query. */
   conversation?: ConversationTurn[];
-  /** FCR-042: page + optional project for conversational continuity. */
-  context?: EvaluateContext;
   /**
-   * FCR-047: demo mode. The public /demo page sets this true (+ context.page
-   * "demo"). The backend forces it on the public /demo/evaluate path anyway, so
-   * the agent gives a teaser answer and never creates a project.
+   * FCR-042: page + optional project for conversational continuity.
+   * FCR-047: demo mode is derived from `context.page === "demo"` (no separate
+   * flag) — the public /demo page sets it; the BE forces it on /demo/evaluate.
    */
-  demo?: boolean;
+  context?: EvaluateContext;
 }
 
 /**
@@ -349,7 +347,12 @@ export const fireCodeApi = {
    * render the call-to-action instead of a generic error.
    */
   async evaluateDemo(request: EvaluateRequest): Promise<EvaluateResponse> {
-    const body = { ...request, demo: true } as unknown as Record<string, unknown>;
+    // Demo mode is signalled by context.page === "demo" (no flag). Force it here
+    // too so the BE enters DEMO MODE even if a caller omitted the context.
+    const body = {
+      ...request,
+      context: { ...(request.context ?? {}), page: "demo" as const, project: request.context?.project ?? null },
+    } as unknown as Record<string, unknown>;
     try {
       return await resolveBody<EvaluateResponse>(
         post({

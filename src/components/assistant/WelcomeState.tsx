@@ -1,27 +1,22 @@
-import { ArrowRight, BellRing, Flame, ShieldCheck, UtensilsCrossed, Warehouse } from "lucide-react";
+import { ArrowRight, Flame } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
+import { getDemoScenarios, type DemoScenario } from "@/lib/demoScenarios";
 import { AssistantAvatar } from "./AssistantAvatar";
 
 interface Props {
-  /** Tap handler — sends the example query through the chat. */
-  onAsk: (q: string) => void;
+  /** Tap handler — applies the scenario (grounds the agent + fills the inputs). */
+  onPick: (scenario: DemoScenario) => void;
 }
 
 /**
  * The assistant's first impression: brand mark + value line + curated capability
- * cards. The FIRST card is a full building scenario that returns a rich
- * evaluation (matched rules + requirements + NFPA refs + CR context + risk), so
- * the very first tap showcases the agent's depth. Cards reveal with a stagger.
+ * cards. Each card carries a full building scenario (type/usage/area/floors/…)
+ * so the tap grounds the agent and returns a rich evaluation — the very first
+ * tap showcases the agent's depth. Cards reveal with a stagger.
  */
-export function WelcomeState({ onAsk }: Props) {
+export function WelcomeState({ onPick }: Props) {
   const { tr } = useLang();
-
-  const examples = [
-    { icon: UtensilsCrossed, label: tr.demoExLabel1, q: tr.demoEx1 },
-    { icon: Warehouse, label: tr.demoExLabel2, q: tr.demoEx2 },
-    { icon: BellRing, label: tr.demoExLabel3, q: tr.demoEx3 },
-    { icon: ShieldCheck, label: tr.demoExLabel4, q: tr.demoEx4 },
-  ];
+  const scenarios = getDemoScenarios(tr);
 
   return (
     <div className="flex flex-col items-center gap-4 px-1 py-3 text-center duration-500 animate-in fade-in-50">
@@ -33,18 +28,18 @@ export function WelcomeState({ onAsk }: Props) {
       </div>
 
       <div className="grid w-full gap-2 sm:grid-cols-2">
-        {examples.map((ex, i) => (
+        {scenarios.map((s, i) => (
           <button
-            key={ex.label}
+            key={s.label}
             type="button"
-            onClick={() => onAsk(ex.q)}
+            onClick={() => onPick(s)}
             style={{ animationDelay: `${i * 70}ms`, animationFillMode: "backwards" }}
             className="group flex items-center gap-2.5 rounded-xl border border-border bg-secondary/40 p-3 text-left transition-all duration-200 animate-in fade-in-50 slide-in-from-bottom-2 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/5 hover:shadow-[var(--shadow-glow)]"
           >
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-              <ex.icon className="h-4 w-4" />
+              <s.icon className="h-4 w-4" />
             </span>
-            <span className="text-xs font-medium leading-tight">{ex.label}</span>
+            <span className="text-xs font-medium leading-tight">{s.label}</span>
             <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
           </button>
         ))}

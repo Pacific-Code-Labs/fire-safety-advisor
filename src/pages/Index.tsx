@@ -10,6 +10,7 @@ import { useLang } from "@/contexts/LangContext";
 import { useAssistant } from "@/contexts/AssistantContext";
 import { fireCodeApi, BuildingType, RuleCategory } from "@/services/fireCodeApi";
 import { type Msg } from "@/components/ChatPanel";
+import { type DemoScenarioParams } from "@/lib/demoScenarios";
 import { cn } from "@/lib/utils";
 import { tChrome, fmt } from "@/lib/chrome-i18n";
 import { resolveSeo, useHeadTags } from "@/lib/seo";
@@ -106,6 +107,19 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   const handleFilterChange = <T,>(setter: (v: T) => void) => (v: T) => {
     setter(v);
+    setPage(0);
+  };
+
+  /** Demo capability card → OVERWRITE all building inputs with the scenario
+   * (so the left rules list refilters AND the agent is grounded). */
+  const applyScenario = (p: DemoScenarioParams) => {
+    setBuilding(p.building_type);
+    setContext(p.usage);
+    setArea(p.area_m2);
+    setFloors(p.floors);
+    setOccupants(p.occupants);
+    setCeilingHeight(p.ceiling_height_m);
+    setVolume(p.volume_m3);
     setPage(0);
   };
 
@@ -322,6 +336,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
                 messages={chatMessages}
                 setMessages={setChatMessages}
                 demo
+                onApplyScenario={applyScenario}
               />
             </div>
           )}
@@ -354,6 +369,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
               messages={chatMessages}
               setMessages={setChatMessages}
               demo
+              onApplyScenario={applyScenario}
             />
           </div>
         </div>

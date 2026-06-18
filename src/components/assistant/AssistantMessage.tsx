@@ -2,13 +2,14 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/contexts/LangContext";
+import { getDemoScenarios, type DemoScenario } from "@/lib/demoScenarios";
 
 interface Props {
   text: string;
   /** Public demo → append the "get the full evaluation" CTA + follow-up chips. */
   demo?: boolean;
-  /** Tap handler for follow-up chips. */
-  onAsk?: (q: string) => void;
+  /** Tap handler for follow-up chips — applies a grounded scenario. */
+  onPick?: (scenario: DemoScenario) => void;
 }
 
 /**
@@ -30,14 +31,13 @@ function parseMessage(text: string): { lead: string; items: string[] } {
   return { lead, items };
 }
 
-export function AssistantMessage({ text, demo, onAsk }: Props) {
+export function AssistantMessage({ text, demo, onPick }: Props) {
   const { tr } = useLang();
   const { lead, items } = parseMessage(text);
 
-  const followups = [
-    { label: tr.demoExLabel1, q: tr.demoEx1 },
-    { label: tr.demoExLabel4, q: tr.demoEx4 },
-  ];
+  // Two grounded follow-up scenarios (restaurant + CR requirements).
+  const scenarios = getDemoScenarios(tr);
+  const followups = [scenarios[0], scenarios[3]];
 
   return (
     <div className="space-y-3">
@@ -69,7 +69,7 @@ export function AssistantMessage({ text, demo, onAsk }: Props) {
         </div>
       )}
 
-      {demo && onAsk && (
+      {demo && onPick && (
         <div className="space-y-1.5">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {tr.demoFollowupLabel}
@@ -79,7 +79,7 @@ export function AssistantMessage({ text, demo, onAsk }: Props) {
               <button
                 key={f.label}
                 type="button"
-                onClick={() => onAsk(f.q)}
+                onClick={() => onPick(f)}
                 className="rounded-full border border-border bg-secondary/50 px-3 py-1 text-xs transition hover:border-primary/40 hover:bg-primary/5"
               >
                 {f.label}

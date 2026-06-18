@@ -17,6 +17,7 @@
  */
 import { useCallback, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   fireCodeApi,
   BuildingType,
@@ -142,6 +143,10 @@ function toUpdateBody(patch: Partial<Project>): ProjectUpdateRequest {
  */
 export function useProjects() {
   const qc = useQueryClient();
+  // /projects is authenticated — only fetch when a Cognito user is present.
+  // BillingProvider mounts this hook globally (incl. the public landing/demo
+  // pages); without this gate a guest would fire /projects → 401.
+  const { user } = useAuth();
 
   const listQuery = useQuery({
     queryKey: projectKeys.list(),
@@ -150,6 +155,7 @@ export function useProjects() {
       const res = await fireCodeApi.listProjects({ page: 0, page_size: 100 });
       return res.data.map(fromResponse);
     },
+    enabled: !!user,
   });
 
   const createMut = useMutation({

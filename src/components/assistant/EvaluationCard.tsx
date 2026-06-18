@@ -1,4 +1,4 @@
-import { AlertTriangle, BookOpen, MapPin } from "lucide-react";
+import { AlertTriangle, BookOpen, Check, ListChecks, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
 import type { CrContextItem, EvaluateResponse } from "@/services/fireCodeApi";
 
@@ -50,9 +50,16 @@ export function EvaluationCard({ data }: Props) {
 
       {data.foundryUsed && data.requirements?.length > 0 && (
         <div className="rounded-md border border-border bg-background/30 p-2 text-xs">
-          <div className="font-semibold text-accent mb-1">{tr.requirements}:</div>
-          <ul className="space-y-0.5 text-muted-foreground">
-            {data.requirements.map((req, ri) => <li key={ri}>• {req}</li>)}
+          <div className="mb-1.5 flex items-center gap-1.5 font-semibold text-accent">
+            <ListChecks className="h-3.5 w-3.5" /> {tr.requirements}:
+          </div>
+          <ul className="space-y-1">
+            {data.requirements.map((req, ri) => (
+              <li key={ri} className="flex gap-2 leading-relaxed">
+                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+                <span>{req}</span>
+              </li>
+            ))}
           </ul>
         </div>
       )}

@@ -20,6 +20,7 @@ import { AssistantMessage } from "@/components/assistant/AssistantMessage";
 import { AssistantAvatar } from "@/components/assistant/AssistantAvatar";
 import { WelcomeState } from "@/components/assistant/WelcomeState";
 import { TypingIndicator } from "@/components/assistant/TypingIndicator";
+import { type DemoScenario, type DemoScenarioParams } from "@/lib/demoScenarios";
 import { cn } from "@/lib/utils";
 
 export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit";
@@ -55,6 +56,12 @@ interface Props {
    * sign-up CTA on the 429 daily-cap response.
    */
   demo?: boolean;
+  /**
+   * Demo only: apply a curated scenario's building params to the page's inputs
+   * (the BuildingSelector) so a tapped capability card both grounds the agent
+   * AND visibly fills the inputs. Provided by the /demo page.
+   */
+  onApplyScenario?: (params: DemoScenarioParams) => void;
 }
 
 /** Cap replayed history to the most recent N turns (FCR-042 token budget). */
@@ -68,7 +75,7 @@ function toConversation(messages: Msg[]): ConversationTurn[] {
     .slice(-MAX_CONVERSATION_TURNS);
 }
 
-export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages, pageContext, demo = false }: Props) {
+export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages, pageContext, demo = false, onApplyScenario }: Props) {
   const { lang, tr } = useLang();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -150,7 +157,12 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     if (err) console.error("Assistant error:", err);
   };
 
-  const ask = async (text: string) => {
+  /**
+   * Send a query. `overrides` (from a tapped demo scenario) ground the building
+   * params for THIS request immediately, bypassing the setState race where the
+   * just-applied selector state hasn't propagated to props yet.
+   */
+  const ask = async (text: string, overrides?: DemoScenarioParams) => {
     if (!text.trim() || isLoading) return;
     // Prior turns BEFORE appending the current question (FCR-042). The current
     // query is sent separately as user_query, so it is excluded here.
@@ -159,20 +171,21 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     setInput("");
     setIsLoading(true);
 
-    // FCR-047: the public demo sends demo=true + context.page="demo" and hits
-    // the throttled public /demo/evaluate; the dashboard assistant uses the
-    // authenticated /evaluate.
+    // The public demo sends context.page="demo" and hits the throttled public
+    // /demo/evaluate (demo mode is now derived from context.page, no flag); the
+    // dashboard assistant uses the authenticated /evaluate.
     const requestBody = {
       // FCR-044: send the REAL selected values (or omit). No fabricated
-      // "comercial"/usage-from-query defaults — the agent infers or asks.
-      building_type: buildingType || undefined,
-      usage: usage || undefined,
+      // defaults — the agent infers or asks. A tapped scenario's `overrides`
+      // win for this request so the agent is grounded immediately.
+      building_type: overrides?.building_type ?? buildingType ?? undefined,
+      usage: overrides?.usage ?? usage ?? undefined,
       user_query: text,
-      area_m2: areaM2 || undefined,
-      floors: floors || undefined,
-      occupants: occupants || undefined,
-      ceiling_height_m: ceilingHeight || undefined,
-      volume_m3: volume || undefined,
+      area_m2: overrides?.area_m2 ?? areaM2 ?? undefined,
+      floors: overrides?.floors ?? floors ?? undefined,
+      occupants: overrides?.occupants ?? occupants ?? undefined,
+      ceiling_height_m: overrides?.ceiling_height_m ?? ceilingHeight ?? undefined,
+      volume_m3: overrides?.volume_m3 ?? volume ?? undefined,
       language: lang,
       conversation,
       context: demo
@@ -180,7 +193,6 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         : pageContext
         ? { page: pageContext.page, project: pageContext.payload ?? null }
         : undefined,
-      demo: demo || undefined,
     };
 
     try {
@@ -201,6 +213,12 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /** A tapped demo scenario: overwrite the visible inputs AND ground this request. */
+  const handlePick = (s: DemoScenario) => {
+    onApplyScenario?.(s.params);
+    ask(s.query, s.params);
   };
 
   const renderAssistantBody = (m: Msg) => {
@@ -228,7 +246,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       return <DemoLimitCard data={m.payload as DemoLimitResponse} />;
     }
     if (type === "message") {
-      return <AssistantMessage text={m.text} demo={demo} onAsk={ask} />;
+      return <AssistantMessage text={m.text} demo={demo} onPick={handlePick} />;
     }
     // error / fallback
     return <TextMessage text={m.text} />;
@@ -264,7 +282,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       </div>
 
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
-        {messages.length === 0 && <WelcomeState onAsk={ask} />}
+        {messages.length === 0 && <WelcomeState onPick={handlePick} />}
 
         {messages.map((m, i) => (
           <div
