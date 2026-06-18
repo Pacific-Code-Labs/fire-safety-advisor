@@ -65,7 +65,7 @@ export default function Pricing() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <Header />
       <main className="container py-12">
         <div className="mx-auto max-w-2xl text-center">

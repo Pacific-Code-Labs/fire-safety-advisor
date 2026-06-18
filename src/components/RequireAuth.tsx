@@ -22,7 +22,7 @@ export function RequireAuth({ children, roles }: RequireAuthProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-background">
         <div className="flex items-center gap-3 text-muted-foreground">
           <Flame className="h-5 w-5 text-primary animate-pulse" />
           <span>Loading…</span>

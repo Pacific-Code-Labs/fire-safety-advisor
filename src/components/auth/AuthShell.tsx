@@ -32,7 +32,7 @@ export function AuthShell({
 }) {
   const { lang } = useLang();
   return (
-    <div className="min-h-screen grid place-items-center bg-background px-4 py-10 relative">
+    <div className="min-h-[100dvh] grid place-items-center bg-background px-4 py-10 relative">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
