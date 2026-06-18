@@ -261,6 +261,22 @@ export interface EvaluateResponse {
   foundryUsed: boolean;
 }
 
+/** FCR-101: a single clarifying question the agent needs answered. */
+export interface NeedsInfoQuestion {
+  key: string;
+  label: string;
+  type?: "text" | "number" | "select";
+  required?: boolean;
+  hint?: string;
+  options?: string[];
+}
+
+/** FCR-101: `needs_info` response payload — structured questions + inferred context. */
+export interface NeedsInfoData {
+  questions: NeedsInfoQuestion[];
+  context?: Record<string, unknown>;
+}
+
 // ── API client ───────────────────────────────────────────────────────────────
 
 const API_NAME = "FireCodeApi";

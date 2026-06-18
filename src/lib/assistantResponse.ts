@@ -8,16 +8,35 @@
  * as { type: "evaluation", data: <response> }.
  */
 
-import type { EvaluateResponse } from "@/services/fireCodeApi";
+import type { EvaluateResponse, NeedsInfoData } from "@/services/fireCodeApi";
 
-export type AssistantResponseType = "evaluation" | "message" | "project_created";
+export type { NeedsInfoData };
 
-export interface ProjectCreatedData {
-  id?: string;
+export type AssistantResponseType =
+  | "evaluation"
+  | "message"
+  | "project_created"
+  | "needs_info";
+
+/** The project payload nested inside ProjectCreatedData (mirrors BE ProjectResponse). */
+export interface ProjectPreview {
   name: string;
   usage?: string;
   buildingType?: string;
-  keyRequirements?: string[];
+  requirements?: string[];
+  reference?: string[];
+  risk?: string;
+  [k: string]: unknown;
+}
+
+/**
+ * BE `project_created` payload = { message, projectId, project }. FCR-100:
+ * `projectId` is null for the non-persisted DEMO PREVIEW.
+ */
+export interface ProjectCreatedData {
+  message?: string;
+  projectId?: string | null;
+  project: ProjectPreview;
   [k: string]: unknown;
 }
 
@@ -28,7 +47,8 @@ export interface MessageData {
 export type NormalizedResponse =
   | { type: "evaluation"; data: EvaluateResponse }
   | { type: "message"; data: MessageData }
-  | { type: "project_created"; data: ProjectCreatedData };
+  | { type: "project_created"; data: ProjectCreatedData }
+  | { type: "needs_info"; data: NeedsInfoData };
 
 function looksLikeEvaluation(obj: unknown): obj is EvaluateResponse {
   if (!obj || typeof obj !== "object") return false;
@@ -49,7 +69,15 @@ export function normalizeAssistantResponse(raw: unknown): NormalizedResponse {
       case "message":
         return { type: "message", data: (data as MessageData) ?? { message: "" } };
       case "project_created":
-        return { type: "project_created", data: (data as ProjectCreatedData) ?? { name: "" } };
+        return {
+          type: "project_created",
+          data: (data as ProjectCreatedData) ?? { project: { name: "" } },
+        };
+      case "needs_info":
+        return {
+          type: "needs_info",
+          data: (data as NeedsInfoData) ?? { questions: [], context: {} },
+        };
       case "evaluation":
         return { type: "evaluation", data: data as EvaluateResponse };
       default:

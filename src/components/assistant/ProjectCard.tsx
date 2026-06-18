@@ -5,22 +5,28 @@ import type { ProjectCreatedData } from "@/lib/assistantResponse";
 interface Props { data: ProjectCreatedData; }
 
 export function ProjectCard({ data }: Props) {
-  const { lang } = useLang();
-  const reqs = data.keyRequirements ?? [];
+  const { lang, tr } = useLang();
+  const project = data.project ?? ({ name: "" } as ProjectCreatedData["project"]);
+  const reqs = project.requirements ?? [];
+  // FCR-100: projectId === null/undefined ⇒ non-persisted demo PREVIEW.
+  const isPreview = data.projectId == null;
+  const name = project.name || (lang === "es" ? "Proyecto" : "Project");
 
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-sm font-semibold text-accent">
         <FolderPlus className="h-4 w-4" />
-        {lang === "es" ? "Proyecto creado" : "Project created"}
+        {isPreview
+          ? lang === "es" ? "Vista previa del proyecto" : "Project preview"
+          : lang === "es" ? "Proyecto creado" : "Project created"}
       </div>
       <div className="rounded-md border border-border bg-background/40 p-2 text-xs space-y-1">
-        <div><span className="font-semibold">{lang === "es" ? "Nombre" : "Name"}:</span> {data.name}</div>
-        {data.usage && (
-          <div><span className="font-semibold">{lang === "es" ? "Uso" : "Usage"}:</span> {data.usage}</div>
+        <div><span className="font-semibold">{lang === "es" ? "Nombre" : "Name"}:</span> {name}</div>
+        {project.usage && (
+          <div><span className="font-semibold">{lang === "es" ? "Uso" : "Usage"}:</span> {project.usage}</div>
         )}
-        {data.buildingType && (
-          <div><span className="font-semibold">{lang === "es" ? "Tipo" : "Type"}:</span> {data.buildingType}</div>
+        {project.buildingType && (
+          <div><span className="font-semibold">{lang === "es" ? "Tipo" : "Type"}:</span> {project.buildingType}</div>
         )}
         {reqs.length > 0 && (
           <div className="pt-1">
@@ -31,6 +37,9 @@ export function ProjectCard({ data }: Props) {
           </div>
         )}
       </div>
+      {isPreview && (
+        <p className="text-[11px] italic text-muted-foreground">{tr.demoPreviewNote}</p>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Send, Sparkles, Loader2, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,10 @@ import { UpgradeModal } from "@/components/UpgradeModal";
 import type { PageContext } from "@/contexts/AssistantContext";
 import {
   normalizeAssistantResponse,
+  type AssistantResponseType,
   type ProjectCreatedData,
   type MessageData,
+  type NeedsInfoData,
 } from "@/lib/assistantResponse";
 import { TextMessage } from "@/components/assistant/TextMessage";
 import { EvaluationCard } from "@/components/assistant/EvaluationCard";
@@ -20,10 +23,21 @@ import { AssistantMessage } from "@/components/assistant/AssistantMessage";
 import { AssistantAvatar } from "@/components/assistant/AssistantAvatar";
 import { WelcomeState } from "@/components/assistant/WelcomeState";
 import { TypingIndicator } from "@/components/assistant/TypingIndicator";
+import { ChoicePrompt } from "@/components/assistant/ChoicePrompt";
+import { NeedsInfoForm } from "@/components/assistant/NeedsInfoForm";
 import { type DemoScenario, type DemoScenarioParams } from "@/lib/demoScenarios";
 import { cn } from "@/lib/utils";
 
-export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit";
+export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit" | "prompt" | "needs_info";
+
+/** FCR-100: which guided-demo step a quick-reply prompt drives. */
+export type PromptKind = "see_eval" | "create_project" | "create_account";
+
+export interface PromptPayload {
+  kind: PromptKind;
+  prompt: string;
+  options: { label: string; value: string }[];
+}
 
 export interface Msg {
   role: "user" | "assistant";
@@ -34,7 +48,7 @@ export interface Msg {
   /** Legacy: full evaluation response (kept for backward compat) */
   answer?: EvaluateResponse;
   /** New polymorphic payload */
-  payload?: EvaluateResponse | ProjectCreatedData | MessageData | DemoLimitResponse;
+  payload?: EvaluateResponse | ProjectCreatedData | MessageData | DemoLimitResponse | PromptPayload | NeedsInfoData;
 }
 
 interface Props {
@@ -53,13 +67,14 @@ interface Props {
   /**
    * FCR-047: when true this is the PUBLIC demo assistant — calls the throttled
    * public /demo/evaluate (teaser answers, never creates projects) and renders a
-   * sign-up CTA on the 429 daily-cap response.
+   * sign-up CTA on the 429 daily-cap response. FCR-100: it also drives the
+   * guided 3-step demo (teaser → full evaluation → project preview → sign-up).
    */
   demo?: boolean;
   /**
    * Demo only: apply a curated scenario's building params to the page's inputs
-   * (the BuildingSelector) so a tapped capability card both grounds the agent
-   * AND visibly fills the inputs. Provided by the /demo page.
+   * (the BuildingSelector) so a tapped capability card visibly fills the inputs.
+   * Provided by the /demo page.
    */
   onApplyScenario?: (params: DemoScenarioParams) => void;
 }
@@ -70,13 +85,30 @@ const MAX_CONVERSATION_TURNS = 10;
 /** Map the running assistant message list to the agent {role,content} contract. */
 function toConversation(messages: Msg[]): ConversationTurn[] {
   return messages
-    .filter((m) => m.type !== "error" && (m.text?.trim()?.length ?? 0) > 0)
+    .filter(
+      (m) =>
+        m.type !== "error" &&
+        m.type !== "prompt" &&
+        m.type !== "needs_info" &&
+        (m.text?.trim()?.length ?? 0) > 0,
+    )
     .map<ConversationTurn>((m) => ({ role: m.role, content: m.text }))
     .slice(-MAX_CONVERSATION_TURNS);
 }
 
+/** Options passed to ask(). FCR-100 guided-demo controls. */
+interface AskOptions {
+  /** A tapped scenario's params ground this request immediately (bypasses the setState race). */
+  overrides?: DemoScenarioParams;
+  /** Teaser step: omit building params so the agent returns a short message, not a full eval. */
+  teaser?: boolean;
+  /** After a successful (non-needs_info) demo response, show this guided prompt next. */
+  demoNext?: PromptKind;
+}
+
 export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages, pageContext, demo = false, onApplyScenario }: Props) {
   const { lang, tr } = useLang();
+  const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   // FCR-026: the authenticated /evaluate quota gate returns 402/429 → QuotaError.
@@ -84,11 +116,18 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   const [quota, setQuota] = useState<QuotaError | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // FCR-100 guided-demo state (refs avoid re-render churn / setState races).
+  const demoNextRef = useRef<PromptKind | null>(null);
+  const activeScenarioRef = useRef<DemoScenario | null>(null);
+  const activeQueryRef = useRef<string>("");
+  const demoEndedRef = useRef<boolean>(false);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, isLoading]);
 
-  const handleResponse = (raw: unknown) => {
+  /** Render the agent response and return its normalized type (for guided flow). */
+  const handleResponse = (raw: unknown): AssistantResponseType => {
     const norm = normalizeAssistantResponse(raw);
 
     switch (norm.type) {
@@ -120,20 +159,31 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         break;
       }
       case "project_created": {
-        const name = norm.data.name || (lang === "es" ? "Proyecto" : "Project");
+        const name = norm.data.project?.name || (lang === "es" ? "Proyecto" : "Project");
+        const isPreview = norm.data.projectId == null;
         setMessages((m) => [
           ...m,
           {
             role: "assistant",
-            text: lang === "es" ? `Proyecto "${name}" creado.` : `Project "${name}" created.`,
+            text: isPreview
+              ? lang === "es" ? `Vista previa de "${name}".` : `Preview of "${name}".`
+              : lang === "es" ? `Proyecto "${name}" creado.` : `Project "${name}" created.`,
             type: "project",
             payload: norm.data,
           },
         ]);
-        toast.success(lang === "es" ? "Proyecto creado" : "Project created successfully");
+        if (!isPreview) toast.success(lang === "es" ? "Proyecto creado" : "Project created successfully");
+        break;
+      }
+      case "needs_info": {
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", text: "", type: "needs_info", payload: norm.data },
+        ]);
         break;
       }
     }
+    return norm.type;
   };
 
   const handleDemoLimit = (payload: DemoLimitResponse) => {
@@ -157,13 +207,58 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     if (err) console.error("Assistant error:", err);
   };
 
+  /** Append a guided-demo quick-reply prompt for the given step (FCR-100). */
+  const appendPrompt = (kind: PromptKind) => {
+    const byKind: Record<PromptKind, PromptPayload> = {
+      see_eval: {
+        kind,
+        prompt: tr.demoStep2Q,
+        options: [
+          { label: tr.demoSeeEval, value: "yes" },
+          { label: tr.demoNo, value: "no" },
+        ],
+      },
+      create_project: {
+        kind,
+        prompt: tr.demoStep3Q,
+        options: [
+          { label: tr.demoYes, value: "yes" },
+          { label: tr.demoNo, value: "no" },
+        ],
+      },
+      create_account: {
+        kind,
+        prompt: tr.demoAccountQ,
+        options: [
+          { label: tr.demoCreateAccount, value: "yes" },
+          { label: tr.demoNotNow, value: "no" },
+        ],
+      },
+    };
+    const payload = byKind[kind];
+    setMessages((m) => [...m, { role: "assistant", text: payload.prompt, type: "prompt", payload }]);
+  };
+
+  /** Soft-end: invite to sign up, keep the chat open. */
+  const appendInvite = () => {
+    demoEndedRef.current = true;
+    setMessages((m) => [
+      ...m,
+      { role: "assistant", text: tr.demoInvite, type: "message", payload: { message: tr.demoInvite } },
+    ]);
+  };
+
   /**
-   * Send a query. `overrides` (from a tapped demo scenario) ground the building
-   * params for THIS request immediately, bypassing the setState race where the
-   * just-applied selector state hasn't propagated to props yet.
+   * Send a query. `opts.overrides` ground the building params for THIS request
+   * (bypassing the setState race); `opts.teaser` omits building params so the
+   * demo's step-1 answer is a short teaser; `opts.demoNext` is the guided prompt
+   * to append after a successful (non-needs_info) demo response.
    */
-  const ask = async (text: string, overrides?: DemoScenarioParams) => {
+  const ask = async (text: string, opts: AskOptions = {}) => {
     if (!text.trim() || isLoading) return;
+    const { overrides, teaser, demoNext } = opts;
+    if (demoNext !== undefined) demoNextRef.current = demoNext;
+
     // Prior turns BEFORE appending the current question (FCR-042). The current
     // query is sent separately as user_query, so it is excluded here.
     const conversation = toConversation(messages);
@@ -172,20 +267,18 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     setIsLoading(true);
 
     // The public demo sends context.page="demo" and hits the throttled public
-    // /demo/evaluate (demo mode is now derived from context.page, no flag); the
-    // dashboard assistant uses the authenticated /evaluate.
+    // /demo/evaluate; the dashboard assistant uses the authenticated /evaluate.
+    // FCR-044: send REAL selected values (or omit). A tapped scenario's overrides
+    // win; a teaser step omits building params so the agent gives a short answer.
     const requestBody = {
-      // FCR-044: send the REAL selected values (or omit). No fabricated
-      // defaults — the agent infers or asks. A tapped scenario's `overrides`
-      // win for this request so the agent is grounded immediately.
-      building_type: overrides?.building_type ?? buildingType ?? undefined,
-      usage: overrides?.usage ?? usage ?? undefined,
+      building_type: teaser ? undefined : (overrides?.building_type ?? buildingType ?? undefined),
+      usage: teaser ? undefined : (overrides?.usage ?? usage ?? undefined),
       user_query: text,
-      area_m2: overrides?.area_m2 ?? areaM2 ?? undefined,
-      floors: overrides?.floors ?? floors ?? undefined,
-      occupants: overrides?.occupants ?? occupants ?? undefined,
-      ceiling_height_m: overrides?.ceiling_height_m ?? ceilingHeight ?? undefined,
-      volume_m3: overrides?.volume_m3 ?? volume ?? undefined,
+      area_m2: teaser ? undefined : (overrides?.area_m2 ?? areaM2 ?? undefined),
+      floors: teaser ? undefined : (overrides?.floors ?? floors ?? undefined),
+      occupants: teaser ? undefined : (overrides?.occupants ?? occupants ?? undefined),
+      ceiling_height_m: teaser ? undefined : (overrides?.ceiling_height_m ?? ceilingHeight ?? undefined),
+      volume_m3: teaser ? undefined : (overrides?.volume_m3 ?? volume ?? undefined),
       language: lang,
       conversation,
       context: demo
@@ -199,13 +292,18 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       const result = demo
         ? await fireCodeApi.evaluateDemo(requestBody)
         : await fireCodeApi.evaluate(requestBody);
-      handleResponse(result);
+      const type = handleResponse(result);
+      // Guided demo: advance to the next prompt. On needs_info the form drives
+      // the resend (which carries demoNext forward), so don't prompt yet.
+      if (demo && !demoEndedRef.current && type !== "needs_info" && demoNextRef.current) {
+        const next = demoNextRef.current;
+        demoNextRef.current = null;
+        appendPrompt(next);
+      }
     } catch (err) {
       if (err instanceof DemoLimitError) {
         handleDemoLimit(err.payload);
       } else if (err instanceof QuotaError) {
-        // Signed-in evaluate quota reached — open the UpgradeModal (FCR-026)
-        // instead of pushing a generic error bubble.
         setQuota(err);
       } else {
         handleError(err);
@@ -215,10 +313,57 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     }
   };
 
-  /** A tapped demo scenario: overwrite the visible inputs AND ground this request. */
+  /** Start guided-demo step 1 (teaser). */
+  const startDemoStep1 = (scenario: DemoScenario | null, query: string) => {
+    demoEndedRef.current = false;
+    activeScenarioRef.current = scenario;
+    activeQueryRef.current = query;
+    ask(query, { teaser: true, demoNext: "see_eval" });
+  };
+
+  /** A tapped capability card. Demo → guided step 1; dashboard → grounded eval. */
   const handlePick = (s: DemoScenario) => {
     onApplyScenario?.(s.params);
-    ask(s.query, s.params);
+    if (demo) startDemoStep1(s, s.query);
+    else ask(s.query, { overrides: s.params });
+  };
+
+  /** The text input submit. Demo → guided step 1; dashboard → normal eval. */
+  const handleSend = (text: string) => {
+    if (!text.trim() || isLoading) return;
+    if (demo) startDemoStep1(null, text);
+    else ask(text);
+  };
+
+  /** A guided-demo quick-reply choice (FCR-100). */
+  const handleChoice = (kind: PromptKind, value: string) => {
+    if (isLoading) return;
+    if (value === "no") {
+      appendInvite();
+      return;
+    }
+    switch (kind) {
+      case "see_eval": {
+        const s = activeScenarioRef.current;
+        if (s) ask(s.query, { overrides: s.params, demoNext: "create_project" });
+        else ask(activeQueryRef.current, { demoNext: "create_project" });
+        break;
+      }
+      case "create_project":
+        ask(tr.demoCreateProjectMsg, {
+          overrides: activeScenarioRef.current?.params,
+          demoNext: "create_account",
+        });
+        break;
+      case "create_account":
+        navigate("/register");
+        break;
+    }
+  };
+
+  /** Resend after the user answers the agent's clarifying questions (FCR-101). */
+  const handleNeedsInfoSubmit = (summary: string) => {
+    ask(summary, { overrides: activeScenarioRef.current?.params });
   };
 
   const renderAssistantBody = (m: Msg) => {
@@ -244,6 +389,13 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     }
     if (type === "demo_limit" && m.payload) {
       return <DemoLimitCard data={m.payload as DemoLimitResponse} />;
+    }
+    if (type === "prompt" && m.payload) {
+      const p = m.payload as PromptPayload;
+      return <ChoicePrompt prompt={p.prompt} options={p.options} onChoose={(v) => handleChoice(p.kind, v)} />;
+    }
+    if (type === "needs_info" && m.payload) {
+      return <NeedsInfoForm data={m.payload as NeedsInfoData} onSubmit={handleNeedsInfoSubmit} />;
     }
     if (type === "message") {
       return <AssistantMessage text={m.text} demo={demo} onPick={handlePick} />;
@@ -312,7 +464,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       </div>
 
       <form
-        onSubmit={(e) => { e.preventDefault(); ask(input); }}
+        onSubmit={(e) => { e.preventDefault(); handleSend(input); }}
         className="flex items-center gap-2 border-t border-border p-3"
       >
         <Input
