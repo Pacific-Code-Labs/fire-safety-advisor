@@ -21,18 +21,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
       # Authenticate to GitHub Packages so the private DS package
       # (@pacific-code-labs/fire-code-design-system) resolves. The committed
       # .npmrc points @pacific-code-labs at npm.pkg.github.com and reads the
-      # token from $NODE_AUTH_TOKEN; GITHUB_TOKEN has packages:read here.
+      # token from $NODE_AUTH_TOKEN; GITHUB_TOKEN has packages:read here
+      # (the package grants read to this repo). No committed lockfile yet, so
+      # --no-frozen-lockfile lets CI resolve + generate it.
       - name: Install dependencies
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build
         env:
@@ -41,7 +48,7 @@ jobs:
           VITE_COGNITO_USER_POOL_ID: ${{ secrets.VITE_COGNITO_USER_POOL_ID }}
           VITE_COGNITO_USER_POOL_CLIENT_ID: ${{ secrets.VITE_COGNITO_USER_POOL_CLIENT_ID }}
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-        run: bun run build
+        run: pnpm run build
 
       # NOTE: `bun run build` runs the SEO prerender (scripts/prerender.mjs),
       # which already emits a NOINDEX dist/404.html SPA shell (so client routes
