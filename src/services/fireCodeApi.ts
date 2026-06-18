@@ -193,6 +193,8 @@ export type ProjectBuildingType = "residencial" | "comercial" | "industrial";
 /** Request body for POST /projects (ProjectCreate). */
 export interface ProjectCreateRequest {
   name: string;
+  /** FCR-102: 'fire' (default) | 'electrical'. */
+  project_type?: string;
   building_type: ProjectBuildingType;
   usage: string;
   area_m2?: number;
@@ -203,6 +205,8 @@ export interface ProjectCreateRequest {
   requirements?: string[];
   reference?: string[];
   context_cr?: string[];
+  /** FCR-102: { inputs, topology, result } snapshot for electrical projects. */
+  electrical?: { inputs: ElectricalInputs; topology: Topology; result: ElectricalLoadData };
   risk: string;
 }
 
@@ -275,6 +279,140 @@ export interface NeedsInfoQuestion {
 export interface NeedsInfoData {
   questions: NeedsInfoQuestion[];
   context?: Record<string, unknown>;
+}
+
+// ── Electrical preliminary-load (FCR-102+) ───────────────────────────────────
+// camelCase on the wire, mirroring ProjectResponse aliases. The agent emits
+// ElectricalInputs in its action payload; the interactive editor posts
+// { inputs, topology? } to POST /electrical/preliminary (authenticated,
+// deterministic, no Foundry, NOT eval-quota-gated) and receives an
+// ElectricalLoadData snapshot the FE uses to drive the load table / kVA.
+
+export type ElectricalOccupancy =
+  | "residencial"
+  | "comercial"
+  | "industrial"
+  | "social_interest";
+
+/** 1ph 120/240 ; 3-wire 120/208 ; 3ph. */
+export type ElectricalServiceType =
+  | "single_phase"
+  | "network_3h"
+  | "three_phase";
+
+export interface ElectricalMotorLoad {
+  name?: string;
+  hp?: number;
+  kw?: number;
+  quantity?: number;
+}
+
+export interface ElectricalOtherLoad {
+  name: string;
+  va: number;
+}
+
+export interface ElectricalSpecialLoads {
+  range_va?: number;
+  water_heater_va?: number;
+  ac_va?: number;
+  other?: ElectricalOtherLoad[];
+  motors?: ElectricalMotorLoad[];
+}
+
+/** Agent emits this in its action payload; the FE editor posts it. */
+export interface ElectricalInputs {
+  occupancy: ElectricalOccupancy;
+  area_m2: number;
+  floors?: number;
+  service: ElectricalServiceType;
+  voltage?: number;
+  special_loads?: ElectricalSpecialLoads;
+  /** Fraction e.g. 0.25; default 0. */
+  growth_allowance?: number;
+  language?: Language;
+}
+
+// ── Topology (editable single-line diagram) ──────────────────────────────────
+
+export type TopologyNodeType =
+  | "utility"
+  | "meter"
+  | "main_breaker"
+  | "spd"
+  | "panel"
+  | "load";
+
+export type TopologyPhase = "A" | "B" | "C" | "ABC";
+
+export interface TopologyNodeData {
+  va?: number;
+  rating?: string;
+  phase?: TopologyPhase;
+  note?: string;
+}
+
+export interface TopologyNode {
+  id: string;
+  type: TopologyNodeType;
+  label: string;
+  data?: TopologyNodeData;
+}
+
+export interface TopologyEdge {
+  id: string;
+  source: string;
+  target: string;
+}
+
+export interface Topology {
+  nodes: TopologyNode[];
+  edges: TopologyEdge[];
+}
+
+// ── ElectricalLoadResponse (BE -> FE, camelCase aliases) ──────────────────────
+
+export interface LoadTableRow {
+  description: string;
+  connectedVa: number;
+  demandFactor: number;
+  demandedVa: number;
+  phase?: string;
+}
+
+export interface MandatedProvision {
+  code: string;
+  requirement: string;
+  reference: string;
+  status: "required" | "info";
+}
+
+export interface PhaseBalanceEntry {
+  phase: string;
+  va: number;
+}
+
+export interface ElectricalLoadData {
+  occupancy: string;
+  serviceType: string;
+  installedVa: number;
+  demandedVa: number;
+  demandKva: number;
+  suggestedTransformerKva: number;
+  loadTable: LoadTableRow[];
+  phaseBalance: PhaseBalanceEntry[];
+  topology: Topology;
+  mandatedProvisions: MandatedProvision[];
+  assumptions: string[];
+  references: string[];
+  disclaimer: string;
+  notes?: string;
+}
+
+/** Request body for POST /electrical/preliminary. */
+export interface ElectricalPreliminaryRequest {
+  inputs: ElectricalInputs;
+  topology?: Topology;
 }
 
 // ── API client ───────────────────────────────────────────────────────────────
@@ -460,6 +598,25 @@ export const fireCodeApi = {
       path: `/projects/${encodeURIComponent(id)}`,
       options: { headers },
     }).response;
+  },
+
+  // ── Electrical preliminary-load (FCR-102+) — AUTHENTICATED, deterministic ────
+  // POST /electrical/preliminary { inputs, topology? } -> ElectricalLoadData.
+  // Authenticated like /evaluate (Bearer token via authHeader()) but NOT
+  // eval-quota-gated and never reaches Foundry, so no QuotaError handling.
+
+  /** POST /electrical/preliminary — deterministic preliminary load study. */
+  async postElectricalPreliminary(
+    body: ElectricalPreliminaryRequest,
+  ): Promise<ElectricalLoadData> {
+    const headers = await authHeader();
+    return resolveBody<ElectricalLoadData>(
+      post({
+        apiName: API_NAME,
+        path: "/electrical/preliminary",
+        options: { headers, body: body as unknown as Record<string, unknown> as never },
+      }),
+    );
   },
 };
 

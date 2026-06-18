@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Flame, LayoutDashboard, FolderKanban, Sparkles, LogOut, Languages, User, ShieldCheck } from "lucide-react";
+import { Flame, LayoutDashboard, FolderKanban, Sparkles, LogOut, Languages, User, ShieldCheck, Zap } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +24,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalAssistant } from "@/components/GlobalAssistant";
 
 /** Sidebar nav identifiers (one per item). */
-type NavId = "dashboard" | "projects" | "evaluator" | "roles";
+type NavId = "dashboard" | "projects" | "evaluator" | "electrical" | "roles";
 
 /**
  * NAV_PERMISSION (FCR-061) — maps each sidebar item to the [module, submodule]
@@ -39,6 +39,7 @@ const NAV_PERMISSION: Record<NavId, [string, string]> = {
   dashboard: ["panel", "overview"],
   projects: ["projects", "projects"],
   evaluator: ["projects", "evaluator"],
+  electrical: ["projects", "projects"],
   roles: ["admin", "roles"],
 };
 
@@ -71,6 +72,7 @@ function AppSidebar() {
   ];
   const tools: NavItem[] = [
     { id: "evaluator", titleKey: "nav_evaluator", url: "/dashboard/evaluator", icon: Sparkles },
+    { id: "electrical", titleKey: "nav_electrical", url: "/projects/electrical", icon: Zap },
   ];
   const admin: NavItem[] = [
     { id: "roles", titleKey: "nav_roles", url: "/dashboard/roles", icon: ShieldCheck },

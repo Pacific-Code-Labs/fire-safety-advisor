@@ -12,6 +12,16 @@ export function ProjectCard({ data }: Props) {
   const isPreview = data.projectId == null;
   const name = project.name || (lang === "es" ? "Proyecto" : "Project");
 
+  // FCR-102: electrical projects surface a kVA / transformer summary line
+  // instead of the fire-only fields. Tolerate camelCase + snake_case.
+  const projectType = (project.projectType ?? project.project_type) as string | undefined;
+  const isElectrical = projectType === "electrical";
+  const elec = (project.electrical ?? null) as
+    | { result?: { demandKva?: number; suggestedTransformerKva?: number } }
+    | null;
+  const demandKva = elec?.result?.demandKva;
+  const transformerKva = elec?.result?.suggestedTransformerKva;
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-sm font-semibold text-accent">
@@ -27,6 +37,22 @@ export function ProjectCard({ data }: Props) {
         )}
         {project.buildingType && (
           <div><span className="font-semibold">{lang === "es" ? "Tipo" : "Type"}:</span> {project.buildingType}</div>
+        )}
+        {isElectrical && (demandKva != null || transformerKva != null) && (
+          <div className="pt-1 text-foreground">
+            {demandKva != null && (
+              <div>
+                <span className="font-semibold">{tr.elec_demand_kva}:</span>{" "}
+                {demandKva.toLocaleString(undefined, { maximumFractionDigits: 1 })} kVA
+              </div>
+            )}
+            {transformerKva != null && (
+              <div>
+                <span className="font-semibold">{tr.elec_suggested_transformer}:</span>{" "}
+                {transformerKva.toLocaleString(undefined, { maximumFractionDigits: 1 })} kVA
+              </div>
+            )}
+          </div>
         )}
         {reqs.length > 0 && (
           <div className="pt-1">

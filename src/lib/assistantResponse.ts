@@ -8,15 +8,16 @@
  * as { type: "evaluation", data: <response> }.
  */
 
-import type { EvaluateResponse, NeedsInfoData } from "@/services/fireCodeApi";
+import type { EvaluateResponse, NeedsInfoData, ElectricalLoadData } from "@/services/fireCodeApi";
 
-export type { NeedsInfoData };
+export type { NeedsInfoData, ElectricalLoadData };
 
 export type AssistantResponseType =
   | "evaluation"
   | "message"
   | "project_created"
-  | "needs_info";
+  | "needs_info"
+  | "electrical_load";
 
 /** The project payload nested inside ProjectCreatedData (mirrors BE ProjectResponse). */
 export interface ProjectPreview {
@@ -48,7 +49,8 @@ export type NormalizedResponse =
   | { type: "evaluation"; data: EvaluateResponse }
   | { type: "message"; data: MessageData }
   | { type: "project_created"; data: ProjectCreatedData }
-  | { type: "needs_info"; data: NeedsInfoData };
+  | { type: "needs_info"; data: NeedsInfoData }
+  | { type: "electrical_load"; data: ElectricalLoadData };
 
 function looksLikeEvaluation(obj: unknown): obj is EvaluateResponse {
   if (!obj || typeof obj !== "object") return false;
@@ -77,6 +79,11 @@ export function normalizeAssistantResponse(raw: unknown): NormalizedResponse {
         return {
           type: "needs_info",
           data: (data as NeedsInfoData) ?? { questions: [], context: {} },
+        };
+      case "electrical_load":
+        return {
+          type: "electrical_load",
+          data: (data as ElectricalLoadData) ?? ({} as ElectricalLoadData),
         };
       case "evaluation":
         return { type: "evaluation", data: data as EvaluateResponse };

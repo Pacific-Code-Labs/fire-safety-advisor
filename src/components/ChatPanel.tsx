@@ -14,10 +14,12 @@ import {
   type ProjectCreatedData,
   type MessageData,
   type NeedsInfoData,
+  type ElectricalLoadData,
 } from "@/lib/assistantResponse";
 import { TextMessage } from "@/components/assistant/TextMessage";
 import { EvaluationCard } from "@/components/assistant/EvaluationCard";
 import { ProjectCard } from "@/components/assistant/ProjectCard";
+import { ElectricalLoadCard } from "@/components/assistant/ElectricalLoadCard";
 import { DemoLimitCard } from "@/components/assistant/DemoLimitCard";
 import { AssistantMessage } from "@/components/assistant/AssistantMessage";
 import { AssistantAvatar } from "@/components/assistant/AssistantAvatar";
@@ -28,7 +30,7 @@ import { NeedsInfoForm } from "@/components/assistant/NeedsInfoForm";
 import { type DemoScenario, type DemoScenarioParams } from "@/lib/demoScenarios";
 import { cn } from "@/lib/utils";
 
-export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit" | "prompt" | "needs_info";
+export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit" | "prompt" | "needs_info" | "electrical";
 
 /** FCR-100: which guided-demo step a quick-reply prompt drives. */
 export type PromptKind = "see_eval" | "create_project" | "create_account";
@@ -48,7 +50,7 @@ export interface Msg {
   /** Legacy: full evaluation response (kept for backward compat) */
   answer?: EvaluateResponse;
   /** New polymorphic payload */
-  payload?: EvaluateResponse | ProjectCreatedData | MessageData | DemoLimitResponse | PromptPayload | NeedsInfoData;
+  payload?: EvaluateResponse | ProjectCreatedData | MessageData | DemoLimitResponse | PromptPayload | NeedsInfoData | ElectricalLoadData;
 }
 
 interface Props {
@@ -179,6 +181,17 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         setMessages((m) => [
           ...m,
           { role: "assistant", text: "", type: "needs_info", payload: norm.data },
+        ]);
+        break;
+      }
+      case "electrical_load": {
+        const summary =
+          lang === "es"
+            ? `Estudio de carga preliminar: ${norm.data.demandKva?.toLocaleString?.() ?? norm.data.demandKva} kVA demandados.`
+            : `Preliminary load study: ${norm.data.demandKva?.toLocaleString?.() ?? norm.data.demandKva} kVA demanded.`;
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", text: summary, type: "electrical", payload: norm.data },
         ]);
         break;
       }
@@ -384,6 +397,18 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         <>
           <TextMessage text={m.text} />
           {m.payload && <div className="mt-3"><ProjectCard data={m.payload as ProjectCreatedData} /></div>}
+        </>
+      );
+    }
+    if (type === "electrical") {
+      return (
+        <>
+          <TextMessage text={m.text} />
+          {m.payload && (
+            <div className="mt-3">
+              <ElectricalLoadCard data={m.payload as ElectricalLoadData} />
+            </div>
+          )}
         </>
       );
     }
