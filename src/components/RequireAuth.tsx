@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Flame } from "lucide-react";
+import { localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
 
 interface RequireAuthProps {
   children: ReactNode;
@@ -31,8 +32,17 @@ export function RequireAuth({ children, roles }: RequireAuthProps) {
   }
 
   if (!user) {
-    // redirectAfterLogin: stash the intended path so Login can restore it.
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    // redirectAfterLogin: stash the intended (already lang-prefixed) path so
+    // Login can restore it. The /login redirect itself uses the CURRENT url
+    // language (falling back to the persisted/default lang).
+    const lang = stripLangPrefix(location.pathname).lang ?? persistedLang();
+    return (
+      <Navigate
+        to={localizedPath(lang, "/login")}
+        state={{ from: location.pathname }}
+        replace
+      />
+    );
   }
 
   if (roles && roles.length > 0) {
@@ -43,7 +53,10 @@ export function RequireAuth({ children, roles }: RequireAuthProps) {
       ((user as unknown as { signInUserSession?: { accessToken?: { payload?: { "cognito:groups"?: string[] } } } })
         .signInUserSession?.accessToken?.payload?.["cognito:groups"]) ?? [];
     const allowed = roles.some((r) => groups.includes(r));
-    if (!allowed) return <Navigate to="/dashboard" replace />;
+    if (!allowed) {
+      const lang = stripLangPrefix(location.pathname).lang ?? persistedLang();
+      return <Navigate to={localizedPath(lang, "/dashboard")} replace />;
+    }
   }
 
   // `profile` is intentionally allowed to be null here (attributes may still be

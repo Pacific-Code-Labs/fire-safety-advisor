@@ -11,11 +11,12 @@ import { RiskBadge } from "@/components/RiskBadge";
 import { CurrentPlanPanel } from "@/components/CurrentPlanPanel";
 import { FolderKanban, Plus, Sparkles, ArrowRight } from "lucide-react";
 import { BuildingType } from "@/services/fireCodeApi";
+import { localizedPath } from "@/lib/paths";
 
 export default function Dashboard() {
   const { projects, loading } = useProjects();
   const { user } = useAuth();
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const { setPageContext, setInput } = useAssistant();
   const email = (user?.signInDetails?.loginId as string | undefined) ?? user?.username ?? "";
   const recent = projects.slice(0, 5);
@@ -58,7 +59,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <Button asChild className="w-full gap-2">
-                <Link to="/dashboard/evaluator">
+                <Link to={localizedPath(lang, "/dashboard/evaluator")}>
                   <Sparkles className="h-4 w-4" />
                   {tr.open_evaluator}
                 </Link>
@@ -73,7 +74,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <Button asChild variant="outline" className="w-full gap-2">
-                <Link to="/projects/new">
+                <Link to={localizedPath(lang, "/projects/new")}>
                   <Plus className="h-4 w-4" />
                   {tr.new_project}
                 </Link>
@@ -91,7 +92,7 @@ export default function Dashboard() {
               <CardDescription>{tr.latest_evaluations}</CardDescription>
             </div>
             <Button asChild variant="ghost" size="sm" className="gap-1">
-              <Link to="/projects">{tr.view_all} <ArrowRight className="h-4 w-4" /></Link>
+              <Link to={localizedPath(lang, "/projects")}>{tr.view_all} <ArrowRight className="h-4 w-4" /></Link>
             </Button>
           </CardHeader>
           <CardContent>
@@ -102,7 +103,7 @@ export default function Dashboard() {
                 <FolderKanban className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
                 <p className="text-sm text-muted-foreground mb-4">{tr.no_projects}</p>
                 <Button asChild size="sm">
-                  <Link to="/projects/new">{tr.create_first}</Link>
+                  <Link to={localizedPath(lang, "/projects/new")}>{tr.create_first}</Link>
                 </Button>
               </div>
             ) : (
@@ -110,7 +111,7 @@ export default function Dashboard() {
                 {recent.map((p) => (
                   <li key={p.id}>
                     <Link
-                      to={`/projects/${p.id}`}
+                      to={localizedPath(lang, `/projects/${p.id}`)}
                       className="flex items-center justify-between py-3 hover:bg-muted/30 px-2 -mx-2 rounded"
                     >
                       <div className="min-w-0">

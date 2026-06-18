@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
 import { fireCodeApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse } from "@/services/fireCodeApi";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import { localizedPath } from "@/lib/paths";
 import type { PageContext } from "@/contexts/AssistantContext";
 import {
   normalizeAssistantResponse,
@@ -369,7 +370,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         });
         break;
       case "create_account":
-        navigate("/register");
+        navigate(localizedPath(lang, "/register"));
         break;
     }
   };

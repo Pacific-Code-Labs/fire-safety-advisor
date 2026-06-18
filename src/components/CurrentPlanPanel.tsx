@@ -21,6 +21,7 @@ import { useLang } from "@/contexts/LangContext";
 import { useBilling, type UsageMetric } from "@/contexts/BillingContext";
 import type { Dict } from "@/lib/i18n";
 import type { PlanTier } from "@/lib/plans";
+import { localizedPath } from "@/lib/paths";
 
 function fill(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -63,7 +64,7 @@ function UsageRow({ label, metric, tr }: { label: string; metric: UsageMetric; t
 }
 
 export function CurrentPlanPanel() {
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const { tier, usage } = useBilling();
 
   return (
@@ -79,7 +80,7 @@ export function CurrentPlanPanel() {
         <UsageRow label={tr.plan_panel_evals} metric={usage.evaluations} tr={tr} />
         <UsageRow label={tr.plan_panel_projects} metric={usage.savedProjects} tr={tr} />
         <Link
-          to="/pricing"
+          to={localizedPath(lang, "/pricing")}
           className={`${buttonVariants({ variant: "outline", size: "sm" })} w-full`}
         >
           {tr.plan_panel_view_plans}

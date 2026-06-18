@@ -10,6 +10,7 @@ import { useLang } from "@/contexts/LangContext";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { PasswordField } from "@/components/auth/PasswordField";
 import { emailSchema } from "@/lib/authSchemas";
+import { localizedPath } from "@/lib/paths";
 
 const loginSchema = z.object({
   email: emailSchema,
@@ -19,11 +20,12 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { user, signIn, loading: authLoading } = useAuth();
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const navigate = useNavigate();
   const location = useLocation();
-  // redirectAfterLogin: RequireAuth stores the intended path in location.state.from.
-  const from = (location.state as { from?: string } | null)?.from ?? "/dashboard";
+  // redirectAfterLogin: RequireAuth stores the intended (already lang-prefixed)
+  // path in location.state.from; default to this lang's dashboard.
+  const from = (location.state as { from?: string } | null)?.from ?? localizedPath(lang, "/dashboard");
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -49,7 +51,7 @@ export default function Login() {
         sessionStorage.setItem("verificationEmail", data.email.trim());
         sessionStorage.setItem("verificationPassword", data.password);
         sessionStorage.setItem("redirectAfterLogin", from);
-        navigate("/verify-email");
+        navigate(localizedPath(lang, "/verify-email"));
         return;
       }
       navigate(from, { replace: true });
@@ -60,7 +62,7 @@ export default function Login() {
         sessionStorage.setItem("verificationEmail", data.email.trim());
         sessionStorage.setItem("verificationPassword", data.password);
         sessionStorage.setItem("redirectAfterLogin", from);
-        navigate("/verify-email");
+        navigate(localizedPath(lang, "/verify-email"));
         return;
       }
       setError(message);
@@ -77,16 +79,16 @@ export default function Login() {
       subtitle={tr.auth_login_subtitle}
       footer={
         <div className="flex flex-col gap-2">
-          <Link to="/forgot-password" className="text-primary font-medium hover:underline mx-auto">
+          <Link to={localizedPath(lang, "/forgot-password")} className="text-primary font-medium hover:underline mx-auto">
             {tr.auth_login_forgot}
           </Link>
           <div>
             <span className="text-muted-foreground">{tr.auth_login_no_account} </span>
-            <Link to="/register" className="text-primary font-medium hover:underline">
+            <Link to={localizedPath(lang, "/register")} className="text-primary font-medium hover:underline">
               {tr.auth_login_register}
             </Link>
           </div>
-          <Link to="/" className="text-muted-foreground hover:text-foreground mt-1">
+          <Link to={localizedPath(lang, "/")} className="text-muted-foreground hover:text-foreground mt-1">
             {tr.back_home}
           </Link>
         </div>

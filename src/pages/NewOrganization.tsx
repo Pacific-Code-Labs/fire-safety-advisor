@@ -3,6 +3,7 @@ import { Building2 } from "lucide-react";
 import { Button } from "@pacific-code-labs/fire-code-design-system";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useLang } from "@/contexts/LangContext";
+import { localizedPath } from "@/lib/paths";
 
 /**
  * NewOrganization — a thin informational placeholder at /organizations/new.
@@ -14,7 +15,7 @@ import { useLang } from "@/contexts/LangContext";
  * surface (rename / invite members) is future RBAC UI work (FCR-061).
  */
 export default function NewOrganization() {
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const navigate = useNavigate();
 
   return (
@@ -26,7 +27,7 @@ export default function NewOrganization() {
         <h1 className="text-2xl font-bold tracking-tight mb-2">{tr.org_new_title}</h1>
         <p className="text-sm text-muted-foreground mb-2">{tr.org_new_subtitle}</p>
         <p className="text-sm text-muted-foreground mb-6">{tr.org_new_auto}</p>
-        <Button variant="primary" onClick={() => navigate("/dashboard")}>
+        <Button variant="primary" onClick={() => navigate(localizedPath(lang, "/dashboard"))}>
           {tr.org_new_continue}
         </Button>
       </div>

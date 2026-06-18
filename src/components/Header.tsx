@@ -8,17 +8,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { tChrome } from "@/lib/chrome-i18n";
 import { getBrandingVM } from "@/services/branding.service";
+import { localizedPath, runLangSwitch, stripLangPrefix } from "@/lib/paths";
 
 interface HeaderProps {
   chatButton?: React.ReactNode;
 }
 
 export function Header({ chatButton }: HeaderProps) {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const onDemo = pathname.startsWith("/demo");
+  const onDemo = stripLangPrefix(pathname).rest.startsWith("/demo");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const chrome = tChrome(lang);
@@ -27,10 +28,17 @@ export function Header({ chatButton }: HeaderProps) {
 
   const closeMobile = () => setMobileOpen(false);
 
+  // Language toggle navigates to the same page under the other lang prefix
+  // (wrapped in the lang animation). LangLayout's effect then syncs the context.
+  const switchLang = () => {
+    const { rest } = stripLangPrefix(pathname);
+    runLangSwitch(navigate, localizedPath(nextLang, rest));
+  };
+
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 no-print">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+        <Link to={localizedPath(lang, "/")} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
           <div className="relative flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 border border-primary/30 glow-red overflow-hidden">
             {brand.logoUrl ? (
               <img src={brand.logoUrl} alt="" className="h-full w-full object-contain" />
@@ -46,7 +54,7 @@ export function Header({ chatButton }: HeaderProps) {
         <div className="flex items-center gap-2">
           {onDemo && (
             <Button asChild variant="ghost" size="sm" className="gap-2 hidden sm:inline-flex">
-              <Link to="/">
+              <Link to={localizedPath(lang, "/")}>
                 <Home className="h-4 w-4" />
                 {chrome.nav.home}
               </Link>
@@ -56,7 +64,7 @@ export function Header({ chatButton }: HeaderProps) {
           {user ? (
             <>
               <Button asChild variant="ghost" size="sm" className="gap-2 hidden sm:inline-flex">
-                <Link to="/dashboard">
+                <Link to={localizedPath(lang, "/dashboard")}>
                   <LayoutDashboard className="h-4 w-4" />
                   {chrome.nav.dashboard}
                 </Link>
@@ -65,7 +73,7 @@ export function Header({ chatButton }: HeaderProps) {
                 variant="ghost"
                 size="sm"
                 className="gap-2 hidden sm:inline-flex"
-                onClick={async () => { await signOut(); navigate("/"); }}
+                onClick={async () => { await signOut(); navigate(localizedPath(lang, "/")); }}
               >
                 <LogOut className="h-4 w-4" />
                 {chrome.nav.signOut}
@@ -73,7 +81,7 @@ export function Header({ chatButton }: HeaderProps) {
             </>
           ) : (
             <Button asChild variant="ghost" size="sm" className="gap-2 hidden sm:inline-flex">
-              <Link to="/login">
+              <Link to={localizedPath(lang, "/login")}>
                 <LogIn className="h-4 w-4" />
                 {chrome.nav.signIn}
               </Link>
@@ -83,7 +91,7 @@ export function Header({ chatButton }: HeaderProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setLang(nextLang)}
+            onClick={switchLang}
             className="gap-2"
           >
             <Languages className="h-4 w-4" />
@@ -106,7 +114,7 @@ export function Header({ chatButton }: HeaderProps) {
               </SheetHeader>
               <nav className="mt-6 flex flex-col gap-2">
                 <Button asChild variant="ghost" className="justify-start gap-2" onClick={closeMobile}>
-                  <Link to="/">
+                  <Link to={localizedPath(lang, "/")}>
                     <Home className="h-4 w-4" />
                     {chrome.nav.home}
                   </Link>
@@ -114,7 +122,7 @@ export function Header({ chatButton }: HeaderProps) {
                 {user ? (
                   <>
                     <Button asChild variant="ghost" className="justify-start gap-2" onClick={closeMobile}>
-                      <Link to="/dashboard">
+                      <Link to={localizedPath(lang, "/dashboard")}>
                         <LayoutDashboard className="h-4 w-4" />
                         {chrome.nav.dashboard}
                       </Link>
@@ -122,7 +130,7 @@ export function Header({ chatButton }: HeaderProps) {
                     <Button
                       variant="ghost"
                       className="justify-start gap-2"
-                      onClick={async () => { closeMobile(); await signOut(); navigate("/"); }}
+                      onClick={async () => { closeMobile(); await signOut(); navigate(localizedPath(lang, "/")); }}
                     >
                       <LogOut className="h-4 w-4" />
                       {chrome.nav.signOut}
@@ -130,7 +138,7 @@ export function Header({ chatButton }: HeaderProps) {
                   </>
                 ) : (
                   <Button asChild variant="ghost" className="justify-start gap-2" onClick={closeMobile}>
-                    <Link to="/login">
+                    <Link to={localizedPath(lang, "/login")}>
                       <LogIn className="h-4 w-4" />
                       {chrome.nav.signIn}
                     </Link>

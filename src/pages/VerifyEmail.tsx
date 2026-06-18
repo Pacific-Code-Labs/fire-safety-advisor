@@ -5,12 +5,13 @@ import { Button, FormField, OtpInput } from "@pacific-code-labs/fire-code-design
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { localizedPath } from "@/lib/paths";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
 export default function VerifyEmail() {
   const { confirmSignUp, signIn, resendCode } = useAuth();
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -25,8 +26,8 @@ export default function VerifyEmail() {
   useEffect(() => {
     const stored = sessionStorage.getItem("verificationEmail");
     if (stored) setEmail(stored);
-    else navigate("/register");
-  }, [navigate]);
+    else navigate(localizedPath(lang, "/register"));
+  }, [navigate, lang]);
 
   // Resend cooldown timer.
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function VerifyEmail() {
       // Auto sign-in after verification (the BE then auto-provisions the
       // personal org + owner role on the first authenticated call — FCR-008/021).
       const password = sessionStorage.getItem("verificationPassword");
-      const redirectTo = sessionStorage.getItem("redirectAfterLogin") ?? "/dashboard";
+      const redirectTo = sessionStorage.getItem("redirectAfterLogin") ?? localizedPath(lang, "/dashboard");
       if (password) {
         await signIn(email, password);
       }
@@ -57,7 +58,7 @@ export default function VerifyEmail() {
       sessionStorage.removeItem("verificationPassword");
       sessionStorage.removeItem("redirectAfterLogin");
 
-      navigate(password ? redirectTo : "/login", { replace: true });
+      navigate(password ? redirectTo : localizedPath(lang, "/login"), { replace: true });
     } catch (e: unknown) {
       const name = (e as { name?: string })?.name ?? "";
       const message = e instanceof Error ? e.message : tr.auth_verify_error;
@@ -94,7 +95,7 @@ export default function VerifyEmail() {
       }
       icon={<MailCheck className="h-6 w-6" />}
       footer={
-        <button type="button" className="text-primary font-medium hover:underline" onClick={() => navigate("/register")}>
+        <button type="button" className="text-primary font-medium hover:underline" onClick={() => navigate(localizedPath(lang, "/register"))}>
           {tr.auth_verify_back_to_register}
         </button>
       }

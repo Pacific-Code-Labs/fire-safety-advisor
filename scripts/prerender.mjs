@@ -121,11 +121,9 @@ ${urlEntries}
 `;
 await fs.writeFile(path.join(OUT, "sitemap.xml"), sitemap);
 
-// Root index.html: keep the SPA shell but ensure a canonical to the default lang.
-// (Vite already emitted dist/index.html — the SPA entry. We leave it as the app
-// shell so deep links hydrate; crawlers use the per-language prerendered pages
-// + sitemap. We add a noindex 404.html that is ALSO the SPA shell so hard
-// refreshes on client routes resolve.)
+// 404.html: a noindex copy of the SPA shell so hard refreshes on client routes
+// (e.g. /es/projects/123) resolve. (Read the SPA shell BEFORE we overwrite the
+// root index.html below.)
 const spaShell = await fs.readFile(path.join(OUT, "index.html"), "utf8");
 const notFound = spaShell.replace(
   /<head>/,
@@ -133,4 +131,26 @@ const notFound = spaShell.replace(
 );
 await fs.writeFile(path.join(OUT, "404.html"), notFound);
 
-console.log(`[prerender] wrote ${written} page(s) + sitemap.xml + noindex 404.html → ${path.relative(ROOT, OUT)}`);
+// Root index.html: since ALL routes are language-prefixed (/:lang/...), the bare
+// "/" must land on the default language. Overwrite the SPA shell at the root with
+// a tiny redirect shell to "/<DEFAULT_LANG>" (meta-refresh + canonical + a
+// noscript fallback link). Deep links still hydrate via the per-language
+// prerendered pages + the SPA fallback (404.html); crawlers use the sitemap.
+const rootRedirect = `<!doctype html>
+<html lang="${DEFAULT_LANG}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="refresh" content="0;url=/${DEFAULT_LANG}" />
+    <link rel="canonical" href="${siteUrl}/${DEFAULT_LANG}" />
+    <title>FireCode CR</title>
+  </head>
+  <body>
+    <noscript><a href="/${DEFAULT_LANG}">Continue</a></noscript>
+    <script>location.replace("/${DEFAULT_LANG}");</script>
+  </body>
+</html>
+`;
+await fs.writeFile(path.join(OUT, "index.html"), rootRedirect);
+
+console.log(`[prerender] wrote ${written} page(s) + sitemap.xml + noindex 404.html + root redirect shell → ${path.relative(ROOT, OUT)}`);

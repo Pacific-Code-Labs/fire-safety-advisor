@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/contexts/LangContext";
 import { getDemoScenarios, type DemoScenario } from "@/lib/demoScenarios";
+import { localizedPath } from "@/lib/paths";
 
 interface Props {
   text: string;
@@ -32,7 +33,7 @@ function parseMessage(text: string): { lead: string; items: string[] } {
 }
 
 export function AssistantMessage({ text, demo, onPick }: Props) {
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const { lead, items } = parseMessage(text);
 
   // Two grounded follow-up scenarios (restaurant + CR requirements).
@@ -61,7 +62,7 @@ export function AssistantMessage({ text, demo, onPick }: Props) {
             <span>{tr.demoCtaQuestion}</span>
           </p>
           <Button asChild size="sm" className="mt-2.5 h-8">
-            <Link to="/register">
+            <Link to={localizedPath(lang, "/register")}>
               {tr.demoCtaButton}
               <ArrowRight className="ml-1 h-3.5 w-3.5" />
             </Link>

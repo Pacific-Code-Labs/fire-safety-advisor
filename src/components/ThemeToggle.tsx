@@ -1,5 +1,6 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLang } from "@/contexts/LangContext";
 import { tChrome } from "@/lib/chrome-i18n";
@@ -13,10 +14,11 @@ export function ThemeToggle({ className }: { className?: string }) {
       variant="outline"
       size="icon"
       onClick={toggle}
-      className={className}
+      className={cn("relative", className)}
       aria-label={theme === "dark" ? chrome.nav.themeToLight : chrome.nav.themeToDark}
     >
-      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-500 dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all duration-500 dark:rotate-0 dark:scale-100" />
     </Button>
   );
 }

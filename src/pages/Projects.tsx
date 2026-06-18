@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RiskBadge } from "@/components/RiskBadge";
 import { FolderKanban, Plus, Trash2, Eye } from "lucide-react";
 import { BuildingType } from "@/services/fireCodeApi";
+import { localizedPath } from "@/lib/paths";
 import {
   Table,
   TableBody,
@@ -29,7 +30,7 @@ import {
 
 export default function Projects() {
   const { projects, loading, remove } = useProjects();
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const { setPageContext, setInput } = useAssistant();
 
   useEffect(() => {
@@ -52,7 +53,7 @@ export default function Projects() {
             <p className="text-sm text-muted-foreground">{tr.projects_subtitle}</p>
           </div>
           <Button asChild className="gap-2">
-            <Link to="/projects/new"><Plus className="h-4 w-4" /> {tr.new_project}</Link>
+            <Link to={localizedPath(lang, "/projects/new")}><Plus className="h-4 w-4" /> {tr.new_project}</Link>
           </Button>
         </div>
 
@@ -64,7 +65,7 @@ export default function Projects() {
               <div className="text-center py-16">
                 <FolderKanban className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
                 <p className="text-sm text-muted-foreground mb-4">{tr.no_projects}</p>
-                <Button asChild size="sm"><Link to="/projects/new">{tr.create_first}</Link></Button>
+                <Button asChild size="sm"><Link to={localizedPath(lang, "/projects/new")}>{tr.create_first}</Link></Button>
               </div>
             ) : (
               <Table>
@@ -94,7 +95,7 @@ export default function Projects() {
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           <Button asChild variant="ghost" size="icon" aria-label={tr.view}>
-                            <Link to={`/projects/${p.id}`}><Eye className="h-4 w-4" /></Link>
+                            <Link to={localizedPath(lang, `/projects/${p.id}`)}><Eye className="h-4 w-4" /></Link>
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>

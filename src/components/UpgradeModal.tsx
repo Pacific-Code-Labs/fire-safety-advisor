@@ -14,6 +14,7 @@
 import { useNavigate } from "react-router-dom";
 import { Modal } from "@pacific-code-labs/fire-code-design-system";
 import { useLang } from "@/contexts/LangContext";
+import { localizedPath } from "@/lib/paths";
 import type { QuotaError } from "@/services/fireCodeApi";
 
 function fill(template: string, vars: Record<string, string | number>): string {
@@ -55,7 +56,7 @@ export function UpgradeModal({ quota, onClose }: Props) {
   const handleUpgrade = () => {
     onClose();
     // FCR-028: the public pricing surface (card-free) is the upgrade landing.
-    navigate("/pricing");
+    navigate(localizedPath(lang, "/pricing"));
   };
 
   return (

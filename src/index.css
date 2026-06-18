@@ -183,4 +183,48 @@
     .no-print { display: none !important; }
     .panel { background: white !important; box-shadow: none !important; border: 1px solid #ccc !important; }
   }
+
+  /* ── Animations ──────────────────────────────────────────────────────
+     Theme / language / page-transition motion. All disabled under
+     prefers-reduced-motion (single override block at the end). */
+
+  /* Theme colour crossfade — applied transiently to <html> on theme change. */
+  .theme-transition,
+  .theme-transition * {
+    transition: color 0.3s ease,
+                background-color 0.3s ease,
+                border-color 0.3s ease,
+                fill 0.3s ease,
+                stroke 0.3s ease;
+  }
+
+  /* Language swap animation. */
+  @keyframes langOut {
+    from { opacity: 1; transform: scale(1);     filter: blur(0); }
+    to   { opacity: 0; transform: scale(0.985); filter: blur(4px); }
+  }
+  @keyframes langIn {
+    from { opacity: 0; transform: scale(0.985); filter: blur(4px); }
+    to   { opacity: 1; transform: scale(1);     filter: blur(0); }
+  }
+  .lang-anim-out { animation: langOut 0.22s ease forwards; }
+  .lang-anim-in  { animation: langIn 0.32s ease forwards; }
+
+  /* Page enter — re-applied on each route change by <PageTransition>. */
+  @keyframes pageEnter {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page-enter { animation: pageEnter 0.28s ease both; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-transition,
+    .theme-transition *,
+    .lang-anim-out,
+    .lang-anim-in,
+    .page-enter {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
 }

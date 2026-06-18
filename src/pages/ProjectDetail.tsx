@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { RiskBadge } from "@/components/RiskBadge";
 import { ArrowLeft, FileDown, ListChecks, BookOpen, MapPin } from "lucide-react";
 import { BuildingType } from "@/services/fireCodeApi";
+import { localizedPath } from "@/lib/paths";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -49,7 +50,7 @@ function ListBlock({ title, icon: Icon, items, emptyText }: { title: string; ico
 export default function ProjectDetail() {
   const { id = "" } = useParams();
   const { project, loading } = useProject(id);
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const { setPageContext, setInput } = useAssistant();
 
   const buildingLabel: Record<number, string> = {
@@ -79,7 +80,7 @@ export default function ProjectDetail() {
     <DashboardLayout>
       <div className="space-y-4">
         <Button asChild variant="ghost" size="sm" className="gap-1 -ml-2">
-          <Link to="/projects"><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
+          <Link to={localizedPath(lang, "/projects")}><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
         </Button>
 
         {loading ? (
@@ -92,7 +93,7 @@ export default function ProjectDetail() {
           <Card>
             <CardContent className="py-16 text-center">
               <p className="text-sm text-muted-foreground mb-4">{tr.project_not_found}</p>
-              <Button asChild variant="outline"><Link to="/projects">{tr.back_to_projects}</Link></Button>
+              <Button asChild variant="outline"><Link to={localizedPath(lang, "/projects")}>{tr.back_to_projects}</Link></Button>
             </CardContent>
           </Card>
         ) : (

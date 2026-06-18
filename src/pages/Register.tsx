@@ -15,6 +15,7 @@ import {
   type RegisterInfoForm,
   type RegisterPasswordForm,
 } from "@/lib/authSchemas";
+import { localizedPath } from "@/lib/paths";
 
 type Step = "info" | "password";
 
@@ -76,9 +77,9 @@ export default function Register() {
         // Stash everything VerifyEmail needs to auto sign-in after confirmation.
         sessionStorage.setItem("verificationEmail", infoData.email.trim());
         sessionStorage.setItem("verificationPassword", values.password);
-        navigate("/verify-email");
+        navigate(localizedPath(lang, "/verify-email"));
       } else {
-        navigate("/dashboard", { replace: true });
+        navigate(localizedPath(lang, "/dashboard"), { replace: true });
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : tr.auth_register_error);
@@ -94,7 +95,7 @@ export default function Register() {
       footer={
         <div>
           <span className="text-muted-foreground">{tr.auth_register_has_account} </span>
-          <Link to="/login" className="text-primary font-medium hover:underline">
+          <Link to={localizedPath(lang, "/login")} className="text-primary font-medium hover:underline">
             {tr.auth_register_sign_in}
           </Link>
         </div>

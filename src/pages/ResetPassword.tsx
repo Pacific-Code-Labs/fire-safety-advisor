@@ -11,6 +11,7 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { PasswordField } from "@/components/auth/PasswordField";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
 import { emailSchema, passwordSchema } from "@/lib/authSchemas";
+import { localizedPath } from "@/lib/paths";
 
 const schema = z
   .object({
@@ -27,7 +28,7 @@ type ResetForm = z.infer<typeof schema>;
 
 export default function ResetPassword() {
   const { confirmResetPassword } = useAuth();
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const navigate = useNavigate();
 
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +61,7 @@ export default function ResetPassword() {
     try {
       await confirmResetPassword(data.email.trim(), data.code, data.newPassword);
       sessionStorage.removeItem("resetPasswordEmail");
-      navigate("/login", { replace: true });
+      navigate(localizedPath(lang, "/login"), { replace: true });
     } catch (e: unknown) {
       const name = (e as { name?: string })?.name ?? "";
       if (name === "CodeMismatchException") setError(tr.auth_reset_invalid_code);
@@ -79,11 +80,11 @@ export default function ResetPassword() {
           <button
             type="button"
             className="text-primary font-medium hover:underline mx-auto"
-            onClick={() => navigate("/forgot-password")}
+            onClick={() => navigate(localizedPath(lang, "/forgot-password"))}
           >
             {tr.auth_reset_request_new}
           </button>
-          <Link to="/login" className="inline-flex items-center gap-1 text-primary font-medium hover:underline mx-auto">
+          <Link to={localizedPath(lang, "/login")} className="inline-flex items-center gap-1 text-primary font-medium hover:underline mx-auto">
             <ArrowLeft className="h-3.5 w-3.5" />
             {tr.auth_forgot_back_to_login}
           </Link>

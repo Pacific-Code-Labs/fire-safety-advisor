@@ -9,13 +9,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { emailSchema } from "@/lib/authSchemas";
+import { localizedPath } from "@/lib/paths";
 
 const schema = z.object({ email: emailSchema });
 type ForgotForm = z.infer<typeof schema>;
 
 export default function ForgotPassword() {
   const { resetPassword } = useAuth();
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const navigate = useNavigate();
 
   const [submitted, setSubmitted] = useState(false);
@@ -53,13 +54,13 @@ export default function ForgotPassword() {
         icon={<Check className="h-6 w-6" />}
       >
         <div className="flex flex-col gap-3">
-          <Button variant="primary" className="w-full" onClick={() => navigate("/reset-password")}>
+          <Button variant="primary" className="w-full" onClick={() => navigate(localizedPath(lang, "/reset-password"))}>
             {tr.auth_forgot_enter_code}
           </Button>
           <Button variant="outline" className="w-full" onClick={() => setSubmitted(false)}>
             {tr.auth_forgot_different_email}
           </Button>
-          <Link to="/login" className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm mx-auto mt-1">
+          <Link to={localizedPath(lang, "/login")} className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-sm mx-auto mt-1">
             <ArrowLeft className="h-3.5 w-3.5" />
             {tr.auth_forgot_back_to_login}
           </Link>
@@ -73,7 +74,7 @@ export default function ForgotPassword() {
       title={tr.auth_forgot_title}
       subtitle={tr.auth_forgot_subtitle}
       footer={
-        <Link to="/login" className="inline-flex items-center gap-1 text-primary font-medium hover:underline">
+        <Link to={localizedPath(lang, "/login")} className="inline-flex items-center gap-1 text-primary font-medium hover:underline">
           <ArrowLeft className="h-3.5 w-3.5" />
           {tr.auth_forgot_back_to_login}
         </Link>

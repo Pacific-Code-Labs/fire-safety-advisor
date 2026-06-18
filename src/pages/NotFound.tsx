@@ -1,8 +1,9 @@
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useLang } from "@/contexts/LangContext";
 import { tChrome } from "@/lib/chrome-i18n";
 import { resolveSeo, useHeadTags } from "@/lib/seo";
+import { localizedPath } from "@/lib/paths";
 
 const NotFound = () => {
   const location = useLocation();
@@ -21,9 +22,9 @@ const NotFound = () => {
       <div className="text-center">
         <h1 className="mb-4 text-4xl font-bold">{chrome.notFound.title}</h1>
         <p className="mb-4 text-xl text-muted-foreground">{chrome.notFound.message}</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
+        <Link to={localizedPath(lang, "/")} className="text-primary underline hover:text-primary/90">
           {chrome.notFound.backHome}
-        </a>
+        </Link>
       </div>
     </div>
   );

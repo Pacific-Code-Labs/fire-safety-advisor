@@ -5,14 +5,15 @@
 // it; `useHeadTags(...)` updates document.title + meta description + canonical +
 // hreflang as the SPA navigates, from the SAME content. Public-bundle safe.
 //
-// NOTE on URLs: this app does NOT use language-path prefixes (language is a
-// LangContext toggle persisted in localStorage, not in the URL). So canonical /
-// hreflang here use the plain route path; the static prerender (Layer 1) still
-// emits per-language×route HTML for crawlers under /<lang>/<slug>.
+// NOTE on URLs: this app IS language-path-prefixed (FCR-106): every route lives
+// under /:lang/... and the URL drives i18n. So the canonical is the real
+// /<lang>/<slug> URL (via localizedPath), matching the prerendered Layer-1 HTML;
+// hreflang alternates point at each language's prefixed URL.
 import { useEffect } from "react";
 import seo from "@/content/seo.json";
 import type { Lang } from "@/lib/i18n";
 import { absoluteAssetUrl } from "@/lib/media";
+import { localizedPath } from "@/lib/paths";
 
 export type SeoContent = typeof seo;
 export type SeoRoute = keyof typeof seo.pages;
@@ -41,7 +42,9 @@ export function resolveSeo(route: string, lang: Lang, noindex = false): Resolved
   return {
     title: meta?.title ?? seo.defaultTitle[lang] ?? seo.defaultTitle.es,
     description: meta?.description ?? seo.defaultDescription[lang] ?? seo.defaultDescription.es,
-    canonical: siteUrl() + routePath(route),
+    // Language-prefixed canonical so it matches the real /:lang route + the
+    // Layer-1 prerendered URL.
+    canonical: siteUrl() + localizedPath(lang, routePath(route)),
     ogImage: absoluteAssetUrl(seo.ogImage),
     noindex,
   };

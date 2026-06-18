@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner, TooltipProvider } from "@pacific-code-labs/fire-code-design-system";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "./pages/Index.tsx";
@@ -25,6 +25,8 @@ import { BillingProvider } from "@/contexts/BillingContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AssistantProvider } from "@/contexts/AssistantContext";
 import { RequireAuth } from "@/components/RequireAuth";
+import { LangLayout } from "@/components/LangLayout";
+import { DEFAULT_LANG, localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
 import Evaluator from "./pages/Evaluator.tsx";
 
 // The admin CMS lives in the separate private `fire-code-admin` app/repo
@@ -32,6 +34,17 @@ import Evaluator from "./pages/Evaluator.tsx";
 // admin code and never registers an `/admin` route.
 
 const queryClient = new QueryClient();
+
+/**
+ * LegacyRedirect — catches any un-prefixed deep link (e.g. /dashboard, /demo)
+ * and forwards it to the same path under the persisted/Default language prefix.
+ * Bare "/" is handled by its own top-level redirect.
+ */
+function LegacyRedirect() {
+  const location = useLocation();
+  const { rest } = stripLangPrefix(location.pathname);
+  return <Navigate to={localizedPath(persistedLang(), rest) + location.search + location.hash} replace />;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -45,25 +58,38 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/demo" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/verify-email" element={<VerifyEmail />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                <Route path="/dashboard/evaluator" element={<RequireAuth><Evaluator /></RequireAuth>} />
-                <Route path="/dashboard/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-                <Route path="/dashboard/roles" element={<RequireAuth><RolesPage /></RequireAuth>} />
-                <Route path="/organizations/new" element={<RequireAuth><NewOrganization /></RequireAuth>} />
-                <Route path="/projects" element={<RequireAuth><Projects /></RequireAuth>} />
-                <Route path="/projects/new" element={<RequireAuth><NewProject /></RequireAuth>} />
-                <Route path="/projects/electrical" element={<RequireAuth><ElectricalProject /></RequireAuth>} />
-                <Route path="/projects/:id" element={<RequireAuth><ProjectDetail /></RequireAuth>} />
-                <Route path="/pricing" element={<Pricing />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
+                {/*
+                 * ALL app routes are language-prefixed under /:lang (FCR-106).
+                 * The URL drives i18n: LangLayout validates :lang, syncs
+                 * LangContext to it, and renders the matched child via its
+                 * <Outlet/> inside a <PageTransition>.
+                 */}
+                <Route path="/:lang" element={<LangLayout />}>
+                  <Route index element={<Landing />} />
+                  <Route path="demo" element={<Index />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="register" element={<Register />} />
+                  <Route path="verify-email" element={<VerifyEmail />} />
+                  <Route path="forgot-password" element={<ForgotPassword />} />
+                  <Route path="reset-password" element={<ResetPassword />} />
+                  <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                  <Route path="dashboard/evaluator" element={<RequireAuth><Evaluator /></RequireAuth>} />
+                  <Route path="dashboard/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+                  <Route path="dashboard/roles" element={<RequireAuth><RolesPage /></RequireAuth>} />
+                  <Route path="organizations/new" element={<RequireAuth><NewOrganization /></RequireAuth>} />
+                  <Route path="projects" element={<RequireAuth><Projects /></RequireAuth>} />
+                  <Route path="projects/new" element={<RequireAuth><NewProject /></RequireAuth>} />
+                  <Route path="projects/electrical" element={<RequireAuth><ElectricalProject /></RequireAuth>} />
+                  <Route path="projects/:id" element={<RequireAuth><ProjectDetail /></RequireAuth>} />
+                  <Route path="pricing" element={<Pricing />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+
+                {/* Top-level: bare "/" → default language. */}
+                <Route path="/" element={<Navigate to={"/" + DEFAULT_LANG} replace />} />
+                {/* Any un-prefixed deep link → same path under the persisted lang. */}
+                <Route path="*" element={<LegacyRedirect />} />
               </Routes>
             </BrowserRouter>
           </TooltipProvider>

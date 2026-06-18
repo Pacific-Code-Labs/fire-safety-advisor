@@ -26,6 +26,7 @@ import {
 } from "@/services/fireCodeApi";
 import { ElectricalDiagramEditor } from "@/components/electrical/ElectricalDiagramEditor";
 import { ElectricalLoadCard } from "@/components/assistant/ElectricalLoadCard";
+import { localizedPath } from "@/lib/paths";
 
 const EMPTY_TOPOLOGY: Topology = { nodes: [], edges: [] };
 
@@ -105,7 +106,7 @@ export default function ElectricalProject() {
         electrical: { inputs, topology: snapshotTopology, result },
       });
       toast.success(tr.elec_saved);
-      navigate(`/projects/${created.id}`);
+      navigate(localizedPath(lang, `/projects/${created.id}`));
     } catch {
       toast.error(tr.elec_save_error);
     } finally {

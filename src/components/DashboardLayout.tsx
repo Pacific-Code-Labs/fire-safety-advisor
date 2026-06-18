@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Flame, LayoutDashboard, FolderKanban, Sparkles, LogOut, Languages, User, ShieldCheck, Zap } from "lucide-react";
+import { ChevronDown, Flame, LayoutDashboard, FolderKanban, Sparkles, LogOut, Languages, User, ShieldCheck, Zap } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,10 +11,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarRail,
   SidebarTrigger,
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@pacific-code-labs/fire-code-design-system";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,6 +24,7 @@ import { useLang } from "@/contexts/LangContext";
 import { usePermissions } from "@/hooks/useRbac";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalAssistant } from "@/components/GlobalAssistant";
+import { localizedPath, runLangSwitch, stripLangPrefix } from "@/lib/paths";
 
 /** Sidebar nav identifiers (one per item). */
 type NavId = "dashboard" | "projects" | "evaluator" | "electrical" | "roles";
@@ -52,8 +55,11 @@ interface NavItem {
 }
 
 function AppSidebar() {
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const { can, isReady } = usePermissions();
+  const location = useLocation();
+  // The current route stripped of its /:lang prefix — for active-group detection.
+  const currentRest = stripLangPrefix(location.pathname).rest;
 
   /**
    * itemVisible(id) — show when there's no permission mapping, OR permissions
@@ -86,7 +92,7 @@ function AppSidebar() {
     <SidebarMenuItem key={item.url}>
       <SidebarMenuButton asChild tooltip={tr[item.titleKey]}>
         <NavLink
-          to={item.url}
+          to={localizedPath(lang, item.url)}
           end={item.end}
           className="hover:bg-muted/50"
           activeClassName="bg-muted text-primary font-medium"
@@ -98,10 +104,41 @@ function AppSidebar() {
     </SidebarMenuItem>
   );
 
+  // A group is open by default when the current route matches one of its items.
+  const groupHasActive = (items: NavItem[]): boolean =>
+    items.some((i) =>
+      i.end ? currentRest === i.url : currentRest === i.url || currentRest.startsWith(i.url + "/"),
+    );
+
+  // Collapsible group: a CollapsibleTrigger on the SidebarGroupLabel (rotating
+  // chevron) wrapping the menu in CollapsibleContent. Hidden in icon-collapsed
+  // mode (the label itself is hidden), defaultOpen when it owns the active route.
+  const renderGroup = (labelKey: keyof typeof tr & string, items: NavItem[]) => {
+    if (items.length === 0) return null;
+    return (
+      <Collapsible defaultOpen={groupHasActive(items)} className="group/collapsible">
+        <SidebarGroup>
+          <SidebarGroupLabel asChild>
+            <CollapsibleTrigger className="flex w-full items-center justify-between">
+              {tr[labelKey]}
+              <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+            </CollapsibleTrigger>
+          </SidebarGroupLabel>
+          <CollapsibleContent>
+            <SidebarGroupContent>
+              <SidebarMenu>{items.map(renderItem)}</SidebarMenu>
+            </SidebarGroupContent>
+          </CollapsibleContent>
+        </SidebarGroup>
+      </Collapsible>
+    );
+  };
+
   return (
     <Sidebar collapsible="icon">
+      <SidebarRail />
       <SidebarHeader>
-        <Link to="/" className="flex items-center gap-2 px-2 py-1">
+        <Link to={localizedPath(lang, "/")} className="flex items-center gap-2 px-2 py-1">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 border border-primary/30">
             <Flame className="h-4 w-4 text-primary" />
           </div>
@@ -111,33 +148,11 @@ function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        {/* Hide a whole group when none of its items are visible. */}
-        {visibleWorkspace.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>{tr.nav_workspace}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{visibleWorkspace.map(renderItem)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {visibleTools.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>{tr.nav_tools}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{visibleTools.map(renderItem)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {visibleAdmin.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>{tr.nav_admin}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{visibleAdmin.map(renderItem)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        {/* Each group is a collapsible section; a whole group is hidden when
+            none of its items are visible. defaultOpen tracks the active route. */}
+        {renderGroup("nav_workspace", visibleWorkspace)}
+        {renderGroup("nav_tools", visibleTools)}
+        {renderGroup("nav_admin", visibleAdmin)}
       </SidebarContent>
       <SidebarFooter>
         <UserBlock />
@@ -148,7 +163,7 @@ function AppSidebar() {
 
 function UserBlock() {
   const { user, signOut } = useAuth();
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const navigate = useNavigate();
   const email = (user?.signInDetails?.loginId as string | undefined) ?? user?.username ?? "";
 
@@ -161,7 +176,7 @@ function UserBlock() {
         variant="outline"
         size="sm"
         className="w-full justify-start gap-2"
-        onClick={() => navigate("/dashboard/profile")}
+        onClick={() => navigate(localizedPath(lang, "/dashboard/profile"))}
       >
         <User className="h-4 w-4" />
         <span className="group-data-[collapsible=icon]:hidden">{tr.nav_profile}</span>
@@ -172,7 +187,7 @@ function UserBlock() {
         className="w-full justify-start gap-2"
         onClick={async () => {
           await signOut();
-          navigate("/login", { replace: true });
+          navigate(localizedPath(lang, "/login"), { replace: true });
         }}
       >
         <LogOut className="h-4 w-4" />
@@ -183,8 +198,14 @@ function UserBlock() {
 }
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
-  const { lang, setLang, tr } = useLang();
+  const { lang, tr } = useLang();
   const location = useLocation();
+  const navigate = useNavigate();
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Title + active route are computed off the path WITHOUT its /:lang prefix.
+  const rest = stripLangPrefix(location.pathname).rest;
+  const nextLang = lang === "es" ? "en" : "es";
 
   const titleMap: Record<string, string> = {
     "/dashboard": tr.nav_dashboard,
@@ -195,8 +216,16 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
     "/projects/new": tr.new_project,
   };
   const title =
-    titleMap[location.pathname] ??
-    (location.pathname.startsWith("/projects/") ? tr.nav_projects : tr.nav_dashboard);
+    titleMap[rest] ?? (rest.startsWith("/projects/") ? tr.nav_projects : tr.nav_dashboard);
+
+  // Language toggle navigates to the same page under the other lang prefix
+  // (wrapped in the lang animation); LangLayout's effect then syncs the context.
+  const switchLang = () => runLangSwitch(navigate, localizedPath(nextLang, rest));
+
+  // Scroll the main content back to the top on every route change.
+  useEffect(() => {
+    mainRef.current?.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <SidebarProvider>
@@ -213,15 +242,15 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setLang(lang === "es" ? "en" : "es")}
+                onClick={switchLang}
                 className="gap-2"
               >
                 <Languages className="h-4 w-4" />
-                {lang === "es" ? "EN" : "ES"}
+                {nextLang.toUpperCase()}
               </Button>
             </div>
           </header>
-          <main className="flex-1 overflow-auto">
+          <main ref={mainRef} className="flex-1 overflow-auto">
             <div className="container max-w-6xl py-6 px-4 sm:px-6">{children}</div>
           </main>
         </div>

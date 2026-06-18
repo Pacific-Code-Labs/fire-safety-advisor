@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Flame } from "lucide-react";
 import { Card, CardBody, CardHeader, CardTitle, CardDescription } from "@pacific-code-labs/fire-code-design-system";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useLang } from "@/contexts/LangContext";
+import { localizedPath } from "@/lib/paths";
 
 /**
  * AuthShell — the shared frame for every unauthenticated auth screen
@@ -28,13 +30,14 @@ export function AuthShell({
   /** Optional footer area below the card body (links, etc.). */
   footer?: ReactNode;
 }) {
+  const { lang } = useLang();
   return (
     <div className="min-h-screen grid place-items-center bg-background px-4 py-10 relative">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
       <div className="w-full max-w-md">
-        <Link to="/" className="flex items-center gap-3 justify-center mb-6">
+        <Link to={localizedPath(lang, "/")} className="flex items-center gap-3 justify-center mb-6">
           <div className="relative flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 border border-primary/30 glow-red">
             <Flame className="h-5 w-5 text-primary" />
           </div>

@@ -25,6 +25,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBilling } from "@/contexts/BillingContext";
 import { PLAN_ORDER, PLANS, type PlanConfig, type PlanTier } from "@/lib/plans";
 import type { Dict } from "@/lib/i18n";
+import { localizedPath } from "@/lib/paths";
 
 function fill(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -58,7 +59,7 @@ function planFeatures(plan: PlanConfig, tr: Dict): string[] {
 }
 
 export default function Pricing() {
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
   const { user } = useAuth();
   const { tier, isFree } = useBilling();
   const navigate = useNavigate();
@@ -111,7 +112,7 @@ export default function Pricing() {
                     ) : (
                       <Button
                         className="w-full"
-                        onClick={() => navigate(user ? "/dashboard" : "/register")}
+                        onClick={() => navigate(localizedPath(lang, user ? "/dashboard" : "/register"))}
                       >
                         {user ? tr.pricing_back_dashboard : tr.pricing_free_cta_anon}
                       </Button>
@@ -130,7 +131,7 @@ export default function Pricing() {
 
         {user && isFree && (
           <div className="mx-auto mt-8 max-w-5xl text-center">
-            <Link to="/dashboard" className={buttonVariants({ variant: "ghost" })}>
+            <Link to={localizedPath(lang, "/dashboard")} className={buttonVariants({ variant: "ghost" })}>
               {tr.pricing_back_dashboard}
             </Link>
           </div>

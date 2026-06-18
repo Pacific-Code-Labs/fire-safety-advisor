@@ -24,11 +24,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
+    // Animate the colour swap: add .theme-transition for ~400ms then remove it
+    // (prefers-reduced-motion disables the transition in index.css).
+    root.classList.add("theme-transition");
+    const timer = window.setTimeout(() => {
+      root.classList.remove("theme-transition");
+    }, 400);
     root.classList.toggle("dark", theme === "dark");
     localStorage.setItem(STORAGE_KEY, theme);
     // Re-apply the active brand theme in the new mode so the DS theme engine
     // writes the correct light/dark token map (FCR-080).
     applyActiveTheme(theme === "dark");
+    return () => window.clearTimeout(timer);
   }, [theme]);
 
   const setTheme = (t: Theme) => setThemeState(t);

@@ -13,6 +13,7 @@ import type { RiskLevel } from "@/hooks/useProjects";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription } from "@pacific-code-labs/fire-code-design-system";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import { localizedPath } from "@/lib/paths";
 
 function normalizeRisk(raw?: string): RiskLevel | undefined {
   if (!raw) return undefined;
@@ -26,7 +27,7 @@ function normalizeRisk(raw?: string): RiskLevel | undefined {
 export default function NewProject() {
   const navigate = useNavigate();
   const { create } = useProjects();
-  const { tr } = useLang();
+  const { lang, tr } = useLang();
 
   const [name, setName] = useState("");
   const [buildingType, setBuildingType] = useState<BuildingType>(BuildingType.comercial);
@@ -89,7 +90,7 @@ export default function NewProject() {
         ),
       });
 
-      navigate(`/projects/${project.id}`, { replace: true });
+      navigate(localizedPath(lang, `/projects/${project.id}`), { replace: true });
     } catch (e) {
       // FCR-026: saved-projects limit (402) → open the upgrade CTA.
       if (e instanceof QuotaError) {
@@ -106,7 +107,7 @@ export default function NewProject() {
     <DashboardLayout>
       <div className="max-w-2xl space-y-4">
         <Button asChild variant="ghost" size="sm" className="gap-1 -ml-2">
-          <Link to="/projects"><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
+          <Link to={localizedPath(lang, "/projects")}><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
         </Button>
 
         <Card>
