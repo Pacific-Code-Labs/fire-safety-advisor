@@ -47,6 +47,9 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [occupants, setOccupants]       = useState<number>(0);
   const [ceilingHeight, setCeilingHeight] = useState<number>(0);
   const [volume, setVolume]             = useState<number>(0);
+  // FCR-110: bumped each time a demo capability card overwrites the inputs, to
+  // flash a primary ring on the BuildingSelector fields.
+  const [scenarioFlash, setScenarioFlash] = useState<number>(0);
   const [page, setPage]                 = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<RuleCategory | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
@@ -120,6 +123,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
     setOccupants(p.occupants);
     setCeilingHeight(p.ceiling_height_m);
     setVolume(p.volume_m3);
+    setScenarioFlash((n) => n + 1);
     setPage(0);
   };
 
@@ -183,6 +187,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
               occupants={occupants} onOccupantsChange={handleFilterChange(setOccupants)}
               ceilingHeight={ceilingHeight} onCeilingHeightChange={handleFilterChange(setCeilingHeight)}
               volume={volume}       onVolumeChange={handleFilterChange(setVolume)}
+              flash={scenarioFlash}
             />
 
             {/* Stats + category filter */}

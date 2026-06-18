@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Building2, Factory, Home } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
 import { BuildingType } from "@/services/fireCodeApi";
@@ -20,6 +21,12 @@ interface Props {
   onCeilingHeightChange: (v: number) => void;
   volume: number;
   onVolumeChange: (v: number) => void;
+  /**
+   * FCR-110: bump this counter (e.g. when a demo capability card overwrites the
+   * inputs) to flash a primary ring/border on the fields so the user notices the
+   * values changed.
+   */
+  flash?: number;
 }
 
 export function BuildingSelector({
@@ -30,8 +37,20 @@ export function BuildingSelector({
   occupants, onOccupantsChange,
   ceilingHeight, onCeilingHeightChange,
   volume, onVolumeChange,
+  flash,
 }: Props) {
   const { tr } = useLang();
+
+  // FCR-110: pulse the fields when `flash` changes (a scenario was applied).
+  // Skip the initial mount (flash === undefined / 0).
+  const [flashing, setFlashing] = useState(false);
+  useEffect(() => {
+    if (!flash) return;
+    setFlashing(true);
+    const t = setTimeout(() => setFlashing(false), 1100);
+    return () => clearTimeout(t);
+  }, [flash]);
+  const flashCls = flashing ? "field-flash" : "";
   const types: { id: BuildingType; icon: typeof Home; label: string }[] = [
     { id: BuildingType.residencial, icon: Home,      label: tr.residencial },
     { id: BuildingType.comercial,   icon: Building2, label: tr.comercial   },
@@ -42,7 +61,7 @@ export function BuildingSelector({
     <div className="panel p-5 space-y-5">
       <div>
         <Label className="text-xs uppercase tracking-wider text-muted-foreground">{tr.selectBuilding}</Label>
-        <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className={cn("mt-3 grid grid-cols-3 gap-2 rounded-md", flashCls)}>
           {types.map((t) => {
             const active = value === t.id;
             const Icon = t.icon;
@@ -75,7 +94,7 @@ export function BuildingSelector({
             value={area || ""}
             onChange={(e) => onAreaChange(Number(e.target.value))}
             placeholder="280"
-            className="mt-2 bg-input/60"
+            className={cn("mt-2 bg-input/60", flashCls)}
           />
         </div>
         <div>
@@ -87,7 +106,7 @@ export function BuildingSelector({
             value={context}
             onChange={(e) => onContextChange(e.target.value)}
             placeholder="restaurante, bodega…"
-            className="mt-2 bg-input/60"
+            className={cn("mt-2 bg-input/60", flashCls)}
           />
         </div>
         <div>
@@ -99,7 +118,7 @@ export function BuildingSelector({
             value={floors || ""}
             onChange={(e) => onFloorsChange(Number(e.target.value))}
             placeholder="1"
-            className="mt-2 bg-input/60"
+            className={cn("mt-2 bg-input/60", flashCls)}
           />
         </div>
         <div>
@@ -111,7 +130,7 @@ export function BuildingSelector({
             value={occupants || ""}
             onChange={(e) => onOccupantsChange(Number(e.target.value))}
             placeholder="50"
-            className="mt-2 bg-input/60"
+            className={cn("mt-2 bg-input/60", flashCls)}
           />
         </div>
         <div>
@@ -124,7 +143,7 @@ export function BuildingSelector({
             value={ceilingHeight || ""}
             onChange={(e) => onCeilingHeightChange(Number(e.target.value))}
             placeholder="3.5"
-            className="mt-2 bg-input/60"
+            className={cn("mt-2 bg-input/60", flashCls)}
           />
         </div>
         <div>
@@ -136,7 +155,7 @@ export function BuildingSelector({
             value={volume || ""}
             onChange={(e) => onVolumeChange(Number(e.target.value))}
             placeholder="840"
-            className="mt-2 bg-input/60"
+            className={cn("mt-2 bg-input/60", flashCls)}
           />
         </div>
       </div>
