@@ -107,6 +107,12 @@ interface AskOptions {
   teaser?: boolean;
   /** After a successful (non-needs_info) demo response, show this guided prompt next. */
   demoNext?: PromptKind;
+  /**
+   * FCR-109: guided-demo step signal sent to the agent (`context.demo_step`) so
+   * it returns the right shape per stage: "teaser" → short message + hook;
+   * "full_evaluation" → complete evaluation; "project" → create_project preview.
+   */
+  demoStep?: "teaser" | "full_evaluation" | "project";
 }
 
 export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages, pageContext, demo = false, onApplyScenario }: Props) {
@@ -270,7 +276,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
    */
   const ask = async (text: string, opts: AskOptions = {}) => {
     if (!text.trim() || isLoading) return;
-    const { overrides, teaser, demoNext } = opts;
+    const { overrides, teaser, demoNext, demoStep } = opts;
     if (demoNext !== undefined) demoNextRef.current = demoNext;
 
     // Prior turns BEFORE appending the current question (FCR-042). The current
@@ -296,7 +302,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       language: lang,
       conversation,
       context: demo
-        ? { page: "demo" as const, project: null }
+        ? { page: "demo" as const, project: null, demo_step: demoStep }
         : pageContext
         ? { page: pageContext.page, project: pageContext.payload ?? null }
         : undefined,
@@ -332,7 +338,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     demoEndedRef.current = false;
     activeScenarioRef.current = scenario;
     activeQueryRef.current = query;
-    ask(query, { teaser: true, demoNext: "see_eval" });
+    ask(query, { teaser: true, demoNext: "see_eval", demoStep: "teaser" });
   };
 
   /** A tapped capability card. Demo → guided step 1; dashboard → grounded eval. */
@@ -359,14 +365,15 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     switch (kind) {
       case "see_eval": {
         const s = activeScenarioRef.current;
-        if (s) ask(s.query, { overrides: s.params, demoNext: "create_project" });
-        else ask(activeQueryRef.current, { demoNext: "create_project" });
+        if (s) ask(s.query, { overrides: s.params, demoNext: "create_project", demoStep: "full_evaluation" });
+        else ask(activeQueryRef.current, { demoNext: "create_project", demoStep: "full_evaluation" });
         break;
       }
       case "create_project":
         ask(tr.demoCreateProjectMsg, {
           overrides: activeScenarioRef.current?.params,
           demoNext: "create_account",
+          demoStep: "project",
         });
         break;
       case "create_account":

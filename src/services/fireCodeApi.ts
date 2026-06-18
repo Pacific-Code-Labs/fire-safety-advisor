@@ -97,6 +97,8 @@ export interface ConversationTurn {
 export interface EvaluateContext {
   page: "dashboard" | "projects" | "project_detail" | "evaluation" | "demo" | "other";
   project?: Record<string, unknown> | null;
+  /** FCR-109: guided-demo step (DEMO MODE only) — teaser | full_evaluation | project. */
+  demo_step?: "teaser" | "full_evaluation" | "project";
 }
 
 export interface EvaluateRequest {
