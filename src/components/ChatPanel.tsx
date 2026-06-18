@@ -16,6 +16,10 @@ import { TextMessage } from "@/components/assistant/TextMessage";
 import { EvaluationCard } from "@/components/assistant/EvaluationCard";
 import { ProjectCard } from "@/components/assistant/ProjectCard";
 import { DemoLimitCard } from "@/components/assistant/DemoLimitCard";
+import { AssistantMessage } from "@/components/assistant/AssistantMessage";
+import { AssistantAvatar } from "@/components/assistant/AssistantAvatar";
+import { WelcomeState } from "@/components/assistant/WelcomeState";
+import { TypingIndicator } from "@/components/assistant/TypingIndicator";
 import { cn } from "@/lib/utils";
 
 export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit";
@@ -76,10 +80,6 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, isLoading]);
-
-  const suggestions = lang === "es"
-    ? ["¿Qué sistema necesita un restaurante?", "¿Dónde instalo detectores de humo?", "¿Necesito rociadores en una bodega?"]
-    : ["What system does a restaurant need?", "Where do I install smoke detectors?", "Do I need sprinklers in a warehouse?"];
 
   const handleResponse = (raw: unknown) => {
     const norm = normalizeAssistantResponse(raw);
@@ -227,7 +227,10 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     if (type === "demo_limit" && m.payload) {
       return <DemoLimitCard data={m.payload as DemoLimitResponse} />;
     }
-    // message / error / fallback
+    if (type === "message") {
+      return <AssistantMessage text={m.text} demo={demo} onAsk={ask} />;
+    }
+    // error / fallback
     return <TextMessage text={m.text} />;
   };
 
@@ -261,34 +264,25 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       </div>
 
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
-        {messages.length === 0 && (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">{tr.chatIntro}</p>
-            <div className="space-y-2">
-              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{tr.suggestions}</div>
-              {suggestions.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => ask(s)}
-                  className="block w-full rounded-md border border-border bg-secondary/40 px-3 py-2 text-left text-xs hover:border-primary/40 hover:bg-primary/5 transition"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        {messages.length === 0 && <WelcomeState onAsk={ask} />}
 
         {messages.map((m, i) => (
-          <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+          <div
+            key={i}
+            className={cn(
+              "flex gap-2 duration-300 animate-in fade-in-50 slide-in-from-bottom-1",
+              m.role === "user" ? "justify-end" : "justify-start",
+            )}
+          >
+            {m.role === "assistant" && <AssistantAvatar />}
             <div
               className={cn(
-                "max-w-[90%] rounded-lg px-3 py-2 text-sm",
+                "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm",
                 m.role === "user"
-                  ? "bg-primary text-primary-foreground"
+                  ? "rounded-br-sm bg-primary text-primary-foreground shadow-sm"
                   : m.type === "error"
-                  ? "border border-destructive/40 bg-destructive/10 text-destructive"
-                  : "bg-secondary/60 border border-border"
+                  ? "rounded-bl-sm border border-destructive/40 bg-destructive/10 text-destructive"
+                  : "rounded-bl-sm border border-border bg-secondary/60",
               )}
             >
               {m.role === "user" ? <TextMessage text={m.text} /> : renderAssistantBody(m)}
@@ -296,13 +290,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
           </div>
         ))}
 
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="rounded-lg bg-secondary/60 border border-border px-3 py-2 text-sm">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            </div>
-          </div>
-        )}
+        {isLoading && <TypingIndicator />}
       </div>
 
       <form
