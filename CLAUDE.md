@@ -8,7 +8,7 @@ Guidance for AI agents (and humans) working in this repo. Read this before makin
 
 `fire-code-fe` is the FireCode CR web app: a React SPA that helps interpret **NFPA fire-protection standards for Costa Rica**. It lets a user describe a building (type, area, usage, floors, occupants, ceiling height, volume), filters the applicable rules, shows them grouped by fire-protection category, and exposes an AI chat assistant that calls the backend `/evaluate` endpoint (deterministic filter + Azure AI Foundry agent).
 
-It talks to the `fire-code-cr-be` backend (`E:\dev\fire-code-app\fire-code-cr-be`) via a typed REST client. Live API default: `https://fire-code-api.jcampos.dev`. Live site is GitHub Pages.
+It talks to the `fire-code-cr-be` backend (`E:\dev\fire-code-app\fire-code-cr-be`) via a typed REST client. Live API default: `https://fire-api.jcampos.dev`. Live site is GitHub Pages.
 
 ---
 

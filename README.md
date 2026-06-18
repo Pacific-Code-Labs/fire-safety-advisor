@@ -3,7 +3,7 @@
 React + TypeScript web app that helps interpret NFPA fire protection standards for Costa Rica. Filters rules by building characteristics, displays them grouped by category, and provides an AI-powered chat assistant.
 
 **Live site:** `https://chepelcr.github.io/fire-safety-advisor`
-**API:** `https://fire-code-api.jcampos.dev`
+**API:** `https://fire-api.jcampos.dev`
 
 ---
 
@@ -128,7 +128,7 @@ App runs at `http://localhost:8080`.
 | `VITE_COGNITO_IDENTITY_POOL_ID` | Cognito Identity Pool ID for anonymous SigV4 |
 | `VITE_COGNITO_USER_POOL_ID` | Cognito User Pool ID |
 | `VITE_COGNITO_USER_POOL_CLIENT_ID` | Cognito User Pool Client ID |
-| `VITE_API_BASE_URL` | API base URL (`https://fire-code-api.jcampos.dev`) |
+| `VITE_API_BASE_URL` | API base URL (`https://fire-api.jcampos.dev`) |
 
 These are also set as GitHub repository secrets so they are injected at build time in CI.
 
