@@ -192,7 +192,8 @@
       "plan_panel_usage_unlimited": "Ilimitado",
       "plan_panel_view_plans": "Ver planes",
       "common_cancel": "Cancelar",
-      "common_close": "Cerrar"
+      "common_close": "Cerrar",
+      "usagePlaceholder": "restaurante, bodega…"
     },
     "demo": {
       "demoWelcomeTitle": "Tu ingeniero de protección contra incendios, al instante.",

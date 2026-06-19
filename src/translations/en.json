@@ -192,7 +192,8 @@
       "plan_panel_usage_unlimited": "Unlimited",
       "plan_panel_view_plans": "View plans",
       "common_cancel": "Cancel",
-      "common_close": "Close"
+      "common_close": "Close",
+      "usagePlaceholder": "restaurant, warehouse…"
     },
     "demo": {
       "demoWelcomeTitle": "Your fire-protection engineer, instantly.",

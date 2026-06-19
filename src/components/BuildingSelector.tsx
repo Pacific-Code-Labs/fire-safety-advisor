@@ -99,13 +99,13 @@ export function BuildingSelector({
         </div>
         <div>
           <Label htmlFor="ctx" className="text-xs uppercase tracking-wider text-muted-foreground">
-            Uso
+            {tr.usage_label}
           </Label>
           <Input
             id="ctx"
             value={context}
             onChange={(e) => onContextChange(e.target.value)}
-            placeholder="restaurante, bodega…"
+            placeholder={tr.usagePlaceholder}
             className={cn("mt-2 bg-input/60", flashCls)}
           />
         </div>
