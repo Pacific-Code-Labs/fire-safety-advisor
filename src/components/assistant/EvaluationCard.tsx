@@ -1,4 +1,4 @@
-import { AlertTriangle, BookOpen, Check, ListChecks, MapPin } from "lucide-react";
+import { AlertTriangle, BookOpen, Check, Globe, ListChecks, MapPin } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
 import type { CrContextItem, EvaluateResponse } from "@/services/fireCodeApi";
 
@@ -23,18 +23,12 @@ export function EvaluationCard({ data }: Props) {
   const hasContent = data.matchedRules?.length > 0 || data.foundryUsed;
   if (!hasContent) return null;
 
+  const contextItems = toContextItems(data.contextCr);
+
+  // Order (FCR-114): applicable standards → requirements → CR context (titled) →
+  // risk → references LAST.
   return (
     <div className="space-y-2">
-      {data.foundryUsed && data.reference?.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-          <BookOpen className="h-3.5 w-3.5" />
-          <span className="font-semibold">{tr.refLabel}:</span>
-          {data.reference.map((r) => (
-            <span key={r} className="rounded border border-border bg-background/60 px-1.5 py-0.5 font-mono text-[10px]">{r}</span>
-          ))}
-        </div>
-      )}
-
       {data.matchedRules?.length > 0 && (
         <div className="rounded-md border border-border bg-background/40 p-2 text-xs">
           <div className="flex items-center gap-1.5 font-semibold text-accent">
@@ -64,18 +58,24 @@ export function EvaluationCard({ data }: Props) {
         </div>
       )}
 
-      {data.foundryUsed && toContextItems(data.contextCr).length > 0 && (
-        <div className="rounded-md border border-border bg-background/20 p-2 text-xs text-muted-foreground">
-          <ul className="space-y-1">
-            {toContextItems(data.contextCr).map((ctx, ci) => (
-              <li key={ci}>
-                {ctx.topic ? <span className="font-semibold text-foreground/80">{ctx.topic}: </span> : "• "}
-                {ctx.detail}
-                {(ctx.authority || ctx.reference) && (
-                  <span className="ml-1 opacity-70">
-                    ({[ctx.authority, ctx.reference].filter(Boolean).join(" · ")})
-                  </span>
-                )}
+      {data.foundryUsed && contextItems.length > 0 && (
+        <div className="rounded-md border border-border bg-background/20 p-2 text-xs">
+          <div className="mb-1.5 flex items-center gap-1.5 font-semibold text-accent">
+            <Globe className="h-3.5 w-3.5" /> {tr.crContextTitle}:
+          </div>
+          <ul className="space-y-1 text-muted-foreground">
+            {contextItems.map((ctx, ci) => (
+              <li key={ci} className="flex gap-2 leading-relaxed">
+                <span className="mt-0.5 shrink-0 text-accent" aria-hidden>•</span>
+                <span>
+                  {ctx.topic && <span className="font-semibold text-foreground/80">{ctx.topic}: </span>}
+                  {ctx.detail}
+                  {(ctx.authority || ctx.reference) && (
+                    <span className="ml-1 opacity-70">
+                      ({[ctx.authority, ctx.reference].filter(Boolean).join(" · ")})
+                    </span>
+                  )}
+                </span>
               </li>
             ))}
           </ul>
@@ -99,6 +99,17 @@ export function EvaluationCard({ data }: Props) {
               ? "El incumplimiento puede generar paralización de obra y responsabilidad civil."
               : "Non-compliance may cause work shutdown and civil liability."}
           </span>
+        </div>
+      )}
+
+      {/* References LAST (FCR-114). */}
+      {data.foundryUsed && data.reference?.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-2 text-xs text-muted-foreground">
+          <BookOpen className="h-3.5 w-3.5" />
+          <span className="font-semibold">{tr.refLabel}:</span>
+          {data.reference.map((r) => (
+            <span key={r} className="rounded border border-border bg-background/60 px-1.5 py-0.5 font-mono text-[10px]">{r}</span>
+          ))}
         </div>
       )}
     </div>

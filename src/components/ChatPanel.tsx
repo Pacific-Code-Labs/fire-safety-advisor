@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
-import { fireCodeApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse } from "@/services/fireCodeApi";
+import { fireCodeApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse, type NeedsInfoQuestion } from "@/services/fireCodeApi";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { localizedPath } from "@/lib/paths";
 import type { PageContext } from "@/contexts/AssistantContext";
@@ -31,7 +31,7 @@ import { NeedsInfoForm } from "@/components/assistant/NeedsInfoForm";
 import { type DemoScenario, type DemoScenarioParams } from "@/lib/demoScenarios";
 import { cn } from "@/lib/utils";
 
-export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit" | "prompt" | "needs_info" | "electrical" | "intake";
+export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit" | "prompt" | "needs_info" | "electrical" | "question";
 
 /** FCR-100: which guided-demo step a quick-reply prompt drives. */
 export type PromptKind = "see_eval" | "create_project" | "create_account";
@@ -52,6 +52,8 @@ export interface Msg {
   answer?: EvaluateResponse;
   /** New polymorphic payload */
   payload?: EvaluateResponse | ProjectCreatedData | MessageData | DemoLimitResponse | PromptPayload | NeedsInfoData | ElectricalLoadData;
+  /** For a one-at-a-time "question" turn: the submit button label. */
+  submitLabel?: string;
 }
 
 interface Props {
@@ -113,6 +115,8 @@ interface AskOptions {
    * "full_evaluation" → complete evaluation; "project" → create_project preview.
    */
   demoStep?: "teaser" | "full_evaluation" | "project";
+  /** FCR-114: don't render a user bubble for this request (quick-reply choices). */
+  silent?: boolean;
 }
 
 export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages, pageContext, demo = false, onApplyScenario }: Props) {
@@ -130,6 +134,14 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   const activeScenarioRef = useRef<DemoScenario | null>(null);
   const activeQueryRef = useRef<string>("");
   const demoEndedRef = useRef<boolean>(false);
+  // FCR-114: a conversational, one-question-at-a-time flow (intake + agent needs_info).
+  const questionFlowRef = useRef<{
+    qs: NeedsInfoQuestion[];
+    idx: number;
+    collected: string[];
+    submitLabel?: string;
+    onComplete: (summary: string) => void;
+  } | null>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -150,10 +162,8 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
               : `Found ${data.matchedRules.length} applicable standard(s).`;
         } else if (data.foundryUsed && data.requirements.length > 0) {
           // No deterministic rule match, but the agent returned requirements —
-          // lead with the first one (truncated) instead of a generic sentence.
-          const lead = data.requirements[0].trim();
-          const clipped = lead.length > 140 ? `${lead.slice(0, 140).trimEnd()}…` : lead;
-          summary = lang === "es" ? `Requisito clave: ${clipped}` : `Key requirement: ${clipped}`;
+          // a clean intro line (the full requirements render in the card below).
+          summary = tr.evalFullSummary;
         } else {
           summary =
             lang === "es"
@@ -192,10 +202,14 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         break;
       }
       case "needs_info": {
-        setMessages((m) => [
-          ...m,
-          { role: "assistant", text: "", type: "needs_info", payload: norm.data },
-        ]);
+        // FCR-114: ask the agent's clarifying questions ONE AT A TIME
+        // (conversational), then resend the collected answers.
+        const qs = norm.data.questions ?? [];
+        if (qs.length > 0) {
+          startQuestionFlow(qs, (summary) =>
+            ask(summary, { overrides: activeScenarioRef.current?.params }),
+          );
+        }
         break;
       }
       case "electrical_load": {
@@ -283,13 +297,15 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
    */
   const ask = async (text: string, opts: AskOptions = {}) => {
     if (!text.trim() || isLoading) return;
-    const { overrides, teaser, demoNext, demoStep } = opts;
+    const { overrides, teaser, demoNext, demoStep, silent } = opts;
     if (demoNext !== undefined) demoNextRef.current = demoNext;
 
     // Prior turns BEFORE appending the current question (FCR-042). The current
     // query is sent separately as user_query, so it is excluded here.
     const conversation = toConversation(messages);
-    setMessages((m) => [...m, { role: "user", text, type: "message" }]);
+    // FCR-114: quick-reply choices send silently (no raw user bubble — the locked
+    // ChoicePrompt already shows the chosen option). Typed/real answers DO show.
+    if (!silent) setMessages((m) => [...m, { role: "user", text, type: "message" }]);
     setInput("");
     setIsLoading(true);
 
@@ -371,52 +387,85 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     }
     switch (kind) {
       case "see_eval":
-        // Send a clean affirmative as the visible message (NOT a replay of the
-        // original building query); the scenario params ground it and the prior
-        // turns carry the case, so the agent returns the full evaluation.
+        // Silent affirmative (no raw user bubble — the locked choice shows it);
+        // the scenario params + prior turns let the agent return the full eval.
         ask(tr.demoSeeEvalMsg, {
+          silent: true,
           overrides: activeScenarioRef.current?.params,
           demoNext: "create_project",
           demoStep: "full_evaluation",
         });
         break;
-      case "create_project":
-        // Step 3: collect a few interactive project details first (name/focus),
-        // then build the create_project message from the answers.
-        appendIntake();
+      case "create_project": {
+        // Step 3: a conversational intake (name → focus → notes), one question at
+        // a time; on completion send the create message (silently) → preview.
+        const focusOptions = tr.demoIntakeFocusOptions.split("|").map((s) => s.trim()).filter(Boolean);
+        const intake: NeedsInfoQuestion[] = [
+          { key: "name", label: tr.demoIntakeNameLabel, type: "text", required: true, hint: tr.demoIntakeNameHint },
+          { key: "focus", label: tr.demoIntakeFocusLabel, type: "multi_select", required: false, options: focusOptions },
+          { key: "notes", label: tr.demoIntakeNotesLabel, type: "text", required: false },
+        ];
+        startQuestionFlow(
+          intake,
+          (summary) =>
+            ask(`${tr.demoCreateProjectMsg} ${summary}`, {
+              silent: true,
+              overrides: activeScenarioRef.current?.params,
+              demoNext: "create_account",
+              demoStep: "project",
+            }),
+          tr.demoIntakeSubmit,
+        );
         break;
+      }
       case "create_account":
         navigate(localizedPath(lang, "/register"));
         break;
     }
   };
 
-  /** Step-3 interactive project intake (FCR-114) — a client-driven needs_info. */
-  const appendIntake = () => {
-    const focusOptions = tr.demoIntakeFocusOptions.split("|").map((s) => s.trim()).filter(Boolean);
-    const data: NeedsInfoData = {
-      questions: [
-        { key: "name", label: tr.demoIntakeNameLabel, type: "text", required: true, hint: tr.demoIntakeNameHint },
-        { key: "focus", label: tr.demoIntakeFocusLabel, type: "multi_select", required: false, options: focusOptions },
-        { key: "notes", label: tr.demoIntakeNotesLabel, type: "text", required: false },
-      ],
-      context: {},
-    };
-    setMessages((m) => [...m, { role: "assistant", text: tr.demoIntakeTitle, type: "intake", payload: data }]);
+  /**
+   * FCR-114: drive a set of clarifying questions ONE AT A TIME (conversational),
+   * each as its own chat turn, then call onComplete with the joined answers.
+   * Used by both the step-3 project intake and the agent's `needs_info`.
+   */
+  const startQuestionFlow = (
+    qs: NeedsInfoQuestion[],
+    onComplete: (summary: string) => void,
+    submitLabel?: string,
+  ) => {
+    questionFlowRef.current = { qs, idx: 0, collected: [], submitLabel, onComplete };
+    appendQuestion();
   };
 
-  /** Build the create_project message from the intake answers and send it. */
-  const handleIntakeSubmit = (summary: string) => {
-    ask(`${tr.demoCreateProjectMsg} ${summary}`, {
-      overrides: activeScenarioRef.current?.params,
-      demoNext: "create_account",
-      demoStep: "project",
-    });
+  const appendQuestion = () => {
+    const flow = questionFlowRef.current;
+    if (!flow) return;
+    const q = flow.qs[flow.idx];
+    const isLast = flow.idx === flow.qs.length - 1;
+    const submitLabel = isLast ? flow.submitLabel ?? tr.needsInfoSubmit : tr.demoContinue;
+    setMessages((m) => [
+      ...m,
+      { role: "assistant", text: q.label, type: "question", payload: { questions: [q], context: {} }, submitLabel },
+    ]);
   };
 
-  /** Resend after the user answers the agent's clarifying questions (FCR-101). */
-  const handleNeedsInfoSubmit = (summary: string) => {
-    ask(summary, { overrides: activeScenarioRef.current?.params });
+  /** A single question was answered → echo it, then advance or finish. */
+  const handleQuestionAnswer = (summary: string, answers: Record<string, string>) => {
+    const flow = questionFlowRef.current;
+    if (!flow) return;
+    const q = flow.qs[flow.idx];
+    const val = answers[q.key] ?? summary;
+    setMessages((m) => [...m, { role: "user", text: val, type: "message" }]);
+    flow.collected.push(`${q.label} ${val}`);
+    flow.idx += 1;
+    if (flow.idx < flow.qs.length) {
+      appendQuestion();
+    } else {
+      const joined = flow.collected.join("; ");
+      questionFlowRef.current = null;
+      flow.onComplete(joined);
+    }
   };
 
   const renderAssistantBody = (m: Msg) => {
@@ -459,16 +508,15 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       const p = m.payload as PromptPayload;
       return <ChoicePrompt prompt={p.prompt} options={p.options} onChoose={(v) => handleChoice(p.kind, v)} />;
     }
-    if (type === "needs_info" && m.payload) {
-      return <NeedsInfoForm data={m.payload as NeedsInfoData} onSubmit={handleNeedsInfoSubmit} />;
-    }
-    if (type === "intake" && m.payload) {
+    if (type === "question" && m.payload) {
+      // One conversational question — the question text IS the bubble label, so
+      // the form hides its own heading (title="") and shows just the control.
       return (
         <NeedsInfoForm
           data={m.payload as NeedsInfoData}
-          onSubmit={handleIntakeSubmit}
-          title={tr.demoIntakeTitle}
-          submitLabel={tr.demoIntakeSubmit}
+          onSubmit={handleQuestionAnswer}
+          title=""
+          submitLabel={m.submitLabel}
         />
       );
     }

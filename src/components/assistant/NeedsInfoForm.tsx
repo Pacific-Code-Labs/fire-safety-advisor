@@ -8,8 +8,9 @@ import type { NeedsInfoData } from "@/lib/assistantResponse";
 
 interface Props {
   data: NeedsInfoData;
-  onSubmit: (summary: string) => void;
-  /** Optional override for the form heading (e.g. the demo project intake). */
+  /** `summary` = localized "label value; …"; `answers` = per-key as-text values. */
+  onSubmit: (summary: string, answers: Record<string, string>) => void;
+  /** Optional heading; pass "" to hide it (used for one-at-a-time questions). */
   title?: string;
   /** Optional override for the submit button label. */
   submitLabel?: string;
@@ -49,20 +50,24 @@ export function NeedsInfoForm({ data, onSubmit, title, submitLabel }: Props) {
   );
 
   const submit = () => {
+    const map: Record<string, string> = {};
     const filled = questions
       .map((q) => {
         const v = asText(valueOf(q.key));
+        if (v) map[q.key] = v;
         return v ? `${q.label} ${v}` : null;
       })
       .filter((x): x is string => x !== null);
     if (filled.length === 0) return;
     setSubmitted(true);
-    onSubmit(filled.join("; "));
+    onSubmit(filled.join("; "), map);
   };
+
+  const heading = title ?? tr.needsInfoTitle;
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium">{title ?? tr.needsInfoTitle}</p>
+      {heading && <p className="text-sm font-medium">{heading}</p>}
 
       <div className="space-y-3">
         {questions.map((q) => {
@@ -73,7 +78,7 @@ export function NeedsInfoForm({ data, onSubmit, title, submitLabel }: Props) {
 
           return (
             <div key={q.key} className="space-y-1.5">
-              <label className="block text-xs text-muted-foreground">{q.label}</label>
+              <label className="block text-sm leading-relaxed">{q.label}</label>
 
               {hasOptions && (isSelect || isMulti) ? (
                 <div className="flex flex-wrap gap-1.5">
