@@ -1,31 +1,57 @@
 import { useState } from "react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
+import { cn } from "@/lib/utils";
 import type { NeedsInfoData } from "@/lib/assistantResponse";
 
 interface Props {
   data: NeedsInfoData;
   onSubmit: (summary: string) => void;
+  /** Optional override for the form heading (e.g. the demo project intake). */
+  title?: string;
+  /** Optional override for the submit button label. */
+  submitLabel?: string;
 }
 
+type AnswerValue = string | string[];
+
 /**
- * FCR-101: renders the agent's structured clarifying questions as a small form.
- * On submit it builds a localized answer summary and hands it back to ChatPanel,
- * which resends it so the agent now has the missing context.
+ * FCR-101 / FCR-114: renders the structured clarifying questions as a dynamic
+ * form. Each question picks its control by `type`:
+ *   - text / number → <Input>
+ *   - select        → single-choice pill group (one option)
+ *   - multi_select  → multi-choice pill group (many options)
+ * On submit it builds a localized "label value" summary and hands it to the
+ * caller (ChatPanel), which resends it so the agent now has the context.
  */
-export function NeedsInfoForm({ data, onSubmit }: Props) {
+export function NeedsInfoForm({ data, onSubmit, title, submitLabel }: Props) {
   const { tr } = useLang();
   const questions = data.questions ?? [];
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const set = (k: string, v: string) => setAnswers((a) => ({ ...a, [k]: v }));
+  const setText = (k: string, v: string) => setAnswers((a) => ({ ...a, [k]: v }));
+  const setSingle = (k: string, v: string) =>
+    setAnswers((a) => ({ ...a, [k]: a[k] === v ? "" : v }));
+  const toggleMulti = (k: string, v: string) =>
+    setAnswers((a) => {
+      const cur = Array.isArray(a[k]) ? (a[k] as string[]) : [];
+      return { ...a, [k]: cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v] };
+    });
+
+  const valueOf = (k: string): AnswerValue => answers[k] ?? "";
+  const asText = (v: AnswerValue) => (Array.isArray(v) ? v.join(", ") : v).trim();
+
+  const missingRequired = questions.some(
+    (q) => q.required !== false && asText(valueOf(q.key)).length === 0,
+  );
 
   const submit = () => {
     const filled = questions
       .map((q) => {
-        const v = (answers[q.key] ?? "").trim();
+        const v = asText(valueOf(q.key));
         return v ? `${q.label} ${v}` : null;
       })
       .filter((x): x is string => x !== null);
@@ -35,39 +61,62 @@ export function NeedsInfoForm({ data, onSubmit }: Props) {
   };
 
   return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium">{tr.needsInfoTitle}</p>
-      <div className="space-y-2">
-        {questions.map((q) => (
-          <div key={q.key} className="space-y-1">
-            <label className="block text-xs text-muted-foreground">{q.label}</label>
-            {q.options && q.options.length > 0 ? (
-              <select
-                className="w-full rounded-md border border-border bg-input/60 px-2 py-1.5 text-sm"
-                value={answers[q.key] ?? ""}
-                disabled={submitted}
-                onChange={(e) => set(q.key, e.target.value)}
-              >
-                <option value="">—</option>
-                {q.options.map((o) => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
-              </select>
-            ) : (
-              <Input
-                type={q.type === "number" ? "number" : "text"}
-                value={answers[q.key] ?? ""}
-                placeholder={q.hint ?? ""}
-                disabled={submitted}
-                onChange={(e) => set(q.key, e.target.value)}
-                className="bg-input/60"
-              />
-            )}
-          </div>
-        ))}
+    <div className="space-y-3">
+      <p className="text-sm font-medium">{title ?? tr.needsInfoTitle}</p>
+
+      <div className="space-y-3">
+        {questions.map((q) => {
+          const v = valueOf(q.key);
+          const hasOptions = (q.options?.length ?? 0) > 0;
+          const isMulti = q.type === "multi_select";
+          const isSelect = q.type === "select" || (hasOptions && !isMulti);
+
+          return (
+            <div key={q.key} className="space-y-1.5">
+              <label className="block text-xs text-muted-foreground">{q.label}</label>
+
+              {hasOptions && (isSelect || isMulti) ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {q.options!.map((o) => {
+                    const selected = isMulti
+                      ? Array.isArray(v) && v.includes(o)
+                      : v === o;
+                    return (
+                      <button
+                        key={o}
+                        type="button"
+                        disabled={submitted}
+                        onClick={() => (isMulti ? toggleMulti(q.key, o) : setSingle(q.key, o))}
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition disabled:opacity-60",
+                          selected
+                            ? "border-primary bg-primary/10 text-foreground"
+                            : "border-border bg-secondary/50 text-muted-foreground hover:border-primary/40 hover:bg-primary/5",
+                        )}
+                      >
+                        {selected && <Check className="h-3 w-3 text-primary" aria-hidden />}
+                        {o}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <Input
+                  type={q.type === "number" ? "number" : "text"}
+                  value={typeof v === "string" ? v : ""}
+                  placeholder={q.hint ?? ""}
+                  disabled={submitted}
+                  onChange={(e) => setText(q.key, e.target.value)}
+                  className="bg-input/60"
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
-      <Button size="sm" disabled={submitted} onClick={submit}>
-        {tr.needsInfoSubmit}
+
+      <Button size="sm" disabled={submitted || missingRequired} onClick={submit}>
+        {submitLabel ?? tr.needsInfoSubmit}
       </Button>
     </div>
   );

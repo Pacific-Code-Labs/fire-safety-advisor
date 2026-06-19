@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { BuildingSelector } from "@/components/BuildingSelector";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ChatPanel } from "@/components/ChatPanel";
+import { AssistantDrawer } from "@/components/assistant/AssistantDrawer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@pacific-code-labs/fire-code-design-system";
 import { useLang } from "@/contexts/LangContext";
@@ -54,13 +55,8 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [selectedCategory, setSelectedCategory] = useState<RuleCategory | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<Msg[]>([]);
-
-  // /demo only: lock body when local chat modal opens
-  useEffect(() => {
-    if (embedded) return;
-    document.body.style.overflow = chatOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [chatOpen, embedded]);
+  // Mobile chat opens in AssistantDrawer (vaul) — it manages its own body-scroll
+  // lock, so no manual overflow toggling here (FCR-113).
 
   // Dashboard: sync evaluator state into global assistant
   useEffect(() => {
@@ -352,32 +348,24 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
         </footer>
       </main>
 
-      {/* ── Mobile chat modal — /demo only ── */}
-      {!embedded && chatOpen && (
-        <div className="lg:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-            onClick={() => setChatOpen(false)}
+      {/* ── Mobile chat drawer — /demo only (desktop uses the inline right column) ── */}
+      {!embedded && (
+        <AssistantDrawer open={chatOpen} onOpenChange={setChatOpen} title={tr.assistant}>
+          <ChatPanel
+            buildingType={building}
+            usage={context}
+            areaM2={area         || undefined}
+            floors={floors       || undefined}
+            occupants={occupants || undefined}
+            ceilingHeight={ceilingHeight || undefined}
+            volume={volume       || undefined}
+            onClose={() => setChatOpen(false)}
+            messages={chatMessages}
+            setMessages={setChatMessages}
+            demo
+            onApplyScenario={applyScenario}
           />
-          {/* Modal */}
-          <div className="fixed inset-x-3 top-16 bottom-6 z-50 flex flex-col rounded-xl overflow-hidden shadow-2xl border border-border">
-            <ChatPanel
-              buildingType={building}
-              usage={context}
-              areaM2={area         || undefined}
-              floors={floors       || undefined}
-              occupants={occupants || undefined}
-              ceilingHeight={ceilingHeight || undefined}
-              volume={volume       || undefined}
-              onClose={() => setChatOpen(false)}
-              messages={chatMessages}
-              setMessages={setChatMessages}
-              demo
-              onApplyScenario={applyScenario}
-            />
-          </div>
-        </div>
+        </AssistantDrawer>
       )}
     </div>
   );

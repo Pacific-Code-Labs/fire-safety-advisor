@@ -271,7 +271,8 @@ export interface EvaluateResponse {
 export interface NeedsInfoQuestion {
   key: string;
   label: string;
-  type?: "text" | "number" | "select";
+  /** FCR-114: dynamic input types — `select` = one option, `multi_select` = many. */
+  type?: "text" | "number" | "select" | "multi_select";
   required?: boolean;
   hint?: string;
   options?: string[];

@@ -31,7 +31,7 @@ import { NeedsInfoForm } from "@/components/assistant/NeedsInfoForm";
 import { type DemoScenario, type DemoScenarioParams } from "@/lib/demoScenarios";
 import { cn } from "@/lib/utils";
 
-export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit" | "prompt" | "needs_info" | "electrical";
+export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit" | "prompt" | "needs_info" | "electrical" | "intake";
 
 /** FCR-100: which guided-demo step a quick-reply prompt drives. */
 export type PromptKind = "see_eval" | "create_project" | "create_account";
@@ -142,17 +142,24 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     switch (norm.type) {
       case "evaluation": {
         const data = norm.data;
-        const summary = data.matchedRules.length > 0
-          ? lang === "es"
-            ? `Encontré ${data.matchedRules.length} norma(s) aplicable(s).`
-            : `Found ${data.matchedRules.length} applicable standard(s).`
-          : data.foundryUsed && data.requirements.length > 0
-          ? lang === "es"
-            ? "El agente IA proporcionó recomendaciones generales."
-            : "The AI agent provided general recommendations."
-          : lang === "es"
-          ? "No encontré normas específicas para esa consulta."
-          : "No specific standards found for that query.";
+        let summary: string;
+        if (data.matchedRules.length > 0) {
+          summary =
+            lang === "es"
+              ? `Encontré ${data.matchedRules.length} norma(s) aplicable(s).`
+              : `Found ${data.matchedRules.length} applicable standard(s).`;
+        } else if (data.foundryUsed && data.requirements.length > 0) {
+          // No deterministic rule match, but the agent returned requirements —
+          // lead with the first one (truncated) instead of a generic sentence.
+          const lead = data.requirements[0].trim();
+          const clipped = lead.length > 140 ? `${lead.slice(0, 140).trimEnd()}…` : lead;
+          summary = lang === "es" ? `Requisito clave: ${clipped}` : `Key requirement: ${clipped}`;
+        } else {
+          summary =
+            lang === "es"
+              ? "No encontré normas específicas para esa consulta."
+              : "No specific standards found for that query.";
+        }
 
         setMessages((m) => [
           ...m,
@@ -363,23 +370,48 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       return;
     }
     switch (kind) {
-      case "see_eval": {
-        const s = activeScenarioRef.current;
-        if (s) ask(s.query, { overrides: s.params, demoNext: "create_project", demoStep: "full_evaluation" });
-        else ask(activeQueryRef.current, { demoNext: "create_project", demoStep: "full_evaluation" });
-        break;
-      }
-      case "create_project":
-        ask(tr.demoCreateProjectMsg, {
+      case "see_eval":
+        // Send a clean affirmative as the visible message (NOT a replay of the
+        // original building query); the scenario params ground it and the prior
+        // turns carry the case, so the agent returns the full evaluation.
+        ask(tr.demoSeeEvalMsg, {
           overrides: activeScenarioRef.current?.params,
-          demoNext: "create_account",
-          demoStep: "project",
+          demoNext: "create_project",
+          demoStep: "full_evaluation",
         });
+        break;
+      case "create_project":
+        // Step 3: collect a few interactive project details first (name/focus),
+        // then build the create_project message from the answers.
+        appendIntake();
         break;
       case "create_account":
         navigate(localizedPath(lang, "/register"));
         break;
     }
+  };
+
+  /** Step-3 interactive project intake (FCR-114) — a client-driven needs_info. */
+  const appendIntake = () => {
+    const focusOptions = tr.demoIntakeFocusOptions.split("|").map((s) => s.trim()).filter(Boolean);
+    const data: NeedsInfoData = {
+      questions: [
+        { key: "name", label: tr.demoIntakeNameLabel, type: "text", required: true, hint: tr.demoIntakeNameHint },
+        { key: "focus", label: tr.demoIntakeFocusLabel, type: "multi_select", required: false, options: focusOptions },
+        { key: "notes", label: tr.demoIntakeNotesLabel, type: "text", required: false },
+      ],
+      context: {},
+    };
+    setMessages((m) => [...m, { role: "assistant", text: tr.demoIntakeTitle, type: "intake", payload: data }]);
+  };
+
+  /** Build the create_project message from the intake answers and send it. */
+  const handleIntakeSubmit = (summary: string) => {
+    ask(`${tr.demoCreateProjectMsg} ${summary}`, {
+      overrides: activeScenarioRef.current?.params,
+      demoNext: "create_account",
+      demoStep: "project",
+    });
   };
 
   /** Resend after the user answers the agent's clarifying questions (FCR-101). */
@@ -430,8 +462,21 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     if (type === "needs_info" && m.payload) {
       return <NeedsInfoForm data={m.payload as NeedsInfoData} onSubmit={handleNeedsInfoSubmit} />;
     }
+    if (type === "intake" && m.payload) {
+      return (
+        <NeedsInfoForm
+          data={m.payload as NeedsInfoData}
+          onSubmit={handleIntakeSubmit}
+          title={tr.demoIntakeTitle}
+          submitLabel={tr.demoIntakeSubmit}
+        />
+      );
+    }
     if (type === "message") {
-      return <AssistantMessage text={m.text} demo={demo} onPick={handlePick} />;
+      // FCR-114: in the guided demo the quick-reply prompts (and the step-3
+      // create_account prompt) drive sign-up — so the per-message CTA is
+      // suppressed (no early invite). The dashboard assistant never sets `demo`.
+      return <AssistantMessage text={m.text} demo={false} onPick={handlePick} />;
     }
     // error / fallback
     return <TextMessage text={m.text} />;
