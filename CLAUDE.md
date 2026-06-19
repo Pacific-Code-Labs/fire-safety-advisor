@@ -135,7 +135,11 @@ All colors are **HSL** and exposed as **semantic CSS custom properties** in `:ro
 
 ## 7. Bilingual (es/en)
 
-`contexts/LangContext.tsx` holds `lang` (default `"es"`), `setLang`, and `tr` = the active dictionary. Strings live in `lib/i18n.ts` (`t.es` / `t.en`). Use `const { lang, tr } = useLang()` and read `tr.<key>`; for the few inline `lang === "es" ? ... : ...` ternaries (e.g. ChatPanel summaries/suggestions), prefer adding dictionary keys over more ternaries. **Never hardcode user-facing English** — this whole layer is slated to fold into the DXP per-page content model (**FCR-080**).
+`contexts/LangContext.tsx` holds `lang` (default `"es"`), `setLang`, and `tr` = the active dictionary. Use `const { lang, tr } = useLang()` and read `tr.<key>`; for the few inline `lang === "es" ? ... : ...` ternaries (e.g. ChatPanel summaries), prefer dictionary keys over more ternaries.
+
+**FCR-080 (LANDED 2026-06-19) — app strings are now ADMIN-MANAGED JSON, not burned in code.** `lib/i18n.ts` no longer inlines the dictionaries; it imports `src/translations/{es,en}.json` and **flatten-merges** the `app` namespace into the flat `t.es`/`t.en` map (so all `tr.<key>` call sites are unchanged). The `app` namespace is **sectioned**: `common` (the shared bucket for cross-screen strings), `navigation`, `auth`, `profile`, `roles`, `rbac`, `electrical`, `demo`. Keys are globally unique across sections (the merge is lossless). `Dict` is now `Record<string,string>` (the per-key literal type-safety is traded for admin editability — keep keys unique when adding). The landing/marketing chrome stays in the SAME files at top level (`nav`/`demo`/`notFound`) resolved via `lib/chrome-i18n.ts` `tChrome` — untouched by the merge.
+
+These strings are edited in the **`fire-code-admin` Translations page** (it flattens/unflattens `{es,en}.json` and writes back + git-pushes). To add an app string: add it to the right `app.<section>` object in BOTH `es.json` and `en.json` (or via the admin), then use `tr.<key>`. New cross-screen strings → `app.common`. **Never hardcode user-facing text in components** — the few remaining inline literals (e.g. `BuildingSelector` "Uso" label + placeholders) are the cleanup tail.
 
 ---
 
