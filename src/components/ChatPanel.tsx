@@ -87,6 +87,22 @@ interface Props {
 /** Cap replayed history to the most recent N turns (FCR-042 token budget). */
 const MAX_CONVERSATION_TURNS = 10;
 
+/**
+ * FCR-115: detect a "create the project" intent in a typed demo message so it
+ * proceeds with the project flow (preview / genuine needs_info) instead of a
+ * teaser. Conservative keyword match (es/en).
+ */
+const CREATE_PROJECT_PATTERNS = [
+  /\bcrea(r|me|)\b.*\bproyecto\b/i,
+  /\bproyecto\b.*\bcrea/i,
+  /\b(guardar|genera(r|)|arma(r|)|haz(me|)|hacer)\b.*\bproyecto\b/i,
+  /\bcreate\b.*\bproject\b/i,
+  /\b(save|generate|make|build|start|new)\b.*\bproject\b/i,
+];
+function isCreateProjectIntent(text: string): boolean {
+  return CREATE_PROJECT_PATTERNS.some((re) => re.test(text));
+}
+
 /** Map the running assistant message list to the agent {role,content} contract. */
 function toConversation(messages: Msg[]): ConversationTurn[] {
   return messages
@@ -134,6 +150,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   const activeScenarioRef = useRef<DemoScenario | null>(null);
   const activeQueryRef = useRef<string>("");
   const demoEndedRef = useRef<boolean>(false);
+  const projectReofferedRef = useRef<boolean>(false); // FCR-115: re-offer the project once on decline
   // FCR-114: a conversational, one-question-at-a-time flow (intake + agent needs_info).
   const questionFlowRef = useRef<{
     qs: NeedsInfoQuestion[];
@@ -280,13 +297,14 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     setMessages((m) => [...m, { role: "assistant", text: payload.prompt, type: "prompt", payload }]);
   };
 
-  /** Soft-end: invite to sign up, keep the chat open. */
+  /** Soft-end: invite to sign up (message + register CTA), keep the chat open. */
   const appendInvite = () => {
     demoEndedRef.current = true;
     setMessages((m) => [
       ...m,
       { role: "assistant", text: tr.demoInvite, type: "message", payload: { message: tr.demoInvite } },
     ]);
+    appendPrompt("create_account");
   };
 
   /**
@@ -342,6 +360,9 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         const next = demoNextRef.current;
         demoNextRef.current = null;
         appendPrompt(next);
+      } else if (demo && demoEndedRef.current && type !== "needs_info") {
+        // FCR-115: after a soft-end, the user kept chatting — re-invite to register.
+        appendPrompt("create_account");
       }
     } catch (err) {
       if (err instanceof DemoLimitError) {
@@ -359,6 +380,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   /** Start guided-demo step 1 (teaser). */
   const startDemoStep1 = (scenario: DemoScenario | null, query: string) => {
     demoEndedRef.current = false;
+    projectReofferedRef.current = false;
     activeScenarioRef.current = scenario;
     activeQueryRef.current = query;
     ask(query, { teaser: true, demoNext: "see_eval", demoStep: "teaser" });
@@ -371,18 +393,50 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     else ask(s.query, { overrides: s.params });
   };
 
-  /** The text input submit. Demo → guided step 1; dashboard → normal eval. */
+  /** The text input submit. Demo → guided step 1 (or straight to the project flow
+   *  if the user explicitly asks to create one); dashboard → normal eval. */
   const handleSend = (text: string) => {
     if (!text.trim() || isLoading) return;
-    if (demo) startDemoStep1(null, text);
-    else ask(text);
+    if (demo) {
+      if (isCreateProjectIntent(text)) {
+        // FCR-115: a manual "create the project" message proceeds with the demo
+        // project flow too (agent → preview or genuine needs_info), not a teaser.
+        ask(text, {
+          overrides: activeScenarioRef.current?.params,
+          demoNext: "create_account",
+          demoStep: "project",
+        });
+      } else {
+        startDemoStep1(null, text);
+      }
+    } else {
+      ask(text);
+    }
   };
 
-  /** A guided-demo quick-reply choice (FCR-100). */
+  /** A guided-demo quick-reply choice (FCR-100 / FCR-115). */
   const handleChoice = (kind: PromptKind, value: string) => {
     if (isLoading) return;
     if (value === "no") {
-      appendInvite();
+      if (kind === "create_project" && !projectReofferedRef.current) {
+        // FCR-115: don't end on the first decline — offer to keep chatting OR
+        // re-offer the project once (maybe they click this time).
+        projectReofferedRef.current = true;
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", text: tr.demoReoffer, type: "message", payload: { message: tr.demoReoffer } },
+        ]);
+        appendPrompt("create_project");
+      } else if (kind === "create_account") {
+        // Declined sign-up — keep the chat open, no further nudge until they ask.
+        demoEndedRef.current = true;
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", text: tr.demoKeepExploring, type: "message", payload: { message: tr.demoKeepExploring } },
+        ]);
+      } else {
+        appendInvite();
+      }
       return;
     }
     switch (kind) {
@@ -396,28 +450,17 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
           demoStep: "full_evaluation",
         });
         break;
-      case "create_project": {
-        // Step 3: a conversational intake (name → focus → notes), one question at
-        // a time; on completion send the create message (silently) → preview.
-        const focusOptions = tr.demoIntakeFocusOptions.split("|").map((s) => s.trim()).filter(Boolean);
-        const intake: NeedsInfoQuestion[] = [
-          { key: "name", label: tr.demoIntakeNameLabel, type: "text", required: true, hint: tr.demoIntakeNameHint },
-          { key: "focus", label: tr.demoIntakeFocusLabel, type: "multi_select", required: false, options: focusOptions },
-          { key: "notes", label: tr.demoIntakeNotesLabel, type: "text", required: false },
-        ];
-        startQuestionFlow(
-          intake,
-          (summary) =>
-            ask(`${tr.demoCreateProjectMsg} ${summary}`, {
-              silent: true,
-              overrides: activeScenarioRef.current?.params,
-              demoNext: "create_account",
-              demoStep: "project",
-            }),
-          tr.demoIntakeSubmit,
-        );
+      case "create_project":
+        // FCR-115: agent-driven — it returns the preview, or genuine `needs_info`
+        // questions for any truly-missing context (rendered one at a time). No
+        // client-scripted intake, so fully-specified card scenarios skip questions.
+        ask(tr.demoCreateProjectMsg, {
+          silent: true,
+          overrides: activeScenarioRef.current?.params,
+          demoNext: "create_account",
+          demoStep: "project",
+        });
         break;
-      }
       case "create_account":
         navigate(localizedPath(lang, "/register"));
         break;

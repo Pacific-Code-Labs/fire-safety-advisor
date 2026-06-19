@@ -24,8 +24,14 @@ export interface ProjectPreview {
   name: string;
   usage?: string;
   buildingType?: string;
+  areaM2?: number;
+  floors?: number;
+  occupants?: number;
+  ceilingHeightM?: number;
+  volumeM3?: number;
   requirements?: string[];
   reference?: string[];
+  contextCr?: Array<string | { topic?: string; detail: string; authority?: string; reference?: string }>;
   risk?: string;
   [k: string]: unknown;
 }
