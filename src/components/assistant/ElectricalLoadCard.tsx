@@ -107,7 +107,7 @@ export function ElectricalLoadCard({ data }: Props) {
           <div className="border-b border-border bg-background/40 px-2 py-1 text-xs font-semibold">
             {tr.elec_panel_schedule}
           </div>
-          <table className="w-full text-[11px]">
+          <table className="w-full text-xs">
             <thead className="text-muted-foreground">
               <tr className="border-b border-border">
                 <th className="px-2 py-1 text-left font-medium">{tr.elec_col_description}</th>
@@ -169,7 +169,7 @@ export function ElectricalLoadCard({ data }: Props) {
             {data.mandatedProvisions.map((p, i) => {
               const required = p.status === "required";
               return (
-                <li key={i} className="flex gap-2 text-[11px] leading-relaxed">
+                <li key={i} className="flex gap-2 text-xs leading-relaxed">
                   {required ? (
                     <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[hsl(var(--risk-medium))]" aria-hidden />
                   ) : (
@@ -178,7 +178,7 @@ export function ElectricalLoadCard({ data }: Props) {
                   <span>
                     <span className="font-semibold">{p.code}</span> — {p.requirement}{" "}
                     <span className="opacity-70">({p.reference})</span>{" "}
-                    <span className="rounded border border-border px-1 py-0.5 text-[9px] uppercase text-muted-foreground">
+                    <span className="rounded border border-border px-1 py-0.5 text-[10px] uppercase text-muted-foreground">
                       {required ? tr.elec_status_required : tr.elec_status_info}
                     </span>
                   </span>
@@ -191,7 +191,7 @@ export function ElectricalLoadCard({ data }: Props) {
 
       {/* Assumptions */}
       {data.assumptions?.length > 0 && (
-        <div className="rounded-md border border-border bg-background/30 p-2 text-[11px] text-muted-foreground">
+        <div className="rounded-md border border-border bg-background/30 p-2 text-xs text-muted-foreground">
           <div className="mb-1 flex items-center gap-1.5 font-semibold text-foreground/80">
             <Info className="h-3.5 w-3.5" /> {tr.elec_assumptions}
           </div>
@@ -205,7 +205,7 @@ export function ElectricalLoadCard({ data }: Props) {
 
       {/* References */}
       {data.references?.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <span className="font-semibold">{tr.elec_references}:</span>
           {data.references.map((r) => (
             <span key={r} className="rounded border border-border bg-background/60 px-1.5 py-0.5 font-mono text-[10px]">
@@ -216,7 +216,7 @@ export function ElectricalLoadCard({ data }: Props) {
       )}
 
       {/* Disclaimer */}
-      <p className="text-[11px] italic text-muted-foreground">
+      <p className="text-xs italic text-muted-foreground">
         {data.disclaimer || tr.elec_disclaimer_note}
       </p>
     </div>

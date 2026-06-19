@@ -297,7 +297,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
                 </span>
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="outline" size="icon" className="h-7 w-7"
+                    variant="outline" size="icon" className="h-9 w-9"
                     disabled={pagination.page === 0 || isLoading}
                     onClick={() => setPage((p) => Math.max(0, p - 1))}
                   >
@@ -307,7 +307,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
                     {pagination.page + 1}
                   </span>
                   <Button
-                    variant="outline" size="icon" className="h-7 w-7"
+                    variant="outline" size="icon" className="h-9 w-9"
                     disabled={pagination.page >= pagination.totalPages - 1 || isLoading}
                     onClick={() => setPage((p) => p + 1)}
                   >

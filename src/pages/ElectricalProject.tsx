@@ -10,13 +10,14 @@
  * study can be saved as an `electrical` project.
  */
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { Loader2, Save, Zap } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Zap } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
+import { useProject } from "@/hooks/useProjects";
 import {
   fireCodeApi,
   type ElectricalInputs,
@@ -43,6 +44,12 @@ function toBuildingType(occupancy: string): ProjectBuildingType {
 export default function ElectricalProject() {
   const { lang, tr } = useLang();
   const navigate = useNavigate();
+  // FCR-118: edit round-trip — `?projectId=<id>` loads a saved study to edit in
+  // place (PUT) instead of creating a new project on save.
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("projectId") ?? undefined;
+  const { project: editProject } = useProject(editId ?? "");
+  const [seeded, setSeeded] = useState(false);
 
   const [inputs, setInputs] = useState<ElectricalInputs>({
     occupancy: "residencial",
@@ -58,8 +65,10 @@ export default function ElectricalProject() {
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // One initial compute to seed the editor's topology before it mounts.
+  // One initial compute to seed the editor's topology before it mounts. In edit
+  // mode (?projectId) the seed comes from the saved snapshot instead (below).
   useEffect(() => {
+    if (editId) return;
     let alive = true;
     fireCodeApi
       .postElectricalPreliminary({ inputs })
@@ -75,6 +84,32 @@ export default function ElectricalProject() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // FCR-118: edit mode — once the project resolves, seed inputs + topology +
+  // result from its saved electrical snapshot (or fall back to a fresh compute
+  // if the id has no study, e.g. a stray link).
+  useEffect(() => {
+    if (!editId || seeded || editProject === undefined) return;
+    setSeeded(true);
+    const snap = editProject?.electrical;
+    if (snap?.result) {
+      setInputs({ ...snap.inputs, language: lang });
+      setName(editProject.name ?? "");
+      setSeed(snap.result);
+      setResult(snap.result);
+      setSnapshotTopology(snap.topology ?? EMPTY_TOPOLOGY);
+    } else {
+      fireCodeApi
+        .postElectricalPreliminary({ inputs })
+        .then((r) => {
+          setSeed(r);
+          setResult(r);
+          setSnapshotTopology(r.topology);
+        })
+        .catch(() => setSeed({ topology: EMPTY_TOPOLOGY } as ElectricalLoadData));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId, seeded, editProject, lang]);
 
   const editorValue = useMemo(
     () => ({ inputs, topology: seed?.topology ?? EMPTY_TOPOLOGY }),
@@ -92,7 +127,7 @@ export default function ElectricalProject() {
     setSaving(true);
     try {
       const projectName = name.trim() || tr.elec_default_name;
-      const created = await fireCodeApi.createProject({
+      const body = {
         name: projectName,
         project_type: "electrical",
         building_type: toBuildingType(inputs.occupancy),
@@ -104,9 +139,13 @@ export default function ElectricalProject() {
         context_cr: [],
         risk: `${result.demandKva} kVA · ${result.suggestedTransformerKva} kVA ${tr.elec_transformer_short}`,
         electrical: { inputs, topology: snapshotTopology, result },
-      });
+      };
+      // FCR-118: edit in place when we loaded an existing study, else create.
+      const saved = editId
+        ? await fireCodeApi.updateProject(editId, body)
+        : await fireCodeApi.createProject(body);
       toast.success(tr.elec_saved);
-      navigate(localizedPath(lang, `/projects/${created.id}`));
+      navigate(localizedPath(lang, `/projects/${saved.id}`));
     } catch {
       toast.error(tr.elec_save_error);
     } finally {
@@ -117,6 +156,9 @@ export default function ElectricalProject() {
   return (
     <DashboardLayout>
       <div className="space-y-4">
+        <Button asChild variant="ghost" size="sm" className="gap-1 -ml-2">
+          <Link to={localizedPath(lang, "/projects")}><ArrowLeft className="h-4 w-4" /> {tr.back_to_projects}</Link>
+        </Button>
         <div className="flex items-center gap-2">
           <Zap className="h-5 w-5 text-primary" />
           <h1 className="text-lg font-semibold">{tr.elec_project_title}</h1>
@@ -230,7 +272,7 @@ export default function ElectricalProject() {
           </Field>
           <Button onClick={save} disabled={saving || !result}>
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            {tr.elec_save}
+            {editId ? tr.elec_update : tr.elec_save}
           </Button>
         </div>
       </div>

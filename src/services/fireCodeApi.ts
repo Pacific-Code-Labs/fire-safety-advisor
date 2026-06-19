@@ -212,6 +212,13 @@ export interface ProjectCreateRequest {
   risk: string;
 }
 
+/** FCR-118: the persisted electrical-study snapshot nested inside a project. */
+export interface ElectricalSnapshot {
+  inputs: ElectricalInputs;
+  topology: Topology;
+  result: ElectricalLoadData;
+}
+
 /** Request body for PUT /projects/{id} (ProjectUpdate) — all fields optional. */
 export type ProjectUpdateRequest = Partial<ProjectCreateRequest>;
 
@@ -230,6 +237,10 @@ export interface ProjectResponse {
   reference: string[];
   contextCr: string[];
   risk: string;
+  /** FCR-102/118: 'fire' (default) | 'electrical'. */
+  projectType?: string;
+  /** FCR-118: present for electrical projects — the saved study snapshot. */
+  electrical?: ElectricalSnapshot | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -523,6 +534,22 @@ export const fireCodeApi = {
       if (limit) throw new DemoLimitError(limit);
       throw err;
     }
+  },
+
+  /**
+   * POST /demo/electrical — PUBLIC, deterministic preliminary electrical study
+   * for the guided demo's 4th step (FCR-118). No auth, no Foundry, no quota; the
+   * same ElectricalCalcService that powers the authenticated editor. Sends no
+   * Authorization header (keeps the SigV4/guest path like the other /demo/*).
+   */
+  async evaluateDemoElectrical(inputs: ElectricalInputs): Promise<ElectricalLoadData> {
+    return resolveBody<ElectricalLoadData>(
+      post({
+        apiName: API_NAME,
+        path: "/demo/electrical",
+        options: { body: inputs as unknown as Record<string, unknown> as never },
+      })
+    );
   },
 
   // ── Projects (FCR-025) — AUTHENTICATED CRUD against /projects* ──────────────

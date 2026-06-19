@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
-import { fireCodeApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse, type NeedsInfoQuestion } from "@/services/fireCodeApi";
+import { fireCodeApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse, type NeedsInfoQuestion, type ElectricalInputs, type ElectricalLoadData, type ElectricalOccupancy } from "@/services/fireCodeApi";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { localizedPath } from "@/lib/paths";
 import type { PageContext } from "@/contexts/AssistantContext";
@@ -29,12 +29,26 @@ import { TypingIndicator } from "@/components/assistant/TypingIndicator";
 import { ChoicePrompt } from "@/components/assistant/ChoicePrompt";
 import { NeedsInfoForm } from "@/components/assistant/NeedsInfoForm";
 import { type DemoScenario, type DemoScenarioParams } from "@/lib/demoScenarios";
+import { getAssistantCapabilities } from "@/lib/assistantCapabilities";
 import { cn } from "@/lib/utils";
+
+/** Read the HTTP status off an Amplify/fetch error, tolerating shapes. */
+function readErrorStatus(err: unknown): number | undefined {
+  if (err && typeof err === "object") {
+    const e = err as {
+      response?: { statusCode?: number; status?: number };
+      statusCode?: number;
+      status?: number;
+    };
+    return e.response?.statusCode ?? e.response?.status ?? e.statusCode ?? e.status;
+  }
+  return undefined;
+}
 
 export type MsgType = "message" | "evaluation" | "project" | "error" | "demo_limit" | "prompt" | "needs_info" | "electrical" | "question";
 
-/** FCR-100: which guided-demo step a quick-reply prompt drives. */
-export type PromptKind = "see_eval" | "create_project" | "create_account";
+/** FCR-100/118: which guided-demo step a quick-reply prompt drives. */
+export type PromptKind = "see_eval" | "create_project" | "see_electrical" | "create_account";
 
 export interface PromptPayload {
   kind: PromptKind;
@@ -138,6 +152,9 @@ interface AskOptions {
 export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceilingHeight, volume, onClose, messages, setMessages, pageContext, demo = false, onApplyScenario }: Props) {
   const { lang, tr } = useLang();
   const navigate = useNavigate();
+  // FCR-118: capabilities are resolved per variant (demo vs internal) so each
+  // assistant's available functions are controlled from one declarative place.
+  const caps = getAssistantCapabilities(demo);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   // FCR-026: the authenticated /evaluate quota gate returns 402/429 → QuotaError.
@@ -256,17 +273,27 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   };
 
   const handleError = (err?: unknown) => {
-    setMessages((m) => [
-      ...m,
-      {
-        role: "assistant",
-        type: "error",
-        text: lang === "es"
-          ? "Error al procesar la consulta. Verifique su conexión."
-          : "Error processing the request. Please check your connection.",
-      },
-    ]);
-    if (err) console.error("Assistant error:", err);
+    // FCR-118: differentiate the real cause instead of always blaming the
+    // connection. The authenticated /evaluate path commonly fails with 401
+    // (expired/missing Cognito access token) or 5xx (backend) — telling the
+    // user "check your connection" for those is misleading and unactionable.
+    const status = readErrorStatus(err);
+    let text: string;
+    if (status === 401 || status === 403) {
+      text = lang === "es"
+        ? "Tu sesión expiró. Vuelve a iniciar sesión para continuar."
+        : "Your session expired. Please sign in again to continue.";
+    } else if (status !== undefined && status >= 500) {
+      text = lang === "es"
+        ? "El servidor tuvo un problema al procesar la consulta. Inténtalo de nuevo en unos minutos."
+        : "The server had a problem processing the request. Please try again shortly.";
+    } else {
+      text = lang === "es"
+        ? "Error al procesar la consulta. Verifique su conexión."
+        : "Error processing the request. Please check your connection.";
+    }
+    setMessages((m) => [...m, { role: "assistant", type: "error", text }]);
+    if (err) console.error("Assistant error:", err, "status:", status);
   };
 
   /** Append a guided-demo quick-reply prompt for the given step (FCR-100). */
@@ -285,6 +312,14 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         prompt: tr.demoStep3Q,
         options: [
           { label: tr.demoYes, value: "yes" },
+          { label: tr.demoNo, value: "no" },
+        ],
+      },
+      see_electrical: {
+        kind,
+        prompt: tr.demoStep4Q,
+        options: [
+          { label: tr.demoSeeElectrical, value: "yes" },
           { label: tr.demoNo, value: "no" },
         ],
       },
@@ -354,20 +389,20 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     };
 
     try {
-      const result = demo
+      const result = caps.throttledDemoEndpoint
         ? await fireCodeApi.evaluateDemo(requestBody)
         : await fireCodeApi.evaluate(requestBody);
       const type = handleResponse(result);
       // Guided demo: advance to the next prompt. On needs_info the form drives
       // the resend (which carries demoNext forward), so don't prompt yet.
-      if (demo && !demoEndedRef.current && type !== "needs_info" && demoNextRef.current) {
+      if (caps.guidedFlow && !demoEndedRef.current && type !== "needs_info" && demoNextRef.current) {
         let next = demoNextRef.current;
         demoNextRef.current = null;
         // FCR-116: if a project already exists, never re-offer "create project" —
         // jump to the sign-up invite instead.
         if (next === "create_project" && projectCreatedRef.current) next = "create_account";
         appendPrompt(next);
-      } else if (demo && demoEndedRef.current && type !== "needs_info") {
+      } else if (caps.guidedFlow && demoEndedRef.current && type !== "needs_info") {
         // FCR-115: after a soft-end, the user kept chatting — re-invite to register.
         appendPrompt("create_account");
       }
@@ -405,13 +440,13 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
    *  if the user explicitly asks to create one); dashboard → normal eval. */
   const handleSend = (text: string) => {
     if (!text.trim() || isLoading) return;
-    if (demo) {
+    if (caps.guidedFlow) {
       if (isCreateProjectIntent(text)) {
         // FCR-115: a manual "create the project" message proceeds with the demo
         // project flow too (agent → preview or genuine needs_info), not a teaser.
         ask(text, {
           overrides: activeScenarioRef.current?.params,
-          demoNext: "create_account",
+          demoNext: "see_electrical",
           demoStep: "project",
         });
       } else {
@@ -422,7 +457,48 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     }
   };
 
-  /** A guided-demo quick-reply choice (FCR-100 / FCR-115). */
+  /**
+   * FCR-118: guided-demo step 4 — compute a REAL preliminary electrical study
+   * from the active scenario (or the current building inputs) via the public,
+   * deterministic /demo/electrical endpoint, render it, then invite to sign up.
+   */
+  const runDemoElectrical = async () => {
+    if (isLoading) return;
+    const p = activeScenarioRef.current?.params;
+    const occMap: Record<BuildingType, ElectricalOccupancy> = {
+      [BuildingType.residencial]: "residencial",
+      [BuildingType.comercial]: "comercial",
+      [BuildingType.industrial]: "industrial",
+    };
+    const bt = (p?.building_type ?? buildingType) as BuildingType;
+    const occupancy: ElectricalOccupancy = occMap[bt] ?? "comercial";
+    const inputs: ElectricalInputs = {
+      occupancy,
+      area_m2: p?.area_m2 ?? areaM2 ?? 120,
+      floors: p?.floors ?? floors ?? undefined,
+      service: occupancy === "residencial" ? "single_phase" : "three_phase",
+      language: lang,
+    };
+    setIsLoading(true);
+    try {
+      const result: ElectricalLoadData = await fireCodeApi.evaluateDemoElectrical(inputs);
+      const summary =
+        lang === "es"
+          ? `Estudio eléctrico preliminar: ${result.demandKva} kVA demandados · transformador sugerido ${result.suggestedTransformerKva} kVA.`
+          : `Preliminary electrical study: ${result.demandKva} kVA demanded · suggested transformer ${result.suggestedTransformerKva} kVA.`;
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", text: summary, type: "electrical", payload: result },
+      ]);
+      appendPrompt("create_account");
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /** A guided-demo quick-reply choice (FCR-100 / FCR-115 / FCR-118). */
   const handleChoice = (kind: PromptKind, value: string) => {
     if (isLoading) return;
     if (value === "no") {
@@ -466,9 +542,13 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         ask(tr.demoCreateProjectMsg, {
           silent: true,
           overrides: activeScenarioRef.current?.params,
-          demoNext: "create_account",
+          demoNext: "see_electrical",
           demoStep: "project",
         });
+        break;
+      case "see_electrical":
+        // FCR-118: deterministic public demo study (no agent/evaluate round-trip).
+        runDemoElectrical();
         break;
       case "create_account":
         navigate(localizedPath(lang, "/register"));
@@ -614,29 +694,38 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.length === 0 && <WelcomeState onPick={handlePick} />}
 
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={cn(
-              "flex gap-2 duration-300 animate-in fade-in-50 slide-in-from-bottom-1",
-              m.role === "user" ? "justify-end" : "justify-start",
-            )}
-          >
-            {m.role === "assistant" && <AssistantAvatar />}
+        {messages.map((m, i) => {
+          // FCR-114/117: rich cards (evaluation/project/electrical) carry the CR
+          // context tiles + reference chips; in the narrow demo column the 85%
+          // bubble clipped them. Give rich assistant cards a wider bubble and let
+          // long content wrap instead of overflow.
+          const effType: MsgType = m.type ?? (m.answer ? "evaluation" : "message");
+          const isRich = effType === "evaluation" || effType === "project" || effType === "electrical";
+          return (
             <div
+              key={i}
               className={cn(
-                "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm",
-                m.role === "user"
-                  ? "rounded-br-sm bg-primary text-primary-foreground shadow-sm"
-                  : m.type === "error"
-                  ? "rounded-bl-sm border border-destructive/40 bg-destructive/10 text-destructive"
-                  : "rounded-bl-sm border border-border bg-secondary/60",
+                "flex gap-2 duration-300 animate-in fade-in-50 slide-in-from-bottom-1",
+                m.role === "user" ? "justify-end" : "justify-start",
               )}
             >
-              {m.role === "user" ? <TextMessage text={m.text} /> : renderAssistantBody(m)}
+              {m.role === "assistant" && <AssistantAvatar />}
+              <div
+                className={cn(
+                  "min-w-0 break-words rounded-2xl px-3.5 py-2.5 text-sm",
+                  m.role === "assistant" && isRich ? "max-w-full sm:max-w-[95%]" : "max-w-[90%] sm:max-w-[85%]",
+                  m.role === "user"
+                    ? "rounded-br-sm bg-primary text-primary-foreground shadow-sm"
+                    : m.type === "error"
+                    ? "rounded-bl-sm border border-destructive/40 bg-destructive/10 text-destructive"
+                    : "rounded-bl-sm border border-border bg-secondary/60",
+                )}
+              >
+                {m.role === "user" ? <TextMessage text={m.text} /> : renderAssistantBody(m)}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {isLoading && <TypingIndicator />}
       </div>

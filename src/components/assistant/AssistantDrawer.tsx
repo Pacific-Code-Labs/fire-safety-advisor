@@ -22,7 +22,7 @@ export function AssistantDrawer({ open, onOpenChange, title, children }: Props) 
         <Vaul.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
         <Vaul.Content
           aria-describedby={undefined}
-          className="fixed inset-y-0 right-0 z-50 flex h-full w-full flex-col bg-background shadow-2xl outline-none sm:w-[420px]"
+          className="fixed inset-y-0 right-0 z-50 flex h-[100dvh] w-full flex-col bg-background shadow-2xl outline-none sm:w-[420px]"
         >
           <Vaul.Title className="sr-only">{title}</Vaul.Title>
           {children}

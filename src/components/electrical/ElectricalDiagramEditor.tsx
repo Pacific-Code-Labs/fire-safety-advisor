@@ -231,7 +231,7 @@ function EditorInner({ value, onChange }: Props) {
   );
 
   return (
-    <div className="flex h-full min-h-[420px] w-full gap-3">
+    <div className="flex h-full min-h-[420px] w-full flex-col gap-3 md:flex-row">
       <div ref={flowRef} className="relative h-full min-h-[420px] flex-1 overflow-hidden rounded-lg border border-border">
         <ReactFlow
           nodes={nodes}
@@ -280,8 +280,8 @@ function EditorInner({ value, onChange }: Props) {
         </ReactFlow>
       </div>
 
-      {/* On-select edit panel */}
-      <div className="w-56 shrink-0 rounded-lg border border-border bg-card p-3">
+      {/* On-select edit panel — stacks below the canvas on mobile/tablet. */}
+      <div className="w-full shrink-0 rounded-lg border border-border bg-card p-3 md:w-56">
         <div className="mb-2 text-xs font-semibold">{tr.elec_edit_node}</div>
         {!selectedNode ? (
           <p className="text-xs text-muted-foreground">{tr.elec_select_node_hint}</p>

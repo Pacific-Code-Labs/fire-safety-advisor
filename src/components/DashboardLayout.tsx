@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, Flame, LayoutDashboard, FolderKanban, Sparkles, LogOut, Languages, User, ShieldCheck, Zap } from "lucide-react";
+import { ChevronDown, Flame, LayoutDashboard, FolderKanban, Sparkles, LogOut, Languages, User, ShieldCheck } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -76,9 +76,12 @@ function AppSidebar() {
     { id: "dashboard", titleKey: "nav_dashboard", url: "/dashboard", icon: LayoutDashboard, end: true },
     { id: "projects", titleKey: "nav_projects", url: "/projects", icon: FolderKanban },
   ];
+  // FCR-118: the electrical preliminary-load study is no longer a standalone
+  // nav tool — it's unified under the Projects module (reached from the Projects
+  // page), since an electrical study persists as a `project_type: "electrical"`
+  // project. This removes the "two repeated modules" overlap with Projects.
   const tools: NavItem[] = [
     { id: "evaluator", titleKey: "nav_evaluator", url: "/dashboard/evaluator", icon: Sparkles },
-    { id: "electrical", titleKey: "nav_electrical", url: "/projects/electrical", icon: Zap },
   ];
   const admin: NavItem[] = [
     { id: "roles", titleKey: "nav_roles", url: "/dashboard/roles", icon: ShieldCheck },

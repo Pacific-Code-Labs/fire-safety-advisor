@@ -7,7 +7,7 @@ import { useAssistant } from "@/contexts/AssistantContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RiskBadge } from "@/components/RiskBadge";
-import { FolderKanban, Plus, Trash2, Eye } from "lucide-react";
+import { FolderKanban, Plus, Trash2, Eye, Zap } from "lucide-react";
 import { BuildingType } from "@/services/fireCodeApi";
 import { localizedPath } from "@/lib/paths";
 import {
@@ -52,9 +52,14 @@ export default function Projects() {
             <h2 className="text-2xl font-bold tracking-tight">{tr.projects_title}</h2>
             <p className="text-sm text-muted-foreground">{tr.projects_subtitle}</p>
           </div>
-          <Button asChild className="gap-2">
-            <Link to={localizedPath(lang, "/projects/new")}><Plus className="h-4 w-4" /> {tr.new_project}</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline" className="gap-2">
+              <Link to={localizedPath(lang, "/projects/electrical")}><Zap className="h-4 w-4" /> {tr.new_electrical}</Link>
+            </Button>
+            <Button asChild className="gap-2">
+              <Link to={localizedPath(lang, "/projects/new")}><Plus className="h-4 w-4" /> {tr.new_project}</Link>
+            </Button>
+          </div>
         </div>
 
         <Card>

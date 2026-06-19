@@ -25,6 +25,7 @@ import {
   type ProjectBuildingType,
   type ProjectCreateRequest,
   type ProjectUpdateRequest,
+  type ElectricalSnapshot,
 } from "@/services/fireCodeApi";
 
 export type RiskLevel = "low" | "medium" | "high";
@@ -44,6 +45,10 @@ export interface Project {
   requirements?: string[];
   reference?: string[];
   contextCr?: string[];
+  /** FCR-118: 'fire' (default) | 'electrical'. */
+  projectType?: string;
+  /** FCR-118: the saved electrical-study snapshot (electrical projects only). */
+  electrical?: ElectricalSnapshot;
   createdAt: string;
 }
 
@@ -95,6 +100,8 @@ function fromResponse(r: ProjectResponse): Project {
     requirements: r.requirements,
     reference: r.reference,
     contextCr: r.contextCr,
+    projectType: r.projectType,
+    electrical: r.electrical ?? undefined,
     createdAt: r.createdAt,
   };
 }

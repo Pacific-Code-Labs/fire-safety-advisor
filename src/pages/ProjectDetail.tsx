@@ -7,8 +7,9 @@ import { useAssistant } from "@/contexts/AssistantContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RiskBadge } from "@/components/RiskBadge";
-import { ArrowLeft, FileDown, ListChecks, BookOpen, MapPin } from "lucide-react";
+import { ArrowLeft, FileDown, ListChecks, BookOpen, MapPin, Zap, Pencil } from "lucide-react";
 import { BuildingType } from "@/services/fireCodeApi";
+import { ElectricalLoadCard } from "@/components/assistant/ElectricalLoadCard";
 import { localizedPath } from "@/lib/paths";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -132,23 +133,48 @@ export default function ProjectDetail() {
               </Card>
 
               <div className="lg:col-span-2 grid gap-4">
-                <ListBlock title={tr.requirements} icon={ListChecks} items={project.requirements} emptyText={tr.no_data} />
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <ListBlock title={tr.references} icon={BookOpen} items={project.reference} emptyText={tr.no_data} />
-                  <ListBlock title={tr.cr_context} icon={MapPin} items={project.contextCr} emptyText={tr.no_data} />
-                </div>
+                {project.electrical?.result ? (
+                  /* FCR-118: an electrical study is mapped INSIDE its project — render
+                     the full study snapshot here, with a link back into the editor. */
+                  <Card>
+                    <CardHeader className="flex flex-row items-start justify-between gap-3 pb-3">
+                      <div>
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <Zap className="h-4 w-4 text-primary" /> {tr.elec_title}
+                        </CardTitle>
+                        <CardDescription>{tr.elec_project_subtitle}</CardDescription>
+                      </div>
+                      <Button asChild variant="outline" size="sm" className="gap-1.5 shrink-0">
+                        <Link to={localizedPath(lang, "/projects/electrical") + `?projectId=${project.id}`}>
+                          <Pencil className="h-3.5 w-3.5" /> {tr.elec_edit_study}
+                        </Link>
+                      </Button>
+                    </CardHeader>
+                    <CardContent>
+                      <ElectricalLoadCard data={project.electrical.result} />
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <>
+                    <ListBlock title={tr.requirements} icon={ListChecks} items={project.requirements} emptyText={tr.no_data} />
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <ListBlock title={tr.references} icon={BookOpen} items={project.reference} emptyText={tr.no_data} />
+                      <ListBlock title={tr.cr_context} icon={MapPin} items={project.contextCr} emptyText={tr.no_data} />
+                    </div>
 
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm">{tr.checklist}</CardTitle>
-                    <CardDescription>{tr.coming_soon}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {tr.checklist_soon}
-                    </p>
-                  </CardContent>
-                </Card>
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm">{tr.checklist}</CardTitle>
+                        <CardDescription>{tr.coming_soon}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          {tr.checklist_soon}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
               </div>
             </div>
           </>
