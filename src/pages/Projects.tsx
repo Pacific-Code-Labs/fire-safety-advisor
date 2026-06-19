@@ -73,7 +73,43 @@ export default function Projects() {
                 <Button asChild size="sm"><Link to={localizedPath(lang, "/projects/new")}>{tr.create_first}</Link></Button>
               </div>
             ) : (
-              <Table>
+              <>
+              {/* Mobile (<sm): card stack — a wide table doesn't fit 375px. */}
+              <ul className="divide-y divide-border sm:hidden">
+                {projects.map((p) => (
+                  <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                    <Link to={localizedPath(lang, `/projects/${p.id}`)} className="min-w-0 flex-1">
+                      <div className="font-medium truncate">{p.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {buildingLabel[p.building_type]} · {p.usage} · {p.area_m2} m²
+                      </div>
+                    </Link>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <RiskBadge level={p.risk} />
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" aria-label={tr.delete}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{tr.delete_project}</AlertDialogTitle>
+                            <AlertDialogDescription>{tr.delete_confirm}</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{tr.cancel}</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => remove(p.id)}>{tr.delete}</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Tablet/desktop (≥sm): full table. */}
+              <Table className="hidden sm:table">
                 <TableHeader>
                   <TableRow>
                     <TableHead>{tr.name}</TableHead>
@@ -127,6 +163,7 @@ export default function Projects() {
                   ))}
                 </TableBody>
               </Table>
+              </>
             )}
           </CardContent>
         </Card>

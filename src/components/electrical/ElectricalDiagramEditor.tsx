@@ -248,7 +248,7 @@ function EditorInner({ value, onChange }: Props) {
         >
           <Background />
           <Controls />
-          <MiniMap pannable zoomable />
+          <MiniMap pannable zoomable className="!hidden sm:!block" />
           <Panel position="top-left" className="flex flex-wrap gap-1.5">
             <Button type="button" size="sm" variant="secondary" onClick={addLoad}>
               <Plus className="mr-1 h-3.5 w-3.5" /> {tr.elec_add_load}

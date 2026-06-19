@@ -166,7 +166,7 @@ export default function ElectricalProject() {
         <p className="max-w-2xl text-sm text-muted-foreground">{tr.elec_project_subtitle}</p>
 
         {/* Structured inputs — the deterministic calc drivers */}
-        <div className="grid gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <Field label={tr.elec_occupancy}>
             <select
               value={inputs.occupancy}

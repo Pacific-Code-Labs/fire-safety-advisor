@@ -83,7 +83,7 @@ export function ElectricalLoadCard({ data }: Props) {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3 md:grid-cols-4">
         <Stat label={tr.elec_installed_va} value={`${fmt(data.installedVa)} VA`} />
         <Stat label={tr.elec_demanded_load} value={`${fmt(data.demandedVa)} VA`} />
         <Stat label={tr.elec_demand_kva} value={`${fmt(data.demandKva)} kVA`} />
@@ -112,9 +112,9 @@ export function ElectricalLoadCard({ data }: Props) {
               <tr className="border-b border-border">
                 <th className="px-2 py-1 text-left font-medium">{tr.elec_col_description}</th>
                 <th className="px-2 py-1 text-right font-medium">{tr.elec_col_connected_va}</th>
-                <th className="px-2 py-1 text-right font-medium">{tr.elec_col_demand_factor}</th>
+                <th className="hidden px-2 py-1 text-right font-medium md:table-cell">{tr.elec_col_demand_factor}</th>
                 <th className="px-2 py-1 text-right font-medium">{tr.elec_col_demanded_va}</th>
-                <th className="px-2 py-1 text-left font-medium">{tr.elec_col_phase}</th>
+                <th className="hidden px-2 py-1 text-left font-medium sm:table-cell">{tr.elec_col_phase}</th>
               </tr>
             </thead>
             <tbody>
@@ -122,9 +122,9 @@ export function ElectricalLoadCard({ data }: Props) {
                 <tr key={i} className="border-b border-border/60 last:border-0">
                   <td className="px-2 py-1">{row.description}</td>
                   <td className="px-2 py-1 text-right font-mono">{fmt(row.connectedVa)}</td>
-                  <td className="px-2 py-1 text-right font-mono">{fmt(row.demandFactor)}</td>
+                  <td className="hidden px-2 py-1 text-right font-mono md:table-cell">{fmt(row.demandFactor)}</td>
                   <td className="px-2 py-1 text-right font-mono">{fmt(row.demandedVa)}</td>
-                  <td className="px-2 py-1 font-mono text-muted-foreground">{row.phase ?? "—"}</td>
+                  <td className="hidden px-2 py-1 font-mono text-muted-foreground sm:table-cell">{row.phase ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
