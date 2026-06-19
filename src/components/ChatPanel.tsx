@@ -151,6 +151,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   const activeQueryRef = useRef<string>("");
   const demoEndedRef = useRef<boolean>(false);
   const projectReofferedRef = useRef<boolean>(false); // FCR-115: re-offer the project once on decline
+  const projectCreatedRef = useRef<boolean>(false); // FCR-116: a project preview already shown → stop offering "create project", go to sign-up
   // FCR-114: a conversational, one-question-at-a-time flow (intake + agent needs_info).
   const questionFlowRef = useRef<{
     qs: NeedsInfoQuestion[];
@@ -202,6 +203,9 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         break;
       }
       case "project_created": {
+        // FCR-116: a project was created/previewed (by the guided step OR a manual
+        // message) — from here on don't offer "create project" again, only sign-up.
+        projectCreatedRef.current = true;
         const name = norm.data.project?.name || (lang === "es" ? "Proyecto" : "Project");
         const isPreview = norm.data.projectId == null;
         setMessages((m) => [
@@ -357,8 +361,11 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
       // Guided demo: advance to the next prompt. On needs_info the form drives
       // the resend (which carries demoNext forward), so don't prompt yet.
       if (demo && !demoEndedRef.current && type !== "needs_info" && demoNextRef.current) {
-        const next = demoNextRef.current;
+        let next = demoNextRef.current;
         demoNextRef.current = null;
+        // FCR-116: if a project already exists, never re-offer "create project" —
+        // jump to the sign-up invite instead.
+        if (next === "create_project" && projectCreatedRef.current) next = "create_account";
         appendPrompt(next);
       } else if (demo && demoEndedRef.current && type !== "needs_info") {
         // FCR-115: after a soft-end, the user kept chatting — re-invite to register.
@@ -381,6 +388,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   const startDemoStep1 = (scenario: DemoScenario | null, query: string) => {
     demoEndedRef.current = false;
     projectReofferedRef.current = false;
+    projectCreatedRef.current = false;
     activeScenarioRef.current = scenario;
     activeQueryRef.current = query;
     ask(query, { teaser: true, demoNext: "see_eval", demoStep: "teaser" });
@@ -418,9 +426,10 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   const handleChoice = (kind: PromptKind, value: string) => {
     if (isLoading) return;
     if (value === "no") {
-      if (kind === "create_project" && !projectReofferedRef.current) {
+      if (kind === "create_project" && !projectReofferedRef.current && !projectCreatedRef.current) {
         // FCR-115: don't end on the first decline — offer to keep chatting OR
-        // re-offer the project once (maybe they click this time).
+        // re-offer the project once (maybe they click this time). FCR-116: skip
+        // the re-offer entirely if a project was already created/previewed.
         projectReofferedRef.current = true;
         setMessages((m) => [
           ...m,
