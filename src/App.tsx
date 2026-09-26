@@ -1,104 +1,65 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { Toaster as Sonner, TooltipProvider } from "@pacific-code-labs/fire-code-design-system";
-import { Toaster } from "@/components/ui/toaster";
-import Index from "./pages/Index.tsx";
+import { useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
+import { TooltipProvider } from "@pacific-code-labs/fire-code-design-system";
 import Landing from "./pages/Landing.tsx";
-import Login from "./pages/Login.tsx";
-import Register from "./pages/Register.tsx";
-import VerifyEmail from "./pages/VerifyEmail.tsx";
-import ForgotPassword from "./pages/ForgotPassword.tsx";
-import ResetPassword from "./pages/ResetPassword.tsx";
-import ProfilePage from "./pages/ProfilePage.tsx";
-import RolesPage from "./pages/RolesPage.tsx";
-import NewOrganization from "./pages/NewOrganization.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
-import Projects from "./pages/Projects.tsx";
-import NewProject from "./pages/NewProject.tsx";
-import ProjectDetail from "./pages/ProjectDetail.tsx";
-import ElectricalProject from "./pages/ElectricalProject.tsx";
 import Pricing from "./pages/Pricing.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { LangProvider } from "@/contexts/LangContext";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { BillingProvider } from "@/contexts/BillingContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { AssistantProvider } from "@/contexts/AssistantContext";
-import { RequireAuth } from "@/components/RequireAuth";
 import { LangLayout } from "@/components/LangLayout";
-import { DEFAULT_LANG, localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
-import Evaluator from "./pages/Evaluator.tsx";
+import { DEFAULT_LANG, isLang, localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
+import { appHref, LEGACY_APP_PATHS } from "@/lib/links";
 
-// The admin CMS lives in the separate private `fire-code-admin` app/repo
-// (landing-dxp-builder, delivery variant B). This public site contains ZERO
-// admin code and never registers an `/admin` route.
+// fire-safety-advisor: the public marketing landing at fire-code.jcampos.dev. Static and
+// content-driven: no auth, no app API. The signed-in app is fire-code-app
+// (app.fire-code.jcampos.dev) and the admin console is the private fire-code-admin.
 
-const queryClient = new QueryClient();
+/** Old single-site URLs (/<lang>/login, /<lang>/dashboard, /<lang>/demo, …) now live in the app. */
+function AppRedirect() {
+  const { pathname, search, hash } = useLocation();
+  const { lang, rest } = stripLangPrefix(pathname);
+  useEffect(() => {
+    window.location.replace(appHref(lang ?? persistedLang(), rest) + search + hash);
+  }, [lang, rest, search, hash]);
+  return null;
+}
 
-/**
- * LegacyRedirect — catches any un-prefixed deep link (e.g. /dashboard, /demo)
- * and forwards it to the same path under the persisted/Default language prefix.
- * Bare "/" is handled by its own top-level redirect.
- */
+/** Any un-prefixed path: an old app path → the app; anything else → same path under a lang. */
 function LegacyRedirect() {
   const location = useLocation();
   const { rest } = stripLangPrefix(location.pathname);
+  const first = rest.split("/")[1] ?? "";
+  if (LEGACY_APP_PATHS.includes(first)) return <AppRedirect />;
   return <Navigate to={localizedPath(persistedLang(), rest) + location.search + location.hash} replace />;
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <AuthProvider>
-        <BillingProvider>
-        <LangProvider>
-          <AssistantProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                {/*
-                 * ALL app routes are language-prefixed under /:lang (FCR-106).
-                 * The URL drives i18n: LangLayout validates :lang, syncs
-                 * LangContext to it, and renders the matched child via its
-                 * <Outlet/> inside a <PageTransition>.
-                 */}
-                <Route path="/:lang" element={<LangLayout />}>
-                  <Route index element={<Landing />} />
-                  <Route path="demo" element={<Index />} />
-                  <Route path="login" element={<Login />} />
-                  <Route path="register" element={<Register />} />
-                  <Route path="verify-email" element={<VerifyEmail />} />
-                  <Route path="forgot-password" element={<ForgotPassword />} />
-                  <Route path="reset-password" element={<ResetPassword />} />
-                  <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                  <Route path="dashboard/evaluator" element={<RequireAuth><Evaluator /></RequireAuth>} />
-                  <Route path="dashboard/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-                  <Route path="dashboard/roles" element={<RequireAuth><RolesPage /></RequireAuth>} />
-                  <Route path="organizations/new" element={<RequireAuth><NewOrganization /></RequireAuth>} />
-                  <Route path="projects" element={<RequireAuth><Projects /></RequireAuth>} />
-                  <Route path="projects/new" element={<RequireAuth><NewProject /></RequireAuth>} />
-                  <Route path="projects/electrical" element={<RequireAuth><ElectricalProject /></RequireAuth>} />
-                  <Route path="projects/:id" element={<RequireAuth><ProjectDetail /></RequireAuth>} />
-                  <Route path="pricing" element={<Pricing />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Route>
+/** /:lang/:segment/* — app paths go to the app, unknown ones 404. */
+function LangChild() {
+  const { lang, segment } = useParams();
+  if (!isLang(lang)) return <LegacyRedirect />;
+  return segment && LEGACY_APP_PATHS.includes(segment) ? <AppRedirect /> : <NotFound />;
+}
 
-                {/* Top-level: bare "/" → default language. */}
-                <Route path="/" element={<Navigate to={"/" + DEFAULT_LANG} replace />} />
-                {/* Any un-prefixed deep link → same path under the persisted lang. */}
-                <Route path="*" element={<LegacyRedirect />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-          </AssistantProvider>
-        </LangProvider>
-        </BillingProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+const App = () => (
+  <ThemeProvider>
+    <LangProvider>
+      <TooltipProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Language-prefixed pages (FCR-106): the URL drives i18n (LangLayout). */}
+            <Route path="/:lang" element={<LangLayout />}>
+              <Route index element={<Landing />} />
+              <Route path="pricing" element={<Pricing />} />
+              <Route path=":segment/*" element={<LangChild />} />
+            </Route>
+
+            <Route path="/" element={<Navigate to={"/" + DEFAULT_LANG} replace />} />
+            <Route path="*" element={<LegacyRedirect />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </LangProvider>
+  </ThemeProvider>
 );
 
 export default App;

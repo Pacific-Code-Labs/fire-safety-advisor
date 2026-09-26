@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Generated from SSM by scripts/load-env-from-ssm.sh — never commit
+.env
+.env.*
