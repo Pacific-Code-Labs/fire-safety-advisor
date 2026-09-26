@@ -452,33 +452,13 @@ function toQueryString(params: Record<string, unknown>): string {
   return query ? `?${query}` : "";
 }
 
-// The API localizes category and risk CODES with `language` ("initiation"/"high" in English);
-// the UI keys styles, icons, labels and counts on the canonical Spanish codes. Map them back
-// once here so every component sees one set.
-const CANONICAL_CATEGORY: Record<string, string> = {
-  initiation: "iniciacion", notification: "notificacion", monitoring: "monitoreo", actuation: "accionamiento",
-};
-const CANONICAL_RISK: Record<string, string> = { high: "alto", medium: "medio", low: "bajo" };
-
-function canonicalCodes<T>(value: T): T {
-  if (Array.isArray(value)) return value.map(canonicalCodes) as T;
-  if (!value || typeof value !== "object") return value;
-  const out: Record<string, unknown> = {};
-  for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
-    if (typeof v === "string" && key === "type" && CANONICAL_CATEGORY[v]) out[key] = CANONICAL_CATEGORY[v];
-    else if (typeof v === "string" && (key === "level" || key === "risk") && CANONICAL_RISK[v]) out[key] = CANONICAL_RISK[v];
-    else out[key] = canonicalCodes(v);
-  }
-  return out as T;
-}
-
 async function call<T>(method: "GET" | "POST", path: string, body?: unknown): Promise<T> {
   if (!PUBLIC_API) throw new Error("The public API is not configured (VITE_PUBLIC_API_URL)");
   const response = await signedPublicRequest(PUBLIC_API, method, path, { body });
   const text = await response.text();
   const data: unknown = text ? JSON.parse(text) : null;
   if (!response.ok) throw new ApiError(response.status, data);
-  return canonicalCodes(data) as T;
+  return data as T;
 }
 
 function asDemoLimit(obj: unknown): DemoLimitResponse | null {
