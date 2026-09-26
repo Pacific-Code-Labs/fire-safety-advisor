@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ShellSkeleton, Toaster as Sonner, TooltipProvider } from "@pacific-code-labs/fire-code-design-system";
+import { Toaster as Sonner, TooltipProvider } from "@pacific-code-labs/fire-code-design-system";
 import Landing from "./pages/Landing.tsx";
 import Pricing from "./pages/Pricing.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -9,6 +9,7 @@ import { LangProvider } from "@/contexts/LangContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AssistantProvider } from "@/contexts/AssistantContext";
 import { LangLayout } from "@/components/LangLayout";
+import { DemoSkeleton } from "@/components/DemoSkeleton";
 import { DEFAULT_LANG, isLang, localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
 import { appHref, LEGACY_APP_PATHS } from "@/lib/links";
 
@@ -59,7 +60,7 @@ const App = () => (
             {/* Language-prefixed pages (FCR-106): the URL drives i18n (LangLayout). */}
             <Route path="/:lang" element={<LangLayout />}>
               <Route index element={<Landing />} />
-              <Route path="demo" element={<Suspense fallback={<ShellSkeleton />}><Index /></Suspense>} />
+              <Route path="demo" element={<Suspense fallback={<DemoSkeleton />}><Index /></Suspense>} />
               <Route path="pricing" element={<Pricing />} />
               <Route path=":segment/*" element={<LangChild />} />
             </Route>

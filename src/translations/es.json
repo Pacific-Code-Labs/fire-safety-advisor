@@ -104,7 +104,21 @@
       "project_type": "Tipo",
       "project_usage": "Uso",
       "risk_level_heading": "Riesgo {level}",
-      "upgrade_tier_current": "actual"
+      "upgrade_tier_current": "actual",
+      "cat_iniciacion": "Iniciación",
+      "cat_notificacion": "Notificación",
+      "cat_monitoreo": "Monitoreo",
+      "cat_accionamiento": "Accionamiento",
+      "risk_level_alto": "Alto",
+      "risk_level_medio": "Medio",
+      "risk_level_bajo": "Bajo",
+      "accionamiento": "Accionamiento",
+      "monitoreo": "Monitoreo",
+      "rule_sec_inspect": "Inspección",
+      "rule_sec_install": "Instalación",
+      "rule_sec_risks": "Riesgos de falla",
+      "rule_sec_tech": "Técnicos",
+      "loading": "Cargando…"
     },
     "demo": {
       "demoAccountQ": "¿Quieres crear una cuenta gratis para guardar este proyecto y no perderlo?",

@@ -2,12 +2,12 @@ import { ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
+import { SiteFooter } from "@/components/SiteFooter";
 import { useLang } from "@/contexts/LangContext";
 import { Link } from "react-router-dom";
 import { localizedPath } from "@/lib/paths";
 import { tChrome } from "@/lib/chrome-i18n";
 import { resolveSeo, useHeadTags } from "@/lib/seo";
-import { getBrandingVM } from "@/services/branding.service";
 import {
   getHeroVM,
   getProblemsVM,
@@ -15,7 +15,6 @@ import {
   getFeaturesVM,
   getHowItWorksVM,
   getCtaVM,
-  getFooterVM,
   type CardVM,
 } from "@/services/landing.service";
 
@@ -27,14 +26,12 @@ const Landing = () => {
   useHeadTags(resolveSeo("home", lang), lang, "home");
 
   const chrome = tChrome(lang);
-  const brand = getBrandingVM(lang);
   const hero = getHeroVM(lang);
   const problems = getProblemsVM(lang);
   const solutions = getSolutionsVM(lang);
   const features = getFeaturesVM(lang);
   const how = getHowItWorksVM(lang);
   const cta = getCtaVM(lang);
-  const footer = getFooterVM(lang);
 
   const demoButton = (
     <Button asChild size="sm" className="gap-2">
@@ -190,17 +187,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-background">
-        <div className="container py-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} {brand.companyName} {brand.companySuffix}. {footer.rights}
-          </div>
-          <Link to={demoHref} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            {footer.demoLink}
-          </Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 };

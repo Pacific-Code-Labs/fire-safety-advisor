@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
+import { SiteFooter } from "@/components/SiteFooter";
 import { BuildingSelector } from "@/components/BuildingSelector";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ChatPanel } from "@/components/ChatPanel";
@@ -347,6 +348,8 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
           {tr.disclaimer}
         </footer>
       </main>
+
+      {!embedded && <SiteFooter />}
 
       {/* ── Mobile chat drawer — /demo only (desktop uses the inline right column) ── */}
       {!embedded && (
