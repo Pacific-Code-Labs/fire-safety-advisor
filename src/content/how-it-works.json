@@ -1,11 +1,20 @@
 {
-  "eyebrow": { "es": "Cómo funciona", "en": "How it works" },
-  "title": { "es": "Tres pasos. Sin fricción.", "en": "Three steps. Zero friction." },
+  "eyebrow": {
+    "es": "Cómo funciona",
+    "en": "How it works"
+  },
+  "title": {
+    "es": "Tres pasos. Sin fricción.",
+    "en": "Three steps. Zero friction."
+  },
   "steps": [
     {
       "id": "enter-data",
       "iconName": "file-text",
-      "title": { "es": "Ingrese los datos del proyecto", "en": "Enter project data" },
+      "title": {
+        "es": "Ingrese los datos del proyecto",
+        "en": "Enter project data"
+      },
       "description": {
         "es": "Tipo de edificio, área, pisos, ocupantes y altura.",
         "en": "Building type, area, floors, occupants and height."
@@ -14,7 +23,10 @@
     {
       "id": "analyze",
       "iconName": "workflow",
-      "title": { "es": "El sistema analiza", "en": "The system analyzes" },
+      "title": {
+        "es": "El sistema analiza",
+        "en": "The system analyzes"
+      },
       "description": {
         "es": "Reglas deterministas + IA evalúan los requisitos aplicables.",
         "en": "Deterministic rules + AI evaluate the applicable requirements."
@@ -23,7 +35,10 @@
     {
       "id": "get-requirements",
       "iconName": "shield-check",
-      "title": { "es": "Obtenga los requisitos", "en": "Get the requirements" },
+      "title": {
+        "es": "Obtenga los requisitos",
+        "en": "Get the requirements"
+      },
       "description": {
         "es": "Resultados por categoría con referencias NFPA y contexto local.",
         "en": "Results by category with NFPA references and local context."

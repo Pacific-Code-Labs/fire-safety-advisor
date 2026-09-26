@@ -1,4 +1,10 @@
 {
-  "rights": { "es": "Todos los derechos reservados.", "en": "All rights reserved." },
-  "demoLink": { "es": "Ir a la demo", "en": "Go to demo" }
+  "rights": {
+    "es": "Todos los derechos reservados.",
+    "en": "All rights reserved."
+  },
+  "demoLink": {
+    "es": "Ir a la demo",
+    "en": "Go to demo"
+  }
 }

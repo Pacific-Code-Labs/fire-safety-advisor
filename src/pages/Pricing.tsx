@@ -2,12 +2,12 @@
  * Pricing (FCR-028, public, card-free) — the 3-tier plan surface.
  *
  * Renders Free / Pro / Enterprise cards from the FE plan mirror (`lib/plans.ts`,
- * synced with BE `config/plans.py`). For a signed-in Free user the Free card is
- * shown as ACTIVE / current plan. Pro + Enterprise are marked "Coming soon"
+ * synced with BE `config/plans.py`). The landing has no session: the Free CTA
+ * opens registration in the app (new tab); the app's own /pricing shows the
+ * user's current plan. Pro + Enterprise are marked "Coming soon"
  * (NO checkout, NO PayPal, NO card fields). Bilingual via LangContext; DS
  * primitives (Card/Badge/Button) from `@pacific-code-labs/fire-code-design-system`.
  */
-import { Link, useNavigate } from "react-router-dom";
 import {
   Badge,
   Button,
@@ -21,11 +21,9 @@ import {
 import { Check } from "lucide-react";
 import { Header } from "@/components/Header";
 import { useLang } from "@/contexts/LangContext";
-import { useAuth } from "@/contexts/AuthContext";
-import { useBilling } from "@/contexts/BillingContext";
 import { PLAN_ORDER, PLANS, type PlanConfig, type PlanTier } from "@/lib/plans";
 import type { Dict } from "@/lib/i18n";
-import { localizedPath } from "@/lib/paths";
+import { appHref, newTab } from "@/lib/links";
 
 function fill(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -60,9 +58,6 @@ function planFeatures(plan: PlanConfig, tr: Dict): string[] {
 
 export default function Pricing() {
   const { lang, tr } = useLang();
-  const { user } = useAuth();
-  const { tier, isFree } = useBilling();
-  const navigate = useNavigate();
 
   return (
     <div className="min-h-[100dvh] bg-background">
@@ -76,17 +71,15 @@ export default function Pricing() {
         <div className="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-3">
           {PLAN_ORDER.map((t) => {
             const plan = PLANS[t];
-            const isCurrent = !!user && tier === t && t === "free";
             const comingSoon = !plan.selfServe;
             return (
               <Card
                 key={t}
-                className={`flex flex-col ${isCurrent ? "border-primary/60 ring-1 ring-primary/30" : ""}`}
+                className="flex flex-col"
               >
                 <CardHeader className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <CardTitle>{tr[NAME_KEY[t]]}</CardTitle>
-                    {isCurrent && <Badge variant="success">{tr.pricing_active_badge}</Badge>}
                     {comingSoon && <Badge variant="info">{tr.pricing_coming_soon}</Badge>}
                   </div>
                   <p className="text-sm text-muted-foreground">{tr[TAGLINE_KEY[t]]}</p>
@@ -105,18 +98,9 @@ export default function Pricing() {
 
                 <CardFooter>
                   {t === "free" ? (
-                    isCurrent ? (
-                      <Button variant="outline" disabled className="w-full">
-                        {tr.pricing_free_cta_active}
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full"
-                        onClick={() => navigate(localizedPath(lang, user ? "/dashboard" : "/register"))}
-                      >
-                        {user ? tr.pricing_back_dashboard : tr.pricing_free_cta_anon}
-                      </Button>
-                    )
+                    <a href={appHref(lang, "/register")} {...newTab} className={`${buttonVariants()} w-full`}>
+                      {tr.pricing_free_cta_anon}
+                    </a>
                   ) : (
                     // Pro / Enterprise — NO checkout / PayPal yet (FCR-027 deferred).
                     <Button variant="outline" disabled className="w-full">
@@ -129,13 +113,6 @@ export default function Pricing() {
           })}
         </div>
 
-        {user && isFree && (
-          <div className="mx-auto mt-8 max-w-5xl text-center">
-            <Link to={localizedPath(lang, "/dashboard")} className={buttonVariants({ variant: "ghost" })}>
-              {tr.pricing_back_dashboard}
-            </Link>
-          </div>
-        )}
       </main>
     </div>
   );

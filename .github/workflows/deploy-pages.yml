@@ -1,73 +1,65 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (fire-code.jcampos.dev)
 
+# The public landing. Content edited online in the admin console is pulled from the public
+# content API before the SEO prerender, so the static pages match the live site; a daily
+# rebuild picks up edits made since the last push.
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "17 6 * * *"
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
-  packages: read
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4   # version comes from package.json "packageManager"
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      # Authenticate to GitHub Packages so the private DS package
-      # (@pacific-code-labs/fire-code-design-system) resolves. The committed
-      # .npmrc points @pacific-code-labs at npm.pkg.github.com and reads the
-      # token from $NODE_AUTH_TOKEN; GITHUB_TOKEN has packages:read here
-      # (the package grants read to this repo). No committed lockfile yet, so
-      # --no-frozen-lockfile lets CI resolve + generate it.
-      - name: Install dependencies
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Build
-        env:
-          VITE_AWS_REGION: ${{ secrets.VITE_AWS_REGION }}
-          VITE_COGNITO_IDENTITY_POOL_ID: ${{ secrets.VITE_COGNITO_IDENTITY_POOL_ID }}
-          VITE_COGNITO_USER_POOL_ID: ${{ secrets.VITE_COGNITO_USER_POOL_ID }}
-          VITE_COGNITO_USER_POOL_CLIENT_ID: ${{ secrets.VITE_COGNITO_USER_POOL_CLIENT_ID }}
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-        run: pnpm run build
-
-      # NOTE: `bun run build` runs the SEO prerender (scripts/prerender.mjs),
-      # which already emits a NOINDEX dist/404.html SPA shell (so client routes
-      # resolve on hard refresh without being indexed as duplicate content). Do
-      # NOT `cp dist/index.html dist/404.html` here — that would clobber it with
-      # an indexable copy (landing-dxp-builder seo-deploy.md).
-
-      - name: Disable Jekyll
-        run: touch dist/.nojekyll
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-  deploy:
-    needs: build
+  build-and-deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Read-only role from fire-code-infrastructure web/web-params.yml (trusts this repo).
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_WEB_BUILD_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # Only site/app-url + public-api/* — the landing never sees auth or app API config.
+      - name: Load web config from SSM (/fire-code/dev/web)
+        run: bash scripts/load-env-from-ssm.sh dev - --github-env
+
+      # Published documents overwrite src/content/*.json (never fails the build).
+      - name: Pull published content
+        run: pnpm content:pull
+
+      # i18n + hard-coded-text checks, typecheck, vite build, SEO prerender, bundle check
+      - run: pnpm build
+
+      - name: Disable Jekyll
+        run: touch dist/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v4

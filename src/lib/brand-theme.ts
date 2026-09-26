@@ -13,15 +13,15 @@
 //
 // `initBrand()` runs once at boot from main.tsx.
 import { applyTheme, getTheme, DEFAULT_THEME_ID } from "@pacific-code-labs/fire-code-design-system";
-import brandingData from "@/content/branding.json";
-import themesData from "@/content/themes.json";
+import { getBranding, getThemes, type ThemesContent } from "@/repositories/content.repository";
 import { resolveAssetUrl } from "@/lib/media";
 
-type ThemeEntry = (typeof themesData.themes)[number];
+type ThemeEntry = ThemesContent["themes"][number];
 
 /** The currently-active named theme from themes.json (falls back to the first). */
 export function activeTheme(): ThemeEntry {
-  return themesData.themes.find((t) => t.isActive) ?? themesData.themes[0];
+  const { themes } = getThemes();
+  return themes.find((t) => t.isActive) ?? themes[0];
 }
 
 /** Map a content theme entry to a known DS engine theme id. */
@@ -60,6 +60,20 @@ export function applyFavicon(ref?: string | null): void {
   link.href = href;
 }
 
+/** Upsert the iOS home-screen icon from branding (optional field). */
+export function applyAppleTouchIcon(ref?: string | null): void {
+  if (typeof document === "undefined") return;
+  const href = resolveAssetUrl(ref);
+  if (!href) return;
+  let link = document.head.querySelector<HTMLLinkElement>("link[rel='apple-touch-icon']");
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "apple-touch-icon";
+    document.head.appendChild(link);
+  }
+  link.href = href;
+}
+
 /**
  * Boot-time brand init (called once from main.tsx). Applies the active theme in
  * the mode persisted by ThemeContext (default dark) and sets the favicon from
@@ -72,5 +86,7 @@ export function initBrand(): void {
   const stored = localStorage.getItem("firecode.theme");
   const isDark = stored ? stored === "dark" : document.documentElement.classList.contains("dark");
   applyActiveTheme(isDark);
-  applyFavicon(brandingData.faviconUrl);
+  const branding = getBranding() as { faviconUrl?: string; appleTouchIconUrl?: string };
+  applyFavicon(branding.faviconUrl);
+  applyAppleTouchIcon(branding.appleTouchIconUrl);
 }

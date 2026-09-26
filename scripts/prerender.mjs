@@ -24,13 +24,15 @@ const seo = JSON.parse(await fs.readFile(path.join(ROOT, "src/content/seo.json")
 const LANGS = ["es", "en"];
 const DEFAULT_LANG = "es";
 // Keep in sync with the router + seo.json.pages.
-const ROUTES = ["home", "demo", "pricing"];
+const ROUTES = ["home", "pricing"];
 
 const siteUrl = (seo.siteUrl ?? "").replace(/\/$/, "");
 const slugOf = (route) => (route === "home" ? "" : `/${route}`);
-const ogImage = /^https?:\/\//.test(seo.ogImage ?? "")
-  ? seo.ogImage
-  : `${siteUrl}${seo.ogImage?.startsWith("/") ? "" : "/"}${seo.ogImage ?? "/og-image.png"}`;
+const branding = JSON.parse(await fs.readFile(path.join(ROOT, "src/content/branding.json"), "utf8"));
+const absolute = (ref) =>
+  /^https?:\/\//.test(ref ?? "") ? ref : `${siteUrl}${ref?.startsWith("/") ? "" : "/"}${ref ?? "/og-image.png"}`;
+// Per-language social card uploaded in the admin (branding.socialCardUrl), else the seo default.
+const ogImageFor = (lang) => absolute(branding.socialCardUrl?.[lang] || seo.ogImage);
 
 const esc = (s) =>
   String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -81,7 +83,7 @@ function injectSeo(shell, { lang, title, description, canonical, route, noindex 
     `<meta property="og:title" content="${esc(title)}" />`,
     `<meta property="og:description" content="${esc(description)}" />`,
     `<meta property="og:url" content="${canonical}" />`,
-    `<meta property="og:image" content="${ogImage}" />`,
+    `<meta property="og:image" content="${ogImageFor(lang)}" />`,
     '<meta name="twitter:card" content="summary_large_image" />',
     `<meta name="twitter:title" content="${esc(title)}" />`,
     `<meta name="twitter:description" content="${esc(description)}" />`,

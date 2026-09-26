@@ -1,10 +1,9 @@
-import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { useLang } from "@/contexts/LangContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { appHref, newTab } from "@/lib/links";
 import { tChrome } from "@/lib/chrome-i18n";
 import { resolveSeo, useHeadTags } from "@/lib/seo";
 import { getBrandingVM } from "@/services/branding.service";
@@ -21,8 +20,8 @@ import {
 
 const Landing = () => {
   const { lang } = useLang();
-  const { user } = useAuth();
-  const demoHref = user ? "/dashboard/evaluator" : "/demo";
+  // The demo is a public page of the app (separate site): open it in a new tab.
+  const demoHref = appHref(lang, "/demo");
 
   useHeadTags(resolveSeo("home", lang), lang, "home");
 
@@ -38,9 +37,9 @@ const Landing = () => {
 
   const demoButton = (
     <Button asChild size="sm" className="gap-2">
-      <Link to={demoHref}>
+      <a href={demoHref} {...newTab}>
         {chrome.nav.demo} <ArrowRight className="h-4 w-4" />
-      </Link>
+      </a>
     </Button>
   );
 
@@ -100,9 +99,9 @@ const Landing = () => {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="gap-2">
-                <Link to={demoHref}>
+                <a href={demoHref} {...newTab}>
                   {hero.ctaPrimary} <ArrowRight className="h-4 w-4" />
-                </Link>
+                </a>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <a href="#how">{hero.ctaSecondary}</a>
@@ -181,9 +180,9 @@ const Landing = () => {
             <p className="mt-4 text-lg text-muted-foreground">{cta.subtitle}</p>
             <div className="mt-8">
               <Button asChild size="lg" className="gap-2">
-                <Link to={demoHref}>
+                <a href={demoHref} {...newTab}>
                   {cta.button} <ArrowRight className="h-4 w-4" />
-                </Link>
+                </a>
               </Button>
             </div>
           </div>
@@ -196,9 +195,9 @@ const Landing = () => {
           <div className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} {brand.companyName} {brand.companySuffix}. {footer.rights}
           </div>
-          <Link to={demoHref} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <a href={demoHref} {...newTab} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             {footer.demoLink}
-          </Link>
+          </a>
         </div>
       </footer>
     </div>

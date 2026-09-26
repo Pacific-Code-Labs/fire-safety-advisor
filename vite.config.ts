@@ -5,19 +5,20 @@ import path from "path";
 export default defineConfig(() => ({
   base: "/",
   server: {
-    host: "::",
-    port: 8080,
+    host: "127.0.0.1",
+    port: 5173, // landing 5173 · app 5174 · admin 5175 (root reboot-server.sh)
+    strictPort: true,
     hmr: {
       overlay: false,
     },
   },
-  // The admin CMS (incl. its local-CMS write-back middleware) now lives in the
-  // separate `fire-code-admin` app/repo; this public site ships no admin code.
+  // Public marketing site only: the app (fire-code-app) and the admin console
+  // (fire-code-admin) are separate apps; no admin or auth code ships here.
   plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
+    dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
   },
 }));
