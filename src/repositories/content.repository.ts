@@ -17,12 +17,7 @@ import themes from "@/content/themes.json";
 import seo from "@/content/seo.json";
 import media from "@/content/media.json";
 import { cachedPublishedContent, loadPublishedContent } from "@pacific-code-labs/fire-code-design-system";
-
-const env = import.meta.env;
-const PUBLIC_API =
-  env.VITE_PUBLIC_API_URL && env.VITE_PUBLIC_IDENTITY_POOL_ID
-    ? { url: env.VITE_PUBLIC_API_URL, identityPoolId: env.VITE_PUBLIC_IDENTITY_POOL_ID }
-    : null;
+import { PUBLIC_API } from "@/config/publicApi";
 
 // Document keys = file names without .json (the admin manifest and the public API use the same).
 const BUNDLED: Record<string, unknown> = {

@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-09-26T09:24:14.079Z",
+  "generatedAt": "2026-09-26T15:28:57.065Z",
   "counts": {
-    "lib": 17,
-    "component": 5,
+    "lib": 21,
+    "component": 27,
     "content": 14,
-    "context": 2,
-    "page": 3,
+    "context": 3,
+    "page": 4,
     "repository": 3,
-    "service": 2
+    "service": 3
   },
   "nodes": [
     {
@@ -16,6 +16,125 @@
       "type": "lib",
       "group": "lib",
       "path": "src/App.tsx"
+    },
+    {
+      "id": "components/assistant/AssistantAvatar",
+      "label": "AssistantAvatar",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/AssistantAvatar.tsx"
+    },
+    {
+      "id": "components/assistant/AssistantDrawer",
+      "label": "AssistantDrawer",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/AssistantDrawer.tsx"
+    },
+    {
+      "id": "components/assistant/AssistantMessage",
+      "label": "AssistantMessage",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/AssistantMessage.tsx"
+    },
+    {
+      "id": "components/assistant/ChoicePrompt",
+      "label": "ChoicePrompt",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/ChoicePrompt.tsx"
+    },
+    {
+      "id": "components/assistant/DemoLimitCard",
+      "label": "DemoLimitCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/DemoLimitCard.tsx"
+    },
+    {
+      "id": "components/assistant/ElectricalLoadCard",
+      "label": "ElectricalLoadCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/ElectricalLoadCard.tsx"
+    },
+    {
+      "id": "components/assistant/EvaluationCard",
+      "label": "EvaluationCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/EvaluationCard.tsx"
+    },
+    {
+      "id": "components/assistant/NeedsInfoForm",
+      "label": "NeedsInfoForm",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/NeedsInfoForm.tsx"
+    },
+    {
+      "id": "components/assistant/ProjectCard",
+      "label": "ProjectCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/ProjectCard.tsx"
+    },
+    {
+      "id": "components/assistant/TextMessage",
+      "label": "TextMessage",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/TextMessage.tsx"
+    },
+    {
+      "id": "components/assistant/TypingIndicator",
+      "label": "TypingIndicator",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/TypingIndicator.tsx"
+    },
+    {
+      "id": "components/assistant/WelcomeState",
+      "label": "WelcomeState",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/assistant/WelcomeState.tsx"
+    },
+    {
+      "id": "components/BuildingSelector",
+      "label": "BuildingSelector",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/BuildingSelector.tsx"
+    },
+    {
+      "id": "components/CategoryCard",
+      "label": "CategoryCard",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/CategoryCard.tsx"
+    },
+    {
+      "id": "components/ChatPanel",
+      "label": "ChatPanel",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ChatPanel.tsx"
+    },
+    {
+      "id": "components/electrical/electricalNodes",
+      "label": "electricalNodes",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/electrical/electricalNodes.tsx"
+    },
+    {
+      "id": "components/electrical/topologyLayout",
+      "label": "topologyLayout",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/electrical/topologyLayout.ts"
     },
     {
       "id": "components/Header",
@@ -39,6 +158,13 @@
       "path": "src/components/PageTransition.tsx"
     },
     {
+      "id": "components/RuleDetailModal",
+      "label": "RuleDetailModal",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/RuleDetailModal.tsx"
+    },
+    {
       "id": "components/ThemeToggle",
       "label": "ThemeToggle",
       "type": "component",
@@ -51,6 +177,41 @@
       "type": "component",
       "group": "component",
       "path": "src/components/ui/button.tsx"
+    },
+    {
+      "id": "components/ui/dialog",
+      "label": "dialog",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/dialog.tsx"
+    },
+    {
+      "id": "components/ui/input",
+      "label": "input",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/input.tsx"
+    },
+    {
+      "id": "components/ui/label",
+      "label": "label",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/ui/label.tsx"
+    },
+    {
+      "id": "components/UpgradeModal",
+      "label": "UpgradeModal",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/UpgradeModal.tsx"
+    },
+    {
+      "id": "config/publicApi",
+      "label": "publicApi",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/config/publicApi.ts"
     },
     {
       "id": "content/branding",
@@ -137,6 +298,13 @@
       "path": "src/content/themes.json"
     },
     {
+      "id": "contexts/AssistantContext",
+      "label": "AssistantContext",
+      "type": "context",
+      "group": "context",
+      "path": "src/contexts/AssistantContext.tsx"
+    },
+    {
       "id": "contexts/LangContext",
       "label": "LangContext",
       "type": "context",
@@ -158,6 +326,20 @@
       "path": "src/index.css"
     },
     {
+      "id": "lib/assistantCapabilities",
+      "label": "assistantCapabilities",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/assistantCapabilities.ts"
+    },
+    {
+      "id": "lib/assistantResponse",
+      "label": "assistantResponse",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/assistantResponse.ts"
+    },
+    {
       "id": "lib/brand-theme",
       "label": "brand-theme",
       "type": "lib",
@@ -177,6 +359,13 @@
       "type": "lib",
       "group": "lib",
       "path": "src/lib/content-lang.ts"
+    },
+    {
+      "id": "lib/demoScenarios",
+      "label": "demoScenarios",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/demoScenarios.ts"
     },
     {
       "id": "lib/flatten",
@@ -249,6 +438,13 @@
       "path": "src/main.tsx"
     },
     {
+      "id": "pages/Index",
+      "label": "Index",
+      "type": "page",
+      "group": "page",
+      "path": "src/pages/Index.tsx"
+    },
+    {
       "id": "pages/Landing",
       "label": "Landing",
       "type": "page",
@@ -298,6 +494,13 @@
       "path": "src/services/branding.service.ts"
     },
     {
+      "id": "services/fireCodeApi",
+      "label": "fireCodeApi",
+      "type": "service",
+      "group": "service",
+      "path": "src/services/fireCodeApi.ts"
+    },
+    {
       "id": "services/landing.service",
       "label": "landing.service",
       "type": "service",
@@ -341,6 +544,11 @@
     },
     {
       "from": "App",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "App",
       "to": "contexts/LangContext",
       "kind": "imports"
     },
@@ -372,6 +580,326 @@
     {
       "from": "App",
       "to": "pages/Pricing",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/AssistantAvatar",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/AssistantMessage",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/AssistantMessage",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/AssistantMessage",
+      "to": "lib/demoScenarios",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/AssistantMessage",
+      "to": "lib/links",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ChoicePrompt",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/DemoLimitCard",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/DemoLimitCard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/DemoLimitCard",
+      "to": "lib/links",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/DemoLimitCard",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ElectricalLoadCard",
+      "to": "components/electrical/electricalNodes",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ElectricalLoadCard",
+      "to": "components/electrical/topologyLayout",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ElectricalLoadCard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ElectricalLoadCard",
+      "to": "lib/assistantResponse",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/EvaluationCard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/EvaluationCard",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/NeedsInfoForm",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/NeedsInfoForm",
+      "to": "components/ui/input",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/NeedsInfoForm",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/NeedsInfoForm",
+      "to": "lib/assistantResponse",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/NeedsInfoForm",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ProjectCard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/ProjectCard",
+      "to": "lib/assistantResponse",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/TypingIndicator",
+      "to": "components/assistant/AssistantAvatar",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/TypingIndicator",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/WelcomeState",
+      "to": "components/assistant/AssistantAvatar",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/WelcomeState",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/assistant/WelcomeState",
+      "to": "lib/demoScenarios",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "components/ui/input",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "components/ui/label",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/BuildingSelector",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/CategoryCard",
+      "to": "components/RuleDetailModal",
+      "kind": "imports"
+    },
+    {
+      "from": "components/CategoryCard",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/CategoryCard",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/CategoryCard",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/AssistantAvatar",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/AssistantMessage",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/ChoicePrompt",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/DemoLimitCard",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/ElectricalLoadCard",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/EvaluationCard",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/NeedsInfoForm",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/ProjectCard",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/TextMessage",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/TypingIndicator",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/assistant/WelcomeState",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/ui/input",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "components/UpgradeModal",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "lib/assistantCapabilities",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "lib/assistantResponse",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "lib/chrome-i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "lib/demoScenarios",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "lib/links",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ChatPanel",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/electrical/electricalNodes",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/electrical/electricalNodes",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "components/electrical/topologyLayout",
+      "to": "components/electrical/electricalNodes",
+      "kind": "imports"
+    },
+    {
+      "from": "components/electrical/topologyLayout",
+      "to": "services/fireCodeApi",
       "kind": "imports"
     },
     {
@@ -425,6 +953,31 @@
       "kind": "imports"
     },
     {
+      "from": "components/RuleDetailModal",
+      "to": "components/ui/dialog",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RuleDetailModal",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RuleDetailModal",
+      "to": "lib/chrome-i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RuleDetailModal",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/RuleDetailModal",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
       "from": "components/ThemeToggle",
       "to": "components/ui/button",
       "kind": "imports"
@@ -455,6 +1008,51 @@
       "kind": "imports"
     },
     {
+      "from": "components/ui/dialog",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/dialog",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/input",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/ui/label",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "components/UpgradeModal",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/UpgradeModal",
+      "to": "lib/paths",
+      "kind": "imports"
+    },
+    {
+      "from": "components/UpgradeModal",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
+      "from": "contexts/AssistantContext",
+      "to": "components/ChatPanel",
+      "kind": "imports"
+    },
+    {
+      "from": "contexts/AssistantContext",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
       "from": "contexts/LangContext",
       "to": "lib/i18n",
       "kind": "imports"
@@ -462,6 +1060,11 @@
     {
       "from": "contexts/ThemeContext",
       "to": "lib/brand-theme",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/assistantResponse",
+      "to": "services/fireCodeApi",
       "kind": "imports"
     },
     {
@@ -492,6 +1095,16 @@
     {
       "from": "lib/content-lang",
       "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/demoScenarios",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "lib/demoScenarios",
+      "to": "services/fireCodeApi",
       "kind": "imports"
     },
     {
@@ -560,6 +1173,71 @@
       "kind": "imports"
     },
     {
+      "from": "pages/Index",
+      "to": "components/assistant/AssistantDrawer",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/BuildingSelector",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/CategoryCard",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/ChatPanel",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/Header",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "components/ui/button",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "contexts/AssistantContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "lib/chrome-i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "lib/demoScenarios",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "lib/seo",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "lib/utils",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Index",
+      "to": "services/fireCodeApi",
+      "kind": "imports"
+    },
+    {
       "from": "pages/Landing",
       "to": "components/Header",
       "kind": "imports"
@@ -581,7 +1259,7 @@
     },
     {
       "from": "pages/Landing",
-      "to": "lib/links",
+      "to": "lib/paths",
       "kind": "imports"
     },
     {
@@ -647,6 +1325,11 @@
     {
       "from": "repositories/branding.repository",
       "to": "repositories/content.repository",
+      "kind": "imports"
+    },
+    {
+      "from": "repositories/content.repository",
+      "to": "config/publicApi",
       "kind": "imports"
     },
     {
@@ -732,6 +1415,11 @@
     {
       "from": "services/branding.service",
       "to": "repositories/branding.repository",
+      "kind": "imports"
+    },
+    {
+      "from": "services/fireCodeApi",
+      "to": "config/publicApi",
       "kind": "imports"
     },
     {

@@ -24,7 +24,7 @@ const seo = JSON.parse(await fs.readFile(path.join(ROOT, "src/content/seo.json")
 const LANGS = ["es", "en"];
 const DEFAULT_LANG = "es";
 // Keep in sync with the router + seo.json.pages.
-const ROUTES = ["home", "pricing"];
+const ROUTES = ["home", "demo", "pricing"];
 
 const siteUrl = (seo.siteUrl ?? "").replace(/\/$/, "");
 const slugOf = (route) => (route === "home" ? "" : `/${route}`);

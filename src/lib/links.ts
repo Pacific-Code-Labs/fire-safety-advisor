@@ -15,7 +15,6 @@ export const newTab = { target: "_blank", rel: "noopener noreferrer" } as const;
  * the admin's "view on site" links — are forwarded to the same path on the app.
  */
 export const LEGACY_APP_PATHS = [
-  "demo",
   "login",
   "register",
   "verify-email",
