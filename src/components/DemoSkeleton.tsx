@@ -1,4 +1,4 @@
-import { ListSkeleton, Skeleton } from "@pacific-code-labs/fire-code-design-system";
+import { ListSkeleton, Skeleton } from "@pacific-code-labs/sokol-design-system";
 import { Header } from "@/components/Header";
 import { useLang } from "@/contexts/LangContext";
 

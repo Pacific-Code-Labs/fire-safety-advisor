@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/contexts/LangContext";
 import { fmt } from "@/lib/chrome-i18n";
-import { fireCodeApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse, type NeedsInfoQuestion, type ElectricalInputs, type ElectricalOccupancy } from "@/services/fireCodeApi";
+import { sokolApi, BuildingType, DemoLimitError, QuotaError, type ConversationTurn, type DemoLimitResponse, type EvaluateResponse, type NeedsInfoQuestion, type ElectricalInputs, type ElectricalOccupancy } from "@/services/sokolApi";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { appHref, newTab } from "@/lib/links";
 import type { PageContext } from "@/contexts/AssistantContext";
@@ -381,8 +381,8 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
 
     try {
       const result = caps.throttledDemoEndpoint
-        ? await fireCodeApi.evaluateDemo(requestBody)
-        : await fireCodeApi.evaluate(requestBody);
+        ? await sokolApi.evaluateDemo(requestBody)
+        : await sokolApi.evaluate(requestBody);
       const type = handleResponse(result);
       // Guided demo: advance to the next prompt. On needs_info the form drives
       // the resend (which carries demoNext forward), so don't prompt yet.
@@ -472,7 +472,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
     };
     setIsLoading(true);
     try {
-      const result: ElectricalLoadData = await fireCodeApi.evaluateDemoElectrical(inputs);
+      const result: ElectricalLoadData = await sokolApi.evaluateDemoElectrical(inputs);
       const summary =
         lang === "es"
           ? `Estudio eléctrico preliminar: ${result.demandKva} kVA demandados · transformador sugerido ${result.suggestedTransformerKva} kVA.`

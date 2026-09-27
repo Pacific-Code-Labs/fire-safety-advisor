@@ -1,4 +1,4 @@
-import type { PublicApiConfig } from "@pacific-code-labs/fire-code-design-system";
+import type { PublicApiConfig } from "@pacific-code-labs/sokol-design-system";
 
 // The landing's only API: the public gateway (identity-pool guests, SigV4). Published content
 // and the demo routes; no user pool and no app API (pnpm check:bundle).

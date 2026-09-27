@@ -6,7 +6,7 @@
  * opens registration in the app (new tab); the app's own /pricing shows the
  * user's current plan. Pro + Enterprise are marked "Coming soon"
  * (NO checkout, NO PayPal, NO card fields). Bilingual via LangContext; DS
- * primitives (Card/Badge/Button) from `@pacific-code-labs/fire-code-design-system`.
+ * primitives (Card/Badge/Button) from `@pacific-code-labs/sokol-design-system`.
  */
 import {
   Badge,
@@ -17,7 +17,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@pacific-code-labs/fire-code-design-system";
+} from "@pacific-code-labs/sokol-design-system";
 import { Check } from "lucide-react";
 import { Header } from "@/components/Header";
 import { useLang } from "@/contexts/LangContext";

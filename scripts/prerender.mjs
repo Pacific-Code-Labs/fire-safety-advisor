@@ -163,7 +163,7 @@ const rootRedirect = `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="refresh" content="0;url=/${DEFAULT_LANG}" />
     <link rel="canonical" href="${siteUrl}/${DEFAULT_LANG}" />
-    <title>FireCode CR</title>
+    <title>Sóköl</title>
   </head>
   <body>
     <noscript><a href="/${DEFAULT_LANG}">Continue</a></noscript>

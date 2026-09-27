@@ -7,10 +7,10 @@ import { CategoryCard } from "@/components/CategoryCard";
 import { ChatPanel } from "@/components/ChatPanel";
 import { AssistantDrawer } from "@/components/assistant/AssistantDrawer";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@pacific-code-labs/fire-code-design-system";
+import { Skeleton } from "@pacific-code-labs/sokol-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { useAssistant } from "@/contexts/AssistantContext";
-import { fireCodeApi, BuildingType, RuleCategory } from "@/services/fireCodeApi";
+import { sokolApi, BuildingType, RuleCategory } from "@/services/sokolApi";
 import { type Msg } from "@/components/ChatPanel";
 import { type DemoScenarioParams } from "@/lib/demoScenarios";
 import { cn } from "@/lib/utils";
@@ -82,7 +82,7 @@ const Index = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["rules", filters, page, selectedCategory, lang],
     queryFn: () =>
-      fireCodeApi.getRules({
+      sokolApi.getRules({
         building_type:    building   || undefined,
         area_m2:          area       || undefined,
         usage:            context    || undefined,

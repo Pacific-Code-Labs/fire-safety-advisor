@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 // FCR-003: the shared design-system's token defaults. Imported BEFORE index.css so this
 // site's index.css (the live light/dark values of the same token names) wins the cascade.
-import "@pacific-code-labs/fire-code-design-system/styles";
+import "@pacific-code-labs/sokol-design-system/styles";
 import "./index.css";
 // FCR-080: apply the active DXP brand theme (themes.json → DS theme engine) + favicon.
 import { initBrand } from "./lib/brand-theme";

@@ -12,8 +12,8 @@ export default defineConfig(() => ({
       overlay: false,
     },
   },
-  // Public marketing site only: the app (fire-code-app) and the admin console
-  // (fire-code-admin) are separate apps; no admin or auth code ships here.
+  // Public marketing site only: the app (sokol-app) and the admin console
+  // (sokol-admin) are separate apps; no admin or auth code ships here.
   plugins: [react()],
   resolve: {
     alias: {

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster as Sonner, TooltipProvider } from "@pacific-code-labs/fire-code-design-system";
+import { Toaster as Sonner, TooltipProvider } from "@pacific-code-labs/sokol-design-system";
 import Landing from "./pages/Landing.tsx";
 import Pricing from "./pages/Pricing.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -13,9 +13,9 @@ import { DemoSkeleton } from "@/components/DemoSkeleton";
 import { DEFAULT_LANG, isLang, localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
 import { appHref, LEGACY_APP_PATHS } from "@/lib/links";
 
-// fire-safety-advisor: the public marketing landing at fire-code.jcampos.dev. Static and
-// content-driven: no auth, no app API. The public /demo calls the public gateway (guest SigV4). The signed-in app is fire-code-app
-// (app.fire-code.jcampos.dev) and the admin console is the private fire-code-admin.
+// sokol: the public marketing landing at fire-code.jcampos.dev. Static and
+// content-driven: no auth, no app API. The public /demo calls the public gateway (guest SigV4). The signed-in app is sokol-app
+// (app.fire-code.jcampos.dev) and the admin console is the private sokol-admin.
 
 /** Old single-site URLs (/<lang>/login, /<lang>/dashboard, …) now live in the app. */
 function AppRedirect() {

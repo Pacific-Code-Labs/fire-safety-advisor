@@ -1,5 +1,5 @@
 // The signed-in app lives on its own domain; the landing only links to it, in a new tab.
-// URL from SSM /fire-code/<env>/web/site/app-url (VITE_APP_URL), prod domain by default.
+// URL from SSM /sokol/<env>/web/site/app-url (VITE_APP_URL), prod domain by default.
 import type { Lang } from "@/lib/i18n";
 
 export const APP_URL = (import.meta.env.VITE_APP_URL || "https://app.fire-code.jcampos.dev").replace(/\/+$/, "");

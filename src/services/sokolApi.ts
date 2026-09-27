@@ -1,16 +1,16 @@
 /**
- * FireCode CR — public demo API (landing).
+ * Sóköl — public demo API (landing).
  *
  * The landing has no sign-in and no app API: the demo calls the api-be routes that the PUBLIC
- * gateway (public-api.fire-code.jcampos.dev) exposes to identity-pool guests — GET /rules,
+ * gateway (public-api.sokol.jcampos.dev) exposes to identity-pool guests — GET /rules,
  * GET /rules/{id}, POST /demo/evaluate, POST /demo/electrical — SigV4-signed by the design
  * system. api-be caps demo evaluations per visitor.
  *
  * Usage:
- *   const groups = await fireCodeApi.getRules({ building_type: "comercial" });
+ *   const groups = await sokolApi.getRules({ building_type: "comercial" });
  */
 
-import { signedPublicRequest } from "@pacific-code-labs/fire-code-design-system";
+import { signedPublicRequest } from "@pacific-code-labs/sokol-design-system";
 import { PUBLIC_API } from "@/config/publicApi";
 
 // ── DTOs matching the backend contract ───────────────────────────────────────
@@ -139,7 +139,7 @@ export interface DemoLimitResponse {
   ctaHref: string;
 }
 
-/** Thrown by fireCodeApi.evaluateDemo on HTTP 429 (demo daily cap reached). */
+/** Thrown by sokolApi.evaluateDemo on HTTP 429 (demo daily cap reached). */
 export class DemoLimitError extends Error {
   readonly payload: DemoLimitResponse;
   constructor(payload: DemoLimitResponse) {
@@ -187,7 +187,7 @@ export class QuotaError extends Error {
   }
 }
 
-// ── Project DTOs (mirror fire-code-be src/dtos/project_dto.py) ────────────────
+// ── Project DTOs (mirror sokol-api src/dtos/project_dto.py) ────────────────
 
 /** Backend stores building_type as a lowercase string enum. */
 export type ProjectBuildingType = "residencial" | "comercial" | "industrial";
@@ -470,7 +470,7 @@ function asDemoLimit(obj: unknown): DemoLimitResponse | null {
   return null;
 }
 
-export const fireCodeApi = {
+export const sokolApi = {
   /**
    * GET /rules — returns rules grouped by fire protection category.
    * All params are optional; omitting them returns all groups.
@@ -494,7 +494,7 @@ export const fireCodeApi = {
 
   /** The landing only has the public demo: every evaluation is a demo evaluation. */
   evaluate(request: EvaluateRequest): Promise<EvaluateResponse> {
-    return fireCodeApi.evaluateDemo(request);
+    return sokolApi.evaluateDemo(request);
   },
 
   /**

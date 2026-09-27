@@ -11,8 +11,8 @@ const FORBIDDEN = [
   /userPoolId|userPoolClientId|user_pool/i,
   /us-east-1_[A-Za-z0-9]{9}/, // user pool id
   /aws-amplify|amplify-/i,
-  // The app API (not public-api.fire-code.jcampos.dev, which the landing is meant to call).
-  /(?<![\w-])(fire-api\.jcampos\.dev|api\.fire-code\.jcampos\.dev)/,
+  // The app API (not public-api.sokol.jcampos.dev, which the landing is meant to call).
+  /(?<![\w-])(fire-api\.jcampos\.dev|api\.sokol\.jcampos\.dev)/,
   /paypal/i,
 ];
 const hits = [];

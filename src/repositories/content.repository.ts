@@ -1,5 +1,5 @@
 // The ONLY importer of the landing's content JSON (landing-dxp-builder §4). Editors change the
-// documents online in the admin console (fire-code-admin → public API, site "landing"); the
+// documents online in the admin console (sokol-admin → public API, site "landing"); the
 // bundled files are the fallback so the site never depends on the API to render.
 //
 // initContent() uses the last published copy this browser saw (sync, before first paint);
@@ -16,7 +16,7 @@ import branding from "@/content/branding.json";
 import themes from "@/content/themes.json";
 import seo from "@/content/seo.json";
 import media from "@/content/media.json";
-import { cachedPublishedContent, loadPublishedContent } from "@pacific-code-labs/fire-code-design-system";
+import { cachedPublishedContent, loadPublishedContent } from "@pacific-code-labs/sokol-design-system";
 import { PUBLIC_API } from "@/config/publicApi";
 
 // Document keys = file names without .json (the admin manifest and the public API use the same).

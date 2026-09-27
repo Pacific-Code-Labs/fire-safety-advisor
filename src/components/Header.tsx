@@ -2,7 +2,7 @@ import { Languages, Home, LogIn, Menu } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BrandLogo, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@pacific-code-labs/fire-code-design-system";
+import { BrandLogo, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@pacific-code-labs/sokol-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { tChrome } from "@/lib/chrome-i18n";

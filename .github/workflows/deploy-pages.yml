@@ -37,14 +37,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Read-only role from fire-code-infrastructure web/web-params.yml (trusts this repo).
+      # Read-only role from sokol-infrastructure web/web-params.yml (trusts this repo).
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_WEB_BUILD_ROLE_ARN }}
           aws-region: us-east-1
 
       # Only site/app-url + public-api/* — the landing never sees auth or app API config.
-      - name: Load web config from SSM (/fire-code/dev/web)
+      - name: Load web config from SSM (/sokol/dev/web)
         run: bash scripts/load-env-from-ssm.sh dev - --github-env
 
       # Published documents overwrite src/content/*.json (never fails the build).

@@ -494,11 +494,11 @@
       "path": "src/services/branding.service.ts"
     },
     {
-      "id": "services/fireCodeApi",
-      "label": "fireCodeApi",
+      "id": "services/sokolApi",
+      "label": "sokolApi",
       "type": "service",
       "group": "service",
-      "path": "src/services/fireCodeApi.ts"
+      "path": "src/services/sokolApi.ts"
     },
     {
       "id": "services/landing.service",
@@ -629,7 +629,7 @@
     },
     {
       "from": "components/assistant/DemoLimitCard",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -659,7 +659,7 @@
     },
     {
       "from": "components/assistant/EvaluationCard",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -744,7 +744,7 @@
     },
     {
       "from": "components/BuildingSelector",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -764,7 +764,7 @@
     },
     {
       "from": "components/CategoryCard",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -879,7 +879,7 @@
     },
     {
       "from": "components/ChatPanel",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -889,7 +889,7 @@
     },
     {
       "from": "components/electrical/electricalNodes",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -899,7 +899,7 @@
     },
     {
       "from": "components/electrical/topologyLayout",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -974,7 +974,7 @@
     },
     {
       "from": "components/RuleDetailModal",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -1039,7 +1039,7 @@
     },
     {
       "from": "components/UpgradeModal",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -1049,7 +1049,7 @@
     },
     {
       "from": "contexts/AssistantContext",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -1064,7 +1064,7 @@
     },
     {
       "from": "lib/assistantResponse",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -1104,7 +1104,7 @@
     },
     {
       "from": "lib/demoScenarios",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -1234,7 +1234,7 @@
     },
     {
       "from": "pages/Index",
-      "to": "services/fireCodeApi",
+      "to": "services/sokolApi",
       "kind": "imports"
     },
     {
@@ -1418,7 +1418,7 @@
       "kind": "imports"
     },
     {
-      "from": "services/fireCodeApi",
+      "from": "services/sokolApi",
       "to": "config/publicApi",
       "kind": "imports"
     },
