@@ -2,7 +2,7 @@
 
 // The landing's ONLY build values (SSM /sokol/<env>/web/*): no user pool, no app API.
 interface ImportMetaEnv {
-  /** The signed-in app (app.fire-code.jcampos.dev); SSM site/app-url. */
+  /** The signed-in app (app.sokol.jcampos.dev); SSM site/app-url. */
   readonly VITE_APP_URL?: string;
   /** Anonymous published-content API (public-api.sokol.jcampos.dev); SSM public-api/url. */
   readonly VITE_PUBLIC_API_URL?: string;

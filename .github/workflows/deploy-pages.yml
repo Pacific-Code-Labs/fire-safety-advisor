@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages (fire-code.jcampos.dev)
+name: Deploy to GitHub Pages (sokol.jcampos.dev)
 
 # The public landing. Content edited online in the admin console is pulled from the public
 # content API before the SEO prerender, so the static pages match the live site; a daily

@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://fire-code.jcampos.dev/sitemap.xml
+Sitemap: https://sokol.jcampos.dev/sitemap.xml

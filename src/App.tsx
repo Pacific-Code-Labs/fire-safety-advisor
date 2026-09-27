@@ -13,9 +13,9 @@ import { DemoSkeleton } from "@/components/DemoSkeleton";
 import { DEFAULT_LANG, isLang, localizedPath, persistedLang, stripLangPrefix } from "@/lib/paths";
 import { appHref, LEGACY_APP_PATHS } from "@/lib/links";
 
-// sokol: the public marketing landing at fire-code.jcampos.dev. Static and
+// sokol: the public marketing landing at sokol.jcampos.dev. Static and
 // content-driven: no auth, no app API. The public /demo calls the public gateway (guest SigV4). The signed-in app is sokol-app
-// (app.fire-code.jcampos.dev) and the admin console is the private sokol-admin.
+// (app.sokol.jcampos.dev) and the admin console is the private sokol-admin.
 
 /** Old single-site URLs (/<lang>/login, /<lang>/dashboard, …) now live in the app. */
 function AppRedirect() {

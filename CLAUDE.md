@@ -8,14 +8,14 @@ The workspace contract (repos, domains, SSM keys, deploy order) is in the root
 
 ## 1. Purpose
 
-The **public marketing landing** of Sóköl at **`https://fire-code.jcampos.dev`**: a static,
+The **public marketing landing** of Sóköl at **`https://sokol.jcampos.dev`**: a static,
 content-driven SPA (landing-dxp-builder RETROFIT) with an SEO prerender, plus the **public demo**.
 It has **no auth, no app API and no admin code**.
 
 | Site | Repo | Host |
 |---|---|---|
-| **this landing** | `sokol` (public) | `fire-code.jcampos.dev` |
-| signed-in app | `sokol-app` (public) | `app.fire-code.jcampos.dev` |
+| **this landing** | `sokol` (public) | `sokol.jcampos.dev` |
+| signed-in app | `sokol-app` (public) | `app.sokol.jcampos.dev` |
 | admin console + online CMS | `sokol-admin` (private) | `admin.sokol.jcampos.dev` |
 
 Pages: `/:lang` (Landing: hero, problems, solutions, features, how-it-works, CTA, footer),
@@ -97,4 +97,4 @@ and `app.{common,demo,electrical}` (Pricing and demo strings, read as `tr.<key>`
 assume `secrets.AWS_WEB_BUILD_ROLE_ARN` (read-only OIDC role from `sokol-infrastructure`
 `web/web-params.yml`) → `scripts/load-env-from-ssm.sh dev - --github-env` (only `site/app-url`,
 `public-api/{url,identity-pool-id}`) → `pnpm content:pull` → `pnpm build` → GitHub Pages
-(`public/CNAME` = `fire-code.jcampos.dev`).
+(`public/CNAME` = `sokol.jcampos.dev`).

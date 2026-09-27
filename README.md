@@ -1,9 +1,9 @@
 # sokol — Sóköl landing
 
-The public marketing site at **https://fire-code.jcampos.dev**: NFPA fire-protection guidance for
+The public marketing site at **https://sokol.jcampos.dev**: NFPA fire-protection guidance for
 Costa Rica. Static, content-driven, bilingual (es/en), SEO-prerendered.
 
-- Sign in, the demo and the product live in the app: **https://app.fire-code.jcampos.dev**
+- Sign in, the demo and the product live in the app: **https://app.sokol.jcampos.dev**
   (`sokol-app`), opened in a new tab.
 - Content is edited online in the private admin console (`sokol-admin`) and shows up here
   within a minute; the bundled `src/content/*.json` is the fallback.
