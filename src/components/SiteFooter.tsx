@@ -15,7 +15,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-border bg-background no-print">
-      <div className="container py-10 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="container py-5 md:py-6 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4">
         <div className="text-sm text-muted-foreground">
           © {new Date().getFullYear()} {brand.companyName} {brand.companySuffix}. {footer.rights}
         </div>
