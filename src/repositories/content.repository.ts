@@ -1,10 +1,9 @@
 // The ONLY importer of the landing's content JSON (landing-dxp-builder §4). Editors change the
 // documents online in the admin console (sokol-admin → public API, site "landing"); the
-// bundled files are the fallback so the site never depends on the API to render.
+// bundled files are the fallback if the API is unavailable.
 //
-// initContent() uses the last published copy this browser saw (sync, before first paint);
-// refreshContent() fetches fresh documents in the background and reports whether they differ
-// from what is on screen (main.tsx then re-renders).
+// initContent() loads the last published copy this browser saw; refreshContent() fetches current
+// documents before main.tsx renders the site.
 import hero from "@/content/hero.json";
 import problems from "@/content/problems.json";
 import solutions from "@/content/solutions.json";
@@ -19,21 +18,6 @@ import media from "@/content/media.json";
 import { cachedPublishedContent, loadPublishedContent } from "@pacific-code-labs/sokol-design-system";
 import { PUBLIC_API } from "@/config/publicApi";
 
-// Document keys = file names without .json (the admin manifest and the public API use the same).
-const BUNDLED: Record<string, unknown> = {
-  hero,
-  problems,
-  solutions,
-  features,
-  "how-it-works": howItWorks,
-  cta,
-  footer,
-  branding,
-  themes,
-  seo,
-  media,
-};
-
 let published: Record<string, unknown> = {};
 const doc = <T>(key: string, bundled: T): T => (published[key] as T | undefined) ?? bundled;
 
@@ -41,14 +25,9 @@ export function initContent(): void {
   published = cachedPublishedContent("landing") ?? {};
 }
 
-export async function refreshContent(): Promise<boolean> {
+export async function refreshContent(): Promise<void> {
   const fresh = await loadPublishedContent(PUBLIC_API, "landing");
-  if (!fresh) return false;
-  const changed = Object.entries(fresh).some(
-    ([key, value]) => JSON.stringify(value) !== JSON.stringify(published[key] ?? BUNDLED[key]),
-  );
-  published = fresh;
-  return changed;
+  if (fresh) published = fresh;
 }
 
 export type HeroContent = typeof hero;

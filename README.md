@@ -5,8 +5,9 @@ Costa Rica. Static, content-driven, bilingual (es/en), SEO-prerendered.
 
 - Sign in, the demo and the product live in the app: **https://app.sokol.jcampos.dev**
   (`sokol-app`), opened in a new tab.
-- Content is edited online in the private admin console (`sokol-admin`) and shows up here
-  within a minute; the bundled `src/content/*.json` is the fallback.
+- Content is edited online in the private admin console (`sokol-admin`). Each page load fetches
+  published documents from the public API before rendering; cached or bundled content is the
+  fallback when the API is unavailable.
 
 ```bash
 pnpm install
