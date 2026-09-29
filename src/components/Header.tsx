@@ -109,6 +109,16 @@ export function Header({ chatButton }: HeaderProps) {
 
         <div className="flex items-center gap-2">
           {chatButton}
+          {/* Tablet: the nav is in the menu, so keep the demo one tap away. */}
+          {!rest.startsWith("/demo") && (
+            <Link
+              to={localizedPath(lang, "/demo")}
+              className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex lg:hidden")}
+            >
+              <Sparkles className="h-4 w-4" />
+              {chrome.nav.demo}
+            </Link>
+          )}
           {/* The app is a separate site: sign-in opens it in a new tab. */}
           <a href={appHref(lang, "/login")} {...newTab} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}>
             <LogIn className="h-4 w-4" />
