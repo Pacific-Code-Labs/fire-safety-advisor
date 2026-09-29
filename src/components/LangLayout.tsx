@@ -36,10 +36,13 @@ export function LangLayout() {
 
   return (
     <HeaderSlotContext.Provider value={actionsSlot}>
-      <Header actionsRef={setActionsSlot} />
-      <PageTransition>
-        <Outlet />
-      </PageTransition>
+      {/* Grows with the page (#root is one viewport tall), so the sticky header sticks all the way down. */}
+      <div className="min-h-[100dvh]">
+        <Header actionsRef={setActionsSlot} />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
+      </div>
     </HeaderSlotContext.Provider>
   );
 }
