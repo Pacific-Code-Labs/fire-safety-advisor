@@ -1,7 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Header } from "@/components/Header";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useLang } from "@/contexts/LangContext";
 import { Link, useLocation } from "react-router-dom";
@@ -68,9 +67,7 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background text-foreground">
-      <Header />
-
+    <div className="min-h-[calc(100dvh-4rem)] bg-background text-foreground">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border">
         <div

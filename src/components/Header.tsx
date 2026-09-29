@@ -12,8 +12,8 @@ import { localizedPath, runLangSwitch, stripLangPrefix } from "@/lib/paths";
 import { appHref, newTab } from "@/lib/links";
 
 interface HeaderProps {
-  /** Page-specific action (e.g. the demo page's assistant toggle). */
-  chatButton?: React.ReactNode;
+  /** Receives the element pages portal their own actions into (see HeaderSlot). */
+  actionsRef?: (el: HTMLElement | null) => void;
 }
 
 interface NavItem {
@@ -33,7 +33,7 @@ const NAV: NavItem[] = [
   { key: "demo", Icon: Sparkles, path: "/demo", cta: true },
 ];
 
-export function Header({ chatButton }: HeaderProps) {
+export function Header({ actionsRef }: HeaderProps) {
   const { lang } = useLang();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -116,7 +116,7 @@ export function Header({ chatButton }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {chatButton}
+          <div ref={actionsRef} className="contents" />
           {/* Tablet: the nav is in the menu, so keep the demo one tap away. */}
           {!rest.startsWith("/demo") && (
             <Link

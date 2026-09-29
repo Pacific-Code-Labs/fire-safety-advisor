@@ -1,13 +1,11 @@
 import { ListSkeleton, Skeleton } from "@pacific-code-labs/sokol-design-system";
-import { Header } from "@/components/Header";
 import { useLang } from "@/contexts/LangContext";
 
 /** Shown while the demo chunk loads: the demo's own shape (title, filters, rules, assistant). */
 export function DemoSkeleton() {
   const { tr } = useLang();
   return (
-    <div className="flex min-h-[100dvh] flex-col">
-      <Header />
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col">
       <main aria-busy="true" className="container flex-1 px-4 py-4">
         <span className="sr-only">{tr.loading}</span>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start">

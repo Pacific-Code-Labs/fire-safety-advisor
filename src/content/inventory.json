@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-29T04:32:14.282Z",
+  "generatedAt": "2026-09-29T04:34:39.831Z",
   "counts": {
-    "lib": 21,
-    "component": 29,
+    "lib": 22,
+    "component": 30,
     "content": 14,
     "context": 3,
     "page": 4,
@@ -149,6 +149,13 @@
       "type": "component",
       "group": "component",
       "path": "src/components/Header.tsx"
+    },
+    {
+      "id": "components/HeaderSlot",
+      "label": "HeaderSlot",
+      "type": "component",
+      "group": "component",
+      "path": "src/components/HeaderSlot.tsx"
     },
     {
       "id": "components/LangLayout",
@@ -387,6 +394,13 @@
       "type": "lib",
       "group": "lib",
       "path": "src/lib/flatten.ts"
+    },
+    {
+      "id": "lib/header-slot",
+      "label": "header-slot",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/lib/header-slot.ts"
     },
     {
       "id": "lib/i18n",
@@ -903,11 +917,6 @@
     },
     {
       "from": "components/DemoSkeleton",
-      "to": "components/Header",
-      "kind": "imports"
-    },
-    {
-      "from": "components/DemoSkeleton",
       "to": "contexts/LangContext",
       "kind": "imports"
     },
@@ -967,6 +976,16 @@
       "kind": "imports"
     },
     {
+      "from": "components/HeaderSlot",
+      "to": "lib/header-slot",
+      "kind": "imports"
+    },
+    {
+      "from": "components/LangLayout",
+      "to": "components/Header",
+      "kind": "imports"
+    },
+    {
       "from": "components/LangLayout",
       "to": "components/PageTransition",
       "kind": "imports"
@@ -974,6 +993,11 @@
     {
       "from": "components/LangLayout",
       "to": "contexts/LangContext",
+      "kind": "imports"
+    },
+    {
+      "from": "components/LangLayout",
+      "to": "lib/header-slot",
       "kind": "imports"
     },
     {
@@ -1248,7 +1272,7 @@
     },
     {
       "from": "pages/Index",
-      "to": "components/Header",
+      "to": "components/HeaderSlot",
       "kind": "imports"
     },
     {
@@ -1294,11 +1318,6 @@
     {
       "from": "pages/Index",
       "to": "services/sokolApi",
-      "kind": "imports"
-    },
-    {
-      "from": "pages/Landing",
-      "to": "components/Header",
       "kind": "imports"
     },
     {
@@ -1349,11 +1368,6 @@
     {
       "from": "pages/NotFound",
       "to": "lib/seo",
-      "kind": "imports"
-    },
-    {
-      "from": "pages/Pricing",
-      "to": "components/Header",
       "kind": "imports"
     },
     {

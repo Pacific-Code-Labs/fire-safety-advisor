@@ -19,7 +19,6 @@ import {
   CardTitle,
 } from "@pacific-code-labs/sokol-design-system";
 import { Check } from "lucide-react";
-import { Header } from "@/components/Header";
 import { useLang } from "@/contexts/LangContext";
 import { PLAN_ORDER, PLANS, type PlanConfig, type PlanTier } from "@/lib/plans";
 import type { Dict } from "@/lib/i18n";
@@ -60,8 +59,7 @@ export default function Pricing() {
   const { lang, tr } = useLang();
 
   return (
-    <div className="min-h-[100dvh] bg-background">
-      <Header />
+    <div className="min-h-[calc(100dvh-4rem)] bg-background">
       <main className="container py-12">
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-3xl font-bold tracking-tight">{tr.pricing_title}</h1>
