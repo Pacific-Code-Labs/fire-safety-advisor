@@ -2,6 +2,10 @@
   "nav": {
     "home": "Inicio",
     "demo": "Demo",
+    "features": "Funciones",
+    "how": "Cómo funciona",
+    "pricing": "Precios",
+    "main": "Navegación principal",
     "signIn": "Ingresar",
     "langCode": "ES",
     "langSwitchTo": "EN",

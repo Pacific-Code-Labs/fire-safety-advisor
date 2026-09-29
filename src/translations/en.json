@@ -2,6 +2,10 @@
   "nav": {
     "home": "Home",
     "demo": "Demo",
+    "features": "Features",
+    "how": "How it works",
+    "pricing": "Pricing",
+    "main": "Main navigation",
     "signIn": "Sign in",
     "langCode": "EN",
     "langSwitchTo": "ES",

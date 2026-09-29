@@ -60,7 +60,7 @@ type NavigateFn = (to: string) => void;
 
 /**
  * Animated language switch. Adds the ".lang-anim-out" class to the document
- * body, navigates to `target` after the exit beat (~220ms), then swaps in
+ * body, navigates to `target` after the exit beat (~300ms), then swaps in
  * ".lang-anim-in" so the new page fades in. Honors prefers-reduced-motion by
  * navigating immediately with no animation.
  *
@@ -86,6 +86,6 @@ export function runLangSwitch(navigate: NavigateFn, target: string): void {
     navigate(target);
     root.classList.remove("lang-anim-out");
     root.classList.add("lang-anim-in");
-    window.setTimeout(() => root.classList.remove("lang-anim-in"), 360);
-  }, 220);
+    window.setTimeout(() => root.classList.remove("lang-anim-in"), 480);
+  }, 300);
 }

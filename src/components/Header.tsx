@@ -1,24 +1,42 @@
-import { Languages, Home, LogIn, Menu } from "lucide-react";
+import { ArrowRight, Languages, Home, LogIn, Menu, LayoutGrid, ListOrdered, Tag, Sparkles } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { BrandLogo, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@pacific-code-labs/sokol-design-system";
+import { BrandLogo, Button, buttonVariants, Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@pacific-code-labs/sokol-design-system";
 import { useLang } from "@/contexts/LangContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { tChrome } from "@/lib/chrome-i18n";
+import { cn } from "@/lib/utils";
 import { getBrandingVM } from "@/services/branding.service";
 import { localizedPath, runLangSwitch, stripLangPrefix } from "@/lib/paths";
 import { appHref, newTab } from "@/lib/links";
 
 interface HeaderProps {
+  /** Replaces the Demo call-to-action (e.g. the demo page's assistant toggle). */
   chatButton?: React.ReactNode;
 }
+
+interface NavItem {
+  key: "features" | "how" | "pricing";
+  Icon: LucideIcon;
+  /** Home section id (scrolls there) or a page path. */
+  section?: string;
+  path?: string;
+}
+
+const NAV: NavItem[] = [
+  { key: "features", Icon: LayoutGrid, section: "features" },
+  { key: "how", Icon: ListOrdered, section: "how" },
+  { key: "pricing", Icon: Tag, path: "/pricing" },
+];
 
 export function Header({ chatButton }: HeaderProps) {
   const { lang } = useLang();
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const onHome = stripLangPrefix(pathname).rest === "/";
+  const { rest } = stripLangPrefix(pathname);
+  const onHome = rest === "/";
+  const onDemo = rest.startsWith("/demo");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const chrome = tChrome(lang);
@@ -30,59 +48,84 @@ export function Header({ chatButton }: HeaderProps) {
   // Language toggle navigates to the same page under the other lang prefix
   // (wrapped in the lang animation). LangLayout's effect then syncs the context.
   const switchLang = () => {
-    const { rest } = stripLangPrefix(pathname);
     runLangSwitch(navigate, localizedPath(nextLang, rest));
   };
 
+  const hrefFor = (item: NavItem) =>
+    item.section ? `${localizedPath(lang, "/")}#${item.section}` : localizedPath(lang, item.path);
+  const isActive = (item: NavItem) => !!item.path && rest.startsWith(item.path);
+
+  // On the home page a section link just scrolls; elsewhere the Landing page scrolls to the hash on load.
+  const onNavClick = (item: NavItem) => (e: React.MouseEvent) => {
+    closeMobile();
+    if (item.section && onHome) {
+      e.preventDefault();
+      document.getElementById(item.section)?.scrollIntoView({ behavior: "smooth" });
+      window.history.replaceState(null, "", `#${item.section}`);
+    }
+  };
+
+  const demoCta = !onDemo && (
+    <Link to={localizedPath(lang, "/demo")} className={buttonVariants({ size: "sm" })}>
+      {chrome.nav.demo} <ArrowRight className="h-4 w-4" />
+    </Link>
+  );
+
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 no-print">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to={localizedPath(lang, "/")} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-          {/* Uploaded wordmark (light/dark) when there is one; else mark/icon + name + tagline. */}
-          {brand.logoUrl ? (
-            <BrandLogo name={brand.companyName} logoUrl={brand.logoUrl} logoUrlDark={brand.logoUrlDark} imgClassName="h-9" />
-          ) : (
-            <>
-              <BrandLogo name={brand.companyName} markUrl={brand.markUrl} Icon={brand.LogoIcon} variant="mark" className="h-10 w-10 glow-red" />
-              <div className="leading-tight">
-                <div className="text-lg font-bold tracking-tight">{brand.companyName} <span className="text-primary">{brand.companySuffix}</span></div>
-                <div className="text-xs text-muted-foreground hidden sm:block">{brand.tagline}</div>
-              </div>
-            </>
-          )}
-        </Link>
-        <div className="flex items-center gap-2">
-          {!onHome && (
-            <Button asChild variant="ghost" size="sm" className="gap-2 hidden sm:inline-flex">
-              <Link to={localizedPath(lang, "/")}>
-                <Home className="h-4 w-4" />
-                {chrome.nav.home}
+      <div className="container flex h-16 items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-8">
+          <Link to={localizedPath(lang, "/")} className="flex shrink-0 items-center gap-3 hover:opacity-90 transition-opacity">
+            {/* Uploaded wordmark (light/dark) when there is one; else mark/icon + name + tagline. */}
+            {brand.logoUrl ? (
+              <BrandLogo name={brand.companyName} logoUrl={brand.logoUrl} logoUrlDark={brand.logoUrlDark} imgClassName="h-9" />
+            ) : (
+              <>
+                <BrandLogo name={brand.companyName} markUrl={brand.markUrl} Icon={brand.LogoIcon} variant="mark" className="h-10 w-10 glow-red" />
+                <div className="leading-tight">
+                  <div className="text-lg font-bold tracking-tight">{brand.companyName} <span className="text-primary">{brand.companySuffix}</span></div>
+                  <div className="text-xs text-muted-foreground hidden xl:block">{brand.tagline}</div>
+                </div>
+              </>
+            )}
+          </Link>
+
+          <nav aria-label={chrome.nav.main} className="hidden lg:flex items-center gap-1">
+            {NAV.map((item) => (
+              <Link
+                key={item.key}
+                to={hrefFor(item)}
+                onClick={onNavClick(item)}
+                aria-current={isActive(item) ? "page" : undefined}
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  "font-medium text-muted-foreground hover:text-foreground",
+                  isActive(item) && "bg-muted text-foreground",
+                )}
+              >
+                {chrome.nav[item.key]}
               </Link>
-            </Button>
-          )}
-          {chatButton}
+            ))}
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {chatButton ?? <span className="hidden sm:inline-flex">{demoCta}</span>}
           {/* The app is a separate site: sign-in opens it in a new tab. */}
-          <Button asChild variant="ghost" size="sm" className="gap-2 hidden sm:inline-flex">
-            <a href={appHref(lang, "/login")} {...newTab}>
-              <LogIn className="h-4 w-4" />
-              {chrome.nav.signIn}
-            </a>
-          </Button>
+          <a href={appHref(lang, "/login")} {...newTab} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}>
+            <LogIn className="h-4 w-4" />
+            {chrome.nav.signIn}
+          </a>
           <ThemeToggle />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={switchLang}
-            className="gap-2"
-          >
+          <Button variant="outline" size="sm" onClick={switchLang}>
             <Languages className="h-4 w-4" />
             {chrome.nav.langSwitchTo}
           </Button>
 
-          {/* Mobile menu */}
+          {/* Mobile / tablet menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="sm:hidden" aria-label={chrome.nav.openMenu}>
+              <Button variant="outline" size="sm" className="w-8 px-0 lg:hidden" aria-label={chrome.nav.openMenu}>
                 <Menu className="h-4 w-4" />
               </Button>
             </SheetTrigger>
@@ -93,19 +136,31 @@ export function Header({ chatButton }: HeaderProps) {
                   {brand.companyName} <span className="text-primary">{brand.companySuffix}</span>
                 </SheetTitle>
               </SheetHeader>
-              <nav className="mt-6 flex flex-col gap-2">
-                <Button asChild variant="ghost" className="justify-start gap-2" onClick={closeMobile}>
-                  <Link to={localizedPath(lang, "/")}>
-                    <Home className="h-4 w-4" />
-                    {chrome.nav.home}
+              <nav aria-label={chrome.nav.main} className="mt-6 flex flex-col gap-2">
+                <Link to={localizedPath(lang, "/")} onClick={closeMobile} className={cn(buttonVariants({ variant: "ghost" }), "justify-start")}>
+                  <Home className="h-4 w-4" />
+                  {chrome.nav.home}
+                </Link>
+                {NAV.map((item) => (
+                  <Link
+                    key={item.key}
+                    to={hrefFor(item)}
+                    onClick={onNavClick(item)}
+                    aria-current={isActive(item) ? "page" : undefined}
+                    className={cn(buttonVariants({ variant: "ghost" }), "justify-start", isActive(item) && "bg-muted")}
+                  >
+                    <item.Icon className="h-4 w-4" />
+                    {chrome.nav[item.key]}
                   </Link>
-                </Button>
-                <Button asChild variant="ghost" className="justify-start gap-2" onClick={closeMobile}>
-                  <a href={appHref(lang, "/login")} {...newTab}>
-                    <LogIn className="h-4 w-4" />
-                    {chrome.nav.signIn}
-                  </a>
-                </Button>
+                ))}
+                <Link to={localizedPath(lang, "/demo")} onClick={closeMobile} className={cn(buttonVariants({ variant: "ghost" }), "justify-start")}>
+                  <Sparkles className="h-4 w-4" />
+                  {chrome.nav.demo}
+                </Link>
+                <a href={appHref(lang, "/login")} {...newTab} onClick={closeMobile} className={cn(buttonVariants({ variant: "ghost" }), "justify-start")}>
+                  <LogIn className="h-4 w-4" />
+                  {chrome.nav.signIn}
+                </a>
               </nav>
             </SheetContent>
           </Sheet>

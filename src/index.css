@@ -207,15 +207,15 @@
     from { opacity: 0; transform: scale(0.985); filter: blur(4px); }
     to   { opacity: 1; transform: scale(1);     filter: blur(0); }
   }
-  .lang-anim-out { animation: langOut 0.22s ease forwards; }
-  .lang-anim-in  { animation: langIn 0.32s ease forwards; }
+  .lang-anim-out { animation: langOut 0.3s ease forwards; }
+  .lang-anim-in  { animation: langIn 0.45s ease-out forwards; }
 
   /* Page enter — re-applied on each route change by <PageTransition>. */
   @keyframes pageEnter {
-    from { opacity: 0; transform: translateY(4px); }
+    from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  .page-enter { animation: pageEnter 0.28s ease both; }
+  .page-enter { animation: pageEnter 0.5s ease-out both; }
 
   /* FCR-110: demo input flash — when a capability card overwrites the building
      inputs, pulse a primary ring + border so the user notices the change. */

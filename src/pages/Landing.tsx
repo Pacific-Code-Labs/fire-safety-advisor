@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useLang } from "@/contexts/LangContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { localizedPath } from "@/lib/paths";
-import { tChrome } from "@/lib/chrome-i18n";
 import { resolveSeo, useHeadTags } from "@/lib/seo";
 import {
   getHeroVM,
@@ -25,21 +25,18 @@ const Landing = () => {
 
   useHeadTags(resolveSeo("home", lang), lang, "home");
 
-  const chrome = tChrome(lang);
+  // Header section links from other pages land here as /<lang>#<section>.
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
+  }, [hash]);
+
   const hero = getHeroVM(lang);
   const problems = getProblemsVM(lang);
   const solutions = getSolutionsVM(lang);
   const features = getFeaturesVM(lang);
   const how = getHowItWorksVM(lang);
   const cta = getCtaVM(lang);
-
-  const demoButton = (
-    <Button asChild size="sm" className="gap-2">
-      <Link to={demoHref}>
-        {chrome.nav.demo} <ArrowRight className="h-4 w-4" />
-      </Link>
-    </Button>
-  );
 
   const renderCard = (
     { id, Icon, title, description }: CardVM,
@@ -72,7 +69,7 @@ const Landing = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground">
-      <Header chatButton={demoButton} />
+      <Header />
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border">
@@ -83,7 +80,7 @@ const Landing = () => {
               "radial-gradient(800px 400px at 70% -10%, hsl(var(--primary) / 0.18), transparent 60%), radial-gradient(600px 300px at 10% 10%, hsl(var(--primary) / 0.10), transparent 60%)",
           }}
         />
-        <div className="container py-20 md:py-28 lg:py-32">
+        <div className="container pt-10 pb-14 md:pt-14 md:pb-20 lg:pt-16 lg:pb-24">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary mb-6">
               <hero.BadgeIcon className="h-3.5 w-3.5" aria-hidden />
@@ -112,8 +109,8 @@ const Landing = () => {
 
       {/* Problem */}
       <section className="border-b border-border">
-        <div className="container py-20 md:py-24">
-          <div className="max-w-2xl mb-12">
+        <div className="container py-12 md:py-16">
+          <div className="max-w-2xl mb-8 md:mb-10">
             <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{problems.heading.eyebrow}</div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{problems.heading.title}</h2>
           </div>
@@ -125,8 +122,8 @@ const Landing = () => {
 
       {/* Solution */}
       <section className="border-b border-border bg-muted/20">
-        <div className="container py-20 md:py-24">
-          <div className="max-w-2xl mb-12">
+        <div className="container py-12 md:py-16">
+          <div className="max-w-2xl mb-8 md:mb-10">
             <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{solutions.heading.eyebrow}</div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{solutions.heading.title}</h2>
             <p className="mt-4 text-muted-foreground text-lg">{solutions.heading.subtitle}</p>
@@ -138,9 +135,9 @@ const Landing = () => {
       </section>
 
       {/* Features */}
-      <section id="features" className="border-b border-border">
-        <div className="container py-20 md:py-24">
-          <div className="max-w-2xl mb-12">
+      <section id="features" className="scroll-mt-16 border-b border-border">
+        <div className="container py-12 md:py-16">
+          <div className="max-w-2xl mb-8 md:mb-10">
             <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{features.heading.eyebrow}</div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{features.heading.title}</h2>
           </div>
@@ -151,9 +148,9 @@ const Landing = () => {
       </section>
 
       {/* How it works */}
-      <section id="how" className="border-b border-border bg-muted/20">
-        <div className="container py-20 md:py-24">
-          <div className="max-w-2xl mb-12">
+      <section id="how" className="scroll-mt-16 border-b border-border bg-muted/20">
+        <div className="container py-12 md:py-16">
+          <div className="max-w-2xl mb-8 md:mb-10">
             <div className="text-sm font-medium text-primary mb-3 uppercase tracking-wider">{how.heading.eyebrow}</div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{how.heading.title}</h2>
           </div>
@@ -165,8 +162,8 @@ const Landing = () => {
 
       {/* CTA */}
       <section className="border-b border-border">
-        <div className="container py-20 md:py-28">
-          <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card p-10 md:p-16 text-center">
+        <div className="container py-12 md:py-16">
+          <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card p-8 md:p-12 text-center">
             <div
               className="absolute inset-0 -z-10"
               style={{
