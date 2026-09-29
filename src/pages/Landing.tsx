@@ -157,9 +157,9 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="border-b border-border">
-        <div className="container py-12 md:py-16">
+      {/* CTA (the footer's top border closes it) */}
+      <section>
+        <div className="container pt-12 pb-8 md:pt-16 md:pb-10">
           <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card p-8 md:p-12 text-center">
             <div
               className="absolute inset-0 -z-10"

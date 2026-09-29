@@ -37,7 +37,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-border bg-muted/40 no-print">
-      <div className="container py-10">
+      <div className="container pt-8 pb-6">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2">
@@ -71,7 +71,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-border pt-5 text-sm text-muted-foreground sm:flex-row">
           <p>
             © {new Date().getFullYear()} {brand.companyName} {brand.companySuffix}. {footer.rights}
           </p>
