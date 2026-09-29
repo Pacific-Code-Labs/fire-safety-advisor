@@ -1,13 +1,10 @@
 name: Deploy to GitHub Pages (sokol.jcampos.dev)
 
-# The public landing. Content edited online in the admin console is pulled from the public
-# content API before the SEO prerender, so the static pages match the live site; a daily
-# rebuild picks up edits made since the last push.
+# The public landing. Published content is fetched by the browser from the public API when
+# the page loads; the build uses committed content only as a fallback and for static SEO tags.
 on:
   push:
     branches: [main]
-  schedule:
-    - cron: "17 6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -46,10 +43,6 @@ jobs:
       # Only site/app-url + public-api/* — the landing never sees auth or app API config.
       - name: Load web config from SSM (/sokol/dev/web)
         run: bash scripts/load-env-from-ssm.sh dev - --github-env
-
-      # Published documents overwrite src/content/*.json (never fails the build).
-      - name: Pull published content
-        run: pnpm content:pull
 
       # i18n + hard-coded-text checks, typecheck, vite build, SEO prerender, bundle check
       - run: pnpm build

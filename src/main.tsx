@@ -8,15 +8,32 @@ import "./index.css";
 import { initBrand } from "./lib/brand-theme";
 import { initContent, refreshContent } from "./repositories/content.repository";
 
-// Stale-while-revalidate: render at once from the last published copy this browser saw (or the
-// bundled JSON), then fetch the published documents in the background and re-render only when
-// they changed. A cold content API never delays the first paint.
+// Load the published documents from the public API before the first render. The cached copy (or
+// bundled JSON) remains available if the API is unavailable. No CMS content is baked in by CI.
 initContent();
-initBrand();
 const root = createRoot(document.getElementById("root")!);
-root.render(<App />);
-void refreshContent().then((changed) => {
-  if (!changed) return;
+root.render(
+  <main className="container min-h-screen animate-pulse py-8" aria-busy="true">
+    <div className="mb-16 flex items-center justify-between">
+      <div className="h-9 w-28 rounded bg-muted" />
+      <div className="h-9 w-44 rounded bg-muted" />
+    </div>
+    <div className="mx-auto max-w-3xl space-y-5 pt-12">
+      <div className="mx-auto h-12 w-3/4 rounded bg-muted" />
+      <div className="mx-auto h-6 w-full rounded bg-muted" />
+      <div className="mx-auto h-6 w-2/3 rounded bg-muted" />
+    </div>
+  </main>,
+);
+
+async function boot() {
+  try {
+    await refreshContent();
+  } catch {
+    // Keep the cached or bundled content if the public API cannot be reached.
+  }
   initBrand();
-  root.render(<App key="published" />);
-});
+  root.render(<App />);
+}
+
+void boot();

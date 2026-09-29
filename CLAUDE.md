@@ -36,7 +36,8 @@ path on the app** (`App.tsx` `AppRedirect`, list in `lib/links.ts` `LEGACY_APP_P
   `POST /demo/electrical`. The public gateway routes exactly those to the api-be Lambda
   (`sokol-public-be` `DEMO_ROUTES`), which caps demo evaluations per visitor; the guest role
   may invoke only them and `GET /api/public/*`.
-- **The site never depends on the content API to render** (see §4).
+- **Load published content from the public API before the first render** (see §4). The last
+  cached copy, then bundled JSON, is the fallback when the API is unavailable.
 - **No hard-coded user-visible text** (`pnpm check:text`): copy in `src/content/*.json` as
   `{ "es": "…", "en": "…" }`, chrome in `src/translations/{es,en}.json`.
 
@@ -48,7 +49,7 @@ git tag (`github:…#v0.4.0`); `main.tsx` imports its `/styles` before `index.cs
 values win. Local DS work: `pnpm link ../design-system` (drop the `pnpm.overrides` before committing).
 
 `pnpm dev` (127.0.0.1:5173) · `pnpm build` (check:i18n → check:text → tsc → vite build →
-seo:prerender → check:bundle) · `pnpm content:pull` · `pnpm inventory`.
+seo:prerender → check:bundle) · `pnpm inventory`.
 
 ## 4. Content (online CMS with a bundled fallback)
 
@@ -56,13 +57,14 @@ seo:prerender → check:bundle) · `pnpm content:pull` · `pnpm inventory`.
   themes, media, seo` (+ generated `inventory.json`, for the admin's Inventory graph —
   regenerate with `pnpm inventory` when files under `src/` change).
 - **`repositories/content.repository.ts` is the only importer of the JSON.** Getters return the
-  published document when there is one, else the bundled file. `main.tsx`: `initContent()` (last
-  published copy this browser saw, sync) → render → `refreshContent()` in the background
-  (DS `loadPublishedContent`, SigV4 as an identity-pool guest) → re-render only if it changed.
+  published document when there is one, else the bundled file. `main.tsx`: `initContent()` loads
+  the last cached copy → `refreshContent()` requests all published documents through the public
+  API (DS `loadPublishedContent`, SigV4 as an identity-pool guest) → render. When the API is
+  unavailable, the cached copy or bundled JSON is used.
 - Editing happens in the hosted admin (`admin.sokol.jcampos.dev`, site `landing`): a save
   publishes at once and the live site shows it within a minute, no rebuild.
-- CI runs `pnpm content:pull` (`scripts/pull-published-content.mjs`) before the build so the
-  prerendered HTML matches the published content; the workflow also rebuilds daily.
+- CI never downloads published content. The static SEO prerender uses committed fallback copy;
+  the browser updates its head tags from the published SEO document after loading the API.
 - Read chain: repository → `services/*.service.ts` (resolve `{es,en}` via `lib/content-lang.ts`,
   icons via `lib/icons.ts`) → components read plain-string view models. Never branch on language
   in a component.
@@ -96,5 +98,5 @@ and `app.{common,demo,electrical}` (Pricing and demo strings, read as `tr.<key>`
 `.github/workflows/deploy-pages.yml` — push to `main`, daily cron, or manual: pnpm + Node 24 →
 assume `secrets.AWS_WEB_BUILD_ROLE_ARN` (read-only OIDC role from `sokol-infrastructure`
 `web/web-params.yml`) → `scripts/load-env-from-ssm.sh dev - --github-env` (only `site/app-url`,
-`public-api/{url,identity-pool-id}`) → `pnpm content:pull` → `pnpm build` → GitHub Pages
+`public-api/{url,identity-pool-id}`) → `pnpm build` → GitHub Pages
 (`public/CNAME` = `sokol.jcampos.dev`).
