@@ -22,13 +22,15 @@ interface NavItem {
   /** Home section id (scrolls there) or a page path. */
   section?: string;
   path?: string;
+  /** Primary (orange) call-to-action while it is not the current page. */
+  cta?: boolean;
 }
 
 const NAV: NavItem[] = [
   { key: "features", Icon: LayoutGrid, section: "features" },
   { key: "how", Icon: ListOrdered, section: "how" },
   { key: "pricing", Icon: Tag, path: "/pricing" },
-  { key: "demo", Icon: Sparkles, path: "/demo" },
+  { key: "demo", Icon: Sparkles, path: "/demo", cta: true },
 ];
 
 export function Header({ chatButton }: HeaderProps) {
@@ -95,12 +97,18 @@ export function Header({ chatButton }: HeaderProps) {
                 to={hrefFor(item)}
                 onClick={onNavClick(item)}
                 aria-current={isActive(item) ? "page" : undefined}
-                className={cn(
-                  buttonVariants({ variant: "ghost", size: "sm" }),
-                  "font-medium text-muted-foreground hover:text-foreground",
-                  isActive(item) && "bg-muted text-foreground",
-                )}
+                className={
+                  item.cta && !isActive(item)
+                    ? cn(buttonVariants({ size: "sm" }), "ml-2")
+                    : cn(
+                        buttonVariants({ variant: "ghost", size: "sm" }),
+                        "font-medium text-muted-foreground hover:text-foreground",
+                        isActive(item) && "bg-muted text-foreground",
+                        item.cta && "ml-2",
+                      )
+                }
               >
+                {item.cta && <item.Icon className="h-4 w-4" />}
                 {chrome.nav[item.key]}
               </Link>
             ))}
