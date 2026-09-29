@@ -41,6 +41,20 @@
         "en": "Sóköl home-screen icon"
       },
       "createdAt": "2026-09-28T00:00:00Z"
+    },
+    {
+      "id": "media-pacific-code-labs",
+      "kind": "image",
+      "source": "local",
+      "path": "/media/pacific-code-labs.png",
+      "filename": "pacific-code-labs.png",
+      "mime": "image/png",
+      "size": 0,
+      "alt": {
+        "es": "Logo de Pacific Code Labs",
+        "en": "Pacific Code Labs logo"
+      },
+      "createdAt": "2026-09-28T00:00:00Z"
     }
   ]
 }

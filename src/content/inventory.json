@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T04:37:48.744Z",
+  "generatedAt": "2026-09-29T04:55:17.943Z",
   "counts": {
     "lib": 22,
     "component": 30,
@@ -1042,7 +1042,7 @@
     },
     {
       "from": "components/SiteFooter",
-      "to": "lib/chrome-i18n",
+      "to": "lib/links",
       "kind": "imports"
     },
     {
@@ -1372,6 +1372,11 @@
     },
     {
       "from": "pages/Pricing",
+      "to": "components/SiteFooter",
+      "kind": "imports"
+    },
+    {
+      "from": "pages/Pricing",
       "to": "contexts/LangContext",
       "kind": "imports"
     },
@@ -1498,6 +1503,11 @@
     {
       "from": "services/landing.service",
       "to": "lib/icons",
+      "kind": "imports"
+    },
+    {
+      "from": "services/landing.service",
+      "to": "lib/media",
       "kind": "imports"
     },
     {

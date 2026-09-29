@@ -70,6 +70,8 @@ export const getFeatures = (): FeaturesContent => doc("features", features);
 export const getHowItWorks = (): HowItWorksContent => doc("how-it-works", howItWorks);
 export const getCta = (): CtaContent => doc("cta", cta);
 export const getFooter = (): FooterContent => doc("footer", footer);
+/** The bundled footer, for fields a published footer from an older shape lacks. */
+export const getBundledFooter = (): FooterContent => footer;
 export const getBranding = (): BrandingContent => doc("branding", branding);
 export const getThemes = (): ThemesContent => doc("themes", themes);
 export const getSeo = (): SeoContent => doc("seo", seo);

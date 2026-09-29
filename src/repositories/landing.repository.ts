@@ -8,6 +8,7 @@ export {
   getHowItWorks,
   getCta,
   getFooter,
+  getBundledFooter,
   type HeroContent,
   type ProblemsContent,
   type SolutionsContent,

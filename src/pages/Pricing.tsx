@@ -20,6 +20,7 @@ import {
 } from "@pacific-code-labs/sokol-design-system";
 import { Check } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
+import { SiteFooter } from "@/components/SiteFooter";
 import { PLAN_ORDER, PLANS, type PlanConfig, type PlanTier } from "@/lib/plans";
 import type { Dict } from "@/lib/i18n";
 import { appHref, newTab } from "@/lib/links";
@@ -59,8 +60,8 @@ export default function Pricing() {
   const { lang, tr } = useLang();
 
   return (
-    <div className="min-h-[calc(100dvh-4rem)] bg-background">
-      <main className="container py-12">
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col bg-background">
+      <main className="container flex-1 py-12">
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-3xl font-bold tracking-tight">{tr.pricing_title}</h1>
           <p className="mt-2 text-muted-foreground">{tr.pricing_subtitle}</p>
@@ -112,6 +113,7 @@ export default function Pricing() {
         </div>
 
       </main>
+      <SiteFooter />
     </div>
   );
 }

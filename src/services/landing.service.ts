@@ -10,7 +10,9 @@ import {
   getHowItWorks,
   getCta,
   getFooter,
+  getBundledFooter,
 } from "@/repositories/landing.repository";
+import { resolveAssetUrl } from "@/lib/media";
 
 /**
  * Landing services (landing-dxp-builder §4). Each resolves the active language
@@ -49,8 +51,11 @@ export interface CtaVM {
 }
 
 export interface FooterVM {
+  description: string;
+  groups: { product: string; account: string };
+  links: { features: string; how: string; pricing: string; demo: string; signIn: string; signUp: string };
   rights: string;
-  demoLink: string;
+  madeBy: { label: string; name: string; url: string; logoUrl: string };
 }
 
 export function getHeroVM(lang: Lang): HeroVM {
@@ -132,9 +137,24 @@ export function getCtaVM(lang: Lang): CtaVM {
 }
 
 export function getFooterVM(lang: Lang): FooterVM {
-  const f = getFooter();
+  // A published footer from before a field existed falls back to the bundled one, field by field.
+  const bundledFooter = getBundledFooter();
+  const f = { ...bundledFooter, ...getFooter() };
+  const groups = { ...bundledFooter.groups, ...f.groups };
+  const links = { ...bundledFooter.links, ...f.links };
+  const madeBy = { ...bundledFooter.madeBy, ...f.madeBy };
   return {
+    description: pickLang(f.description, lang),
+    groups: { product: pickLang(groups.product, lang), account: pickLang(groups.account, lang) },
+    links: {
+      features: pickLang(links.features, lang),
+      how: pickLang(links.how, lang),
+      pricing: pickLang(links.pricing, lang),
+      demo: pickLang(links.demo, lang),
+      signIn: pickLang(links.signIn, lang),
+      signUp: pickLang(links.signUp, lang),
+    },
     rights: pickLang(f.rights, lang),
-    demoLink: pickLang(f.demoLink, lang),
+    madeBy: { label: pickLang(madeBy.label, lang), name: madeBy.name, url: madeBy.url, logoUrl: resolveAssetUrl(madeBy.logoUrl) },
   };
 }
