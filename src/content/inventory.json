@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T04:28:17.223Z",
+  "generatedAt": "2026-09-29T04:29:37.918Z",
   "counts": {
     "lib": 21,
     "component": 29,
@@ -978,6 +978,11 @@
     },
     {
       "from": "components/LangLayout",
+      "to": "lib/paths",
+      "kind": "imports"
+    },
+    {
+      "from": "components/PageTransition",
       "to": "lib/paths",
       "kind": "imports"
     },

@@ -1,4 +1,4 @@
-import { ArrowRight, Languages, Home, LogIn, Menu, LayoutGrid, ListOrdered, Tag, Sparkles } from "lucide-react";
+import { Languages, Home, LogIn, Menu, LayoutGrid, ListOrdered, Tag, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -12,12 +12,12 @@ import { localizedPath, runLangSwitch, stripLangPrefix } from "@/lib/paths";
 import { appHref, newTab } from "@/lib/links";
 
 interface HeaderProps {
-  /** Replaces the Demo call-to-action (e.g. the demo page's assistant toggle). */
+  /** Page-specific action (e.g. the demo page's assistant toggle). */
   chatButton?: React.ReactNode;
 }
 
 interface NavItem {
-  key: "features" | "how" | "pricing";
+  key: "features" | "how" | "pricing" | "demo";
   Icon: LucideIcon;
   /** Home section id (scrolls there) or a page path. */
   section?: string;
@@ -28,6 +28,7 @@ const NAV: NavItem[] = [
   { key: "features", Icon: LayoutGrid, section: "features" },
   { key: "how", Icon: ListOrdered, section: "how" },
   { key: "pricing", Icon: Tag, path: "/pricing" },
+  { key: "demo", Icon: Sparkles, path: "/demo" },
 ];
 
 export function Header({ chatButton }: HeaderProps) {
@@ -36,7 +37,6 @@ export function Header({ chatButton }: HeaderProps) {
   const navigate = useNavigate();
   const { rest } = stripLangPrefix(pathname);
   const onHome = rest === "/";
-  const onDemo = rest.startsWith("/demo");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const chrome = tChrome(lang);
@@ -56,20 +56,18 @@ export function Header({ chatButton }: HeaderProps) {
   const isActive = (item: NavItem) => !!item.path && rest.startsWith(item.path);
 
   // On the home page a section link just scrolls; elsewhere the Landing page scrolls to the hash on load.
+  // The link of the page you're on scrolls back to its top (a new page starts there anyway).
   const onNavClick = (item: NavItem) => (e: React.MouseEvent) => {
     closeMobile();
     if (item.section && onHome) {
       e.preventDefault();
       document.getElementById(item.section)?.scrollIntoView({ behavior: "smooth" });
       window.history.replaceState(null, "", `#${item.section}`);
+    } else if (isActive(item)) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
-
-  const demoCta = !onDemo && (
-    <Link to={localizedPath(lang, "/demo")} className={buttonVariants({ size: "sm" })}>
-      {chrome.nav.demo} <ArrowRight className="h-4 w-4" />
-    </Link>
-  );
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 no-print">
@@ -110,7 +108,7 @@ export function Header({ chatButton }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {chatButton ?? <span className="hidden sm:inline-flex">{demoCta}</span>}
+          {chatButton}
           {/* The app is a separate site: sign-in opens it in a new tab. */}
           <a href={appHref(lang, "/login")} {...newTab} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}>
             <LogIn className="h-4 w-4" />
@@ -153,10 +151,6 @@ export function Header({ chatButton }: HeaderProps) {
                     {chrome.nav[item.key]}
                   </Link>
                 ))}
-                <Link to={localizedPath(lang, "/demo")} onClick={closeMobile} className={cn(buttonVariants({ variant: "ghost" }), "justify-start")}>
-                  <Sparkles className="h-4 w-4" />
-                  {chrome.nav.demo}
-                </Link>
                 <a href={appHref(lang, "/login")} {...newTab} onClick={closeMobile} className={cn(buttonVariants({ variant: "ghost" }), "justify-start")}>
                   <LogIn className="h-4 w-4" />
                   {chrome.nav.signIn}
