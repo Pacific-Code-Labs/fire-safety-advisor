@@ -113,6 +113,12 @@ export function ProjectCard({ data }: Props) {
           </div>
         )}
 
+        {project.risk && (
+          <p className="border-t border-border/60 pt-1.5 font-semibold">
+            {tr.risk_level_heading.replace("{level}", tr[`risk_level_${project.risk}`] ?? project.risk)}
+          </p>
+        )}
+
         {project.risk === "alto" && (
           <div className="flex items-center gap-1.5 border-t border-border/60 pt-1.5 text-[hsl(var(--risk-high))]">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />

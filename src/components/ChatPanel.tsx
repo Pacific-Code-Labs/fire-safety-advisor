@@ -165,6 +165,8 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
 
   // FCR-100 guided-demo state (refs avoid re-render churn / setState races).
   const demoNextRef = useRef<PromptKind | null>(null);
+  // Clarification answers belong to the same request stage and scenario.
+  const activeAskOptionsRef = useRef<AskOptions>({});
   const activeScenarioRef = useRef<DemoScenario | null>(null);
   const activeQueryRef = useRef<string>("");
   const demoEndedRef = useRef<boolean>(false);
@@ -243,7 +245,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
         const qs = norm.data.questions ?? [];
         if (qs.length > 0) {
           startQuestionFlow(qs, (summary) =>
-            ask(summary, { overrides: activeScenarioRef.current?.params }),
+            ask(summary, { ...activeAskOptionsRef.current, silent: false }),
           );
         }
         break;
@@ -346,6 +348,7 @@ export function ChatPanel({ buildingType, usage, areaM2, floors, occupants, ceil
   const ask = async (text: string, opts: AskOptions = {}) => {
     if (!text.trim() || isLoading) return;
     const { overrides, teaser, demoNext, demoStep, silent } = opts;
+    activeAskOptionsRef.current = opts;
     if (demoNext !== undefined) demoNextRef.current = demoNext;
 
     // Prior turns BEFORE appending the current question (FCR-042). The current

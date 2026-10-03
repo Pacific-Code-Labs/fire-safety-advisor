@@ -45,6 +45,7 @@ jobs:
         run: bash scripts/load-env-from-ssm.sh dev - --github-env
 
       # i18n + hard-coded-text checks, typecheck, vite build, SEO prerender, bundle check
+      - run: pnpm test
       - run: pnpm build
 
       - name: Disable Jekyll

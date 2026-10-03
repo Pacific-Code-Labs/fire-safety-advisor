@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-09-29T04:56:27.147Z",
+  "generatedAt": "2026-10-03T17:04:25.120Z",
   "counts": {
-    "lib": 22,
+    "lib": 24,
     "component": 30,
     "content": 14,
     "context": 3,
@@ -534,6 +534,20 @@
       "type": "service",
       "group": "service",
       "path": "src/services/sokolApi.ts"
+    },
+    {
+      "id": "test/ChatPanel.test",
+      "label": "ChatPanel.test",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/test/ChatPanel.test.tsx"
+    },
+    {
+      "id": "test/ResponseCards.test",
+      "label": "ResponseCards.test",
+      "type": "lib",
+      "group": "lib",
+      "path": "src/test/ResponseCards.test.tsx"
     },
     {
       "id": "test/setup",
@@ -1518,6 +1532,36 @@
     {
       "from": "services/sokolApi",
       "to": "config/publicApi",
+      "kind": "imports"
+    },
+    {
+      "from": "test/ChatPanel.test",
+      "to": "components/ChatPanel",
+      "kind": "imports"
+    },
+    {
+      "from": "test/ChatPanel.test",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "test/ResponseCards.test",
+      "to": "components/assistant/EvaluationCard",
+      "kind": "imports"
+    },
+    {
+      "from": "test/ResponseCards.test",
+      "to": "components/assistant/ProjectCard",
+      "kind": "imports"
+    },
+    {
+      "from": "test/ResponseCards.test",
+      "to": "lib/i18n",
+      "kind": "imports"
+    },
+    {
+      "from": "test/ResponseCards.test",
+      "to": "services/sokolApi",
       "kind": "imports"
     }
   ]

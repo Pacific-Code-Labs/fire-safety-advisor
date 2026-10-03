@@ -36,7 +36,7 @@ export function EvaluationCard({ data }: Props) {
           </div>
           <ul className="mt-1.5 space-y-1 text-muted-foreground">
             {data.matchedRules.map((r) => (
-              <li key={r.id}>• {r.title} — <span className="opacity-80">{r.description.slice(0, 80)}…</span></li>
+              <li key={r.id}>• {r.title} — <span className="opacity-80">{r.description}</span></li>
             ))}
           </ul>
         </div>
@@ -85,6 +85,12 @@ export function EvaluationCard({ data }: Props) {
       {!data.foundryUsed && (
         <p className="text-[11px] italic text-muted-foreground">
           {tr.eval_ai_unavailable}
+        </p>
+      )}
+
+      {data.risk && (
+        <p className="text-xs font-semibold">
+          {tr.risk_level_heading.replace("{level}", tr[`risk_level_${data.risk}`] ?? data.risk)}
         </p>
       )}
 
